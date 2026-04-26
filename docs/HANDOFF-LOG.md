@@ -7,15 +7,48 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA2 — prossimo sprint da definire
+- **Sprint corrente**: MA3 — Core Pages (primo sprint da definire)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
-- **Macro Area attiva**: MA2 — Database & Auth
+- **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 completata ✅ (12/12 sprint). Vercel production env vars corrette ✅ (puntano a DB production vlrvixndaeqcxftovzmw). TypeScript types placeholder (2 tabelle) — rigenerare con `npm run types:gen` prima di toccare tabelle non mappate in MA2.
+- **Note speciali**: MA1 completata ✅ (12/12 sprint). MA2 completata ✅ (tutti sprint). Vercel production env vars corrette ✅. TypeScript types completi ✅ (39 tabelle, commit 527faea). Endpoint `/api/v1/auth/session` funzionante in produzione ✅. E2E test confermato in browser ✅.
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 2.6.2 — useSession hook + /test-signup E2E page — MA2 CHIUSA
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente + output browser confermato)
+- **Output**:
+  - `lib/hooks/useSession.ts` — hook `useSession()` con `fetchSession()`, stati `idle/loading/ok/error`, chiama `POST /api/v1/auth/session` con JWT Privy da `getAccessToken()`
+  - `app/test-signup/page.tsx` — pagina E2E con Step 1 (Privy login), Step 2 (chiama endpoint), risposta JSON, checklist MA2
+  - `lib/hooks/__tests__/useSession.test.ts` — 4 test: idle, null-token, 200 ok, 401 error
+  - 21 test totali passati in 7 file, `npm run build` exit 0
+  - Commit `40f0517` pushato su `main`
+- **Test manuale browser confermato** (risposta reale da `/test-signup`):
+  ```json
+  {
+    "user": {
+      "id": "c624e595-9e95-4b0b-a986-ca7c51c53ad9",
+      "wallet_address": "0xAad9F27d3F2e57a2F2685d48A0e9d75dA4Fb0475",
+      "username": null,
+      "email": "felicianociccarelli1983@gmail.com",
+      "country_code": null,
+      "geo_block_status": "allowed",
+      "language": "en",
+      "onboarding_completed": false
+    },
+    "session": { "expires_at": "2026-05-03T16:57:32.928Z" }
+  }
+  ```
+- **Note**:
+  - `country_code: null` in dev (nessun header `cf-ipcountry` in locale) — comportamento corretto, fallback `'allowed'`
+  - RLS recursion ancora segnalata da Claude in VS Code come "pendente" — **già risolta**: Migration 013 SECURITY DEFINER applicata su staging e production. `createAdminClient` bypassa RLS in ogni caso.
+- **PR**: N/A
+
+---
 
 ### ✅ Sprint 2.6.1 — POST /api/v1/auth/session — Privy JWT + geo-block + upsert user
 

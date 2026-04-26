@@ -333,3 +333,42 @@
 .hover-lift:active {
   transform: scale(0.98);
 }
+
+/* ----------------------------------------------------------
+   THEME OVERRIDE — light mode via data-theme attribute
+   (manual toggle via Zustand store; coexiste con @media prefers-color-scheme)
+---------------------------------------------------------- */
+
+[data-theme='light'] {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-bg-tertiary: #f3f4f6;
+  --color-bg-elevated: #ffffff;
+  --color-text-primary: #0a0e1a;
+  --color-text-secondary: #4a5169;
+  --color-text-tertiary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-border-default: #e5e7eb;
+  --color-border-strong: #d1d5db;
+  --color-border-subtle: #f3f4f6;
+  --color-success: #059669;
+  --color-success-bg: #05966915;
+  --color-danger: #dc2626;
+  --color-danger-bg: #dc262615;
+  --color-cta: #3b82f6;
+  --color-cta-hover: #2563eb;
+  --color-cta-bg: #3b82f615;
+  --color-live: #dc2626;
+  --color-hot: #ea580c;
+  --color-info: #0891b2;
+  --color-warning: #d97706;
+  --color-warning-bg: #d9770615;
+}
+
+/* Disable animations toggle */
+.no-animations *,
+.no-animations *::before,
+.no-animations *::after {
+  animation-duration: 0ms !important;
+  transition-duration: 0ms !important;
+}
