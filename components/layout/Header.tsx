@@ -85,7 +85,7 @@ export function Header() {
         >
           {/* ── HAMBURGER (mobile only) ── */}
           <button
-            className="md:hidden"
+            className="flex md:hidden"
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Apri menu"
             style={{
@@ -96,7 +96,6 @@ export function Header() {
               cursor: 'pointer',
               padding: '8px',
               borderRadius: '6px',
-              display: 'flex',
               alignItems: 'center',
             }}
           >
@@ -260,7 +259,6 @@ export function Header() {
                 color: 'var(--color-text-tertiary)',
                 padding: '6px',
                 borderRadius: '6px',
-                display: 'flex',
                 alignItems: 'center',
               }}
             >
@@ -280,7 +278,6 @@ export function Header() {
                   color: 'var(--color-text-tertiary)',
                   padding: '6px',
                   borderRadius: '6px',
-                  display: 'flex',
                   alignItems: 'center',
                 }}
               >
