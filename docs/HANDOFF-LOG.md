@@ -7,16 +7,53 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: 1.4.2 (CORS Supabase) o 1.3.2 (Privy ↔ Supabase sync)
-- **Prossimo sprint**: l'altro tra i due sopra
+- **Sprint corrente**: 1.3.2 (Privy ↔ Supabase sync — upsert users al login)
+- **Prossimo sprint**: successivi MA1
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
-- **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata
+- **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata. Migration 013 fix RLS applicata da Cowork su staging + production.
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 1.4.2 — Setup Supabase client browser + server + admin
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente)
+- **Output**:
+  - `@supabase/supabase-js@2.104.1` + `@supabase/ssr@0.10.2` installati
+  - `lib/supabase/client.ts` — browser client via `createBrowserClient`
+  - `lib/supabase/server.ts` — server client con cookie handling (Next.js App Router)
+  - `lib/supabase/admin.ts` — service_role client per bypass RLS
+  - `lib/supabase/index.ts` — barrel export solo client browser (server/admin esclusi per Turbopack)
+  - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`
+  - `lib/supabase/__tests__/client.test.ts` — 2 test env vars
+  - `app/test-supabase/page.tsx` — pagina verifica connessione live
+  - 11/11 test passati, `npm run build` exit 0 (5 route static), `npm run validate` exit 0
+  - Commit `9ee3515` pushato su `main`
+- **Deviazioni dal prompt**:
+  - `lib/supabase/index.ts` non re-esporta `server.ts`/`admin.ts` (Turbopack bundla `next/headers` lato client → build fail)
+  - `vitest.config.ts`: aggiunto `loadEnv(mode, cwd, '')` per popolare `process.env` nei test
+- **Note**:
+  - `/test-supabase` mostra connessione ok ma query `achievements` falliva per bug RLS (infinite recursion `42P17`)
+  - **Bug RLS fixato da Cowork** (vedi entry sotto — migration 013)
+- **PR**: N/A
+
+### ✅ DB Fix — Migration 013: fix RLS infinite recursion admin_users (fuori-sprint, Cowork)
+
+- **Chiuso**: 2026-04-26
+- **Eseguito da**: Cowork direttamente via Supabase MCP
+- **Output**:
+  - Creata `public.get_admin_role(uid uuid)` — `SECURITY DEFINER` function che legge `admin_users` bypassando RLS
+  - Riscritta la policy self-referenziale su `admin_users` stessa
+  - Riscritte 16 policy su 15 tabelle che referenziavano `admin_users` direttamente
+  - Applicata su staging (`hhuwxcijarcyivwzpqfp`) e production (`vlrvixndaeqcxftovzmw`)
+  - Verifica: `SELECT id, name FROM achievements LIMIT 3` → 3 risultati su entrambi i DB
+- **Causa root**: le policy su tutte le tabelle facevano `SELECT role FROM admin_users` → la policy di `admin_users` stessa interrogava di nuovo `admin_users` → ricorsione infinita (Postgres error `42P17`)
+- **Fix**: `SECURITY DEFINER` bypassa RLS quando la funzione legge `admin_users`, spezzando il ciclo
+- **PR**: N/A
 
 ### ✅ Sprint 1.4.1 — Configurazione Vercel — vercel.json + metadata produzione
 
@@ -203,7 +240,7 @@
 
 | MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
 | --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
-| MA1 | Foundation & Setup            | 8                 | 12            | ⏳ In corso                              |
+| MA1 | Foundation & Setup            | 9                 | 12            | ⏳ In corso                              |
 | MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
 | MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
 | MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
@@ -212,7 +249,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
 
-**Totale sprint**: 8 / 92
+**Totale sprint**: 9 / 92
 
 ---
 
