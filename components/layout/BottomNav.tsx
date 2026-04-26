@@ -17,7 +17,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="md:hidden"
+      className="md:hidden flex"
       style={{
         position: 'fixed',
         bottom: 0,
@@ -25,9 +25,14 @@ export function BottomNav() {
         right: 0,
         background: 'var(--color-bg-secondary)',
         borderTop: '1px solid var(--color-border-default)',
-        display: 'flex',
         zIndex: 50,
         paddingBottom: 'env(safe-area-inset-bottom)',
+        /* GPU layer promotion — previene jitter durante scroll su mobile */
+        transform: 'translateZ(0)',
+        WebkitTransform: 'translateZ(0)',
+        willChange: 'transform',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
       }}
     >
       {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
