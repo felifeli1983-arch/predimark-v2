@@ -19,7 +19,13 @@ export default function TestSupabasePage() {
         setInfo(JSON.stringify(data, null, 2))
       } catch (err) {
         setStatus('error')
-        setInfo(err instanceof Error ? err.message : String(err))
+        if (err instanceof Error) {
+          setInfo(err.message)
+        } else if (err && typeof err === 'object') {
+          setInfo(JSON.stringify(err, null, 2))
+        } else {
+          setInfo(String(err))
+        }
       }
     }
 
