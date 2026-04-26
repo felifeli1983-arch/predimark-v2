@@ -93,9 +93,6 @@ export function EventCardHeader({
             color: 'var(--color-text-primary)',
             wordBreak: 'break-word',
             overflow: 'hidden',
-            /* Riserva sempre 2 righe, anche con titolo breve, così tags
-             * restano alla stessa Y. */
-            minHeight: '2.6em',
           }}
         >
           {title}

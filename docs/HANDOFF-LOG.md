@@ -19,7 +19,7 @@
 
 | Fix                  | File                                               | Priorità | Problema                                                                       |
 | -------------------- | -------------------------------------------------- | -------- | ------------------------------------------------------------------------------ |
-| `PROMPT-FIX-3.1.1-A` | `lib/stores/themeStore.ts` + Header                | 🔴 ALTA  | REAL/DEMO toggle non persiste (useState locale → deve essere Zustand)          |
+| `PROMPT-FIX-3.1.1-B` | `lib/stores/themeStore.ts` + Header                | 🔴 ALTA  | REAL/DEMO toggle non persiste (useState locale → deve essere Zustand)          |
 | `PROMPT-FIX-3.3.1-A` | `EventCardHeader.tsx` + `HeroCard.tsx`             | 🔴 ALTA  | `<img>` raw invece di `next/image` (violazione Doc 5 + performance)            |
 | `PROMPT-FIX-3.3.3-A` | `mappers.test.ts`                                  | ✅ DONE  | Test outcomes[] — già eseguito commit c53a604                                  |
 | `PROMPT-FIX-3.4.1-A` | `HeroZone.tsx`                                     | 🔴 ALTA  | Hero carousel mobile mancante (stack verticale invece di swipe carousel)       |
