@@ -227,7 +227,15 @@
     color-scheme: dark light;
   }
 
+  html {
+    height: 100%;
+    scroll-behavior: smooth;
+    /* Previene flash di scroll quando si apre un modal */
+    overflow-y: scroll;
+  }
+
   body {
+    min-height: 100dvh;
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
     font-family: var(--font-sans);
@@ -235,6 +243,9 @@
     line-height: var(--leading-normal);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Previene jank da scroll momentum su iOS */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
   }
 
   *:focus-visible {

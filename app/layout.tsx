@@ -49,8 +49,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ReactQueryProvider>
           <PrivyProvider>
             <ThemeProvider>
-              <Header />
-              <main style={{ paddingBottom: '64px' }}>{children}</main>
+              {/*
+               * App shell — flex column che occupa sempre almeno l'intera viewport.
+               * Header sticky in cima, main cresce per riempire lo spazio disponibile,
+               * BottomNav fixed in fondo (solo mobile).
+               */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: '100dvh',
+                  background: 'var(--color-bg-primary)',
+                }}
+              >
+                <Header />
+                <main className="pb-16 md:pb-0" style={{ flex: 1 }}>
+                  {children}
+                </main>
+              </div>
               <BottomNav />
             </ThemeProvider>
           </PrivyProvider>
