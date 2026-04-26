@@ -7,15 +7,34 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.4 (EventCard Crypto Up/Down)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.4.1 (Home page layout completo)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 ✅. Step 3.2 WS ✅. Sprint 3.3.1/3.3.2/3.3.3 EventCard ✅. Prossimo: Fix 3.3.3-A (test outcomes[]) → 3.3.4 Crypto → 3.4.1 Home.
+- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 ✅. Step 3.2 WS ✅. Step 3.3 tutte e 5 le EventCard ✅ (40/40 test). Prossimo: 3.4.1 Home layout completo.
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 3.3.4 — EventCard Crypto Up/Down
+
+- **Chiuso**: 2026-04-26
+- **Commit**: `c3326a3` — feat: EventCard Crypto Up/Down — live prices + countdown + betting feed (3.3.4)
+- **Output**:
+  - `components/markets/charts/Thermometer.tsx` (67 righe) — SVG verticale Up/Down, pure component, nessun hook. Riceve `upProbability` come prop. Linea tratteggiata al 50% come riferimento
+  - `lib/hooks/useCountdown.ts` (63 righe) — `'use client'`, aggiorna ogni 1s via `setInterval`, cleanup su unmount, formato `MM:SS` / `HH:MM:SS`, `expired` flag
+  - `components/markets/cards/CryptoCard.tsx` (273 righe) — card completa: `useCryptoLivePrice` + `useLiveMidpoint` (fallback a `yesPrice` statico se WS non connesso) + `useLiveActivity` (live betting feed, 1 trade) + `useCountdown` + auto-refresh 30s via `fetchEventById`. Source `chainlink` se round ≤30min, `binance` altrimenti. `extractSymbol` regex per btc/eth/sol
+  - `components/markets/EventCard.tsx` aggiornato — `crypto_up_down` → `CryptoCard`. **Nessun PlaceholderCard rimasto** — tutti e 5 i CardKind hanno variante reale
+- **Acceptance criteria**: tutti ✅ — prezzo live ✅, prob live con fallback ✅, countdown con cleanup ✅, betting feed ✅, auto-refresh ✅, source selection ✅, Thermometer pure ✅, nessun hardcoded ✅, `tsc --noEmit` exit 0 ✅, 40/40 test ✅
+- **PR**: N/A
+
+### ✅ Fix 3.3.3-A — Test AuktoraMarket.outcomes[]
+
+- **Chiuso**: 2026-04-26
+- **Commit**: `c53a604` — test: AuktoraMarket.outcomes[] coverage — fix 3.3.3-A
+- **Output**: 2 nuovi test in `lib/polymarket/__tests__/mappers.test.ts` — outcomes 2-way (Yes/No + prezzi) e 3-way (Lakers/Draw/Celtics + retrocompatibilità yesPrice/noPrice). Totale test: 19 mappers (era 17), 40 totali
+- **PR**: N/A
 
 ### ✅ Sprint 3.3.3 — EventCard H2H Sport
 
