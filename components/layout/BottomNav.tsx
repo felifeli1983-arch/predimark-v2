@@ -79,7 +79,7 @@ export function BottomNav() {
         style={{
           flexShrink: 0,
           background: 'var(--color-bg-secondary)',
-          borderTop: '1px solid var(--color-border-default)',
+          borderTop: '1px solid var(--color-border-subtle)',
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >

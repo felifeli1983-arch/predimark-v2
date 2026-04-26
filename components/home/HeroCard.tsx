@@ -70,7 +70,7 @@ export function HeroCard({ event, size = 'small' }: Props) {
         textDecoration: 'none',
         color: 'inherit',
         background: `linear-gradient(135deg, ${accent} 0%, var(--color-bg-secondary) 90%)`,
-        border: '1px solid var(--color-border-default)',
+        border: '1px solid var(--color-border-subtle)',
         cursor: 'pointer',
       }}
     >

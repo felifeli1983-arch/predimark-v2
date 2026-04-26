@@ -33,7 +33,7 @@ export function MobileDrawer({ open, onClose, pathname }: Props) {
           bottom: 0,
           width: '280px',
           background: 'var(--color-bg-secondary)',
-          borderRight: '1px solid var(--color-border-default)',
+          borderRight: '1px solid var(--color-border-subtle)',
           display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',

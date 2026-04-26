@@ -83,7 +83,7 @@ export function EventCardFooter({
             alignItems: 'center',
             gap: 4,
             background: 'var(--color-bg-elevated)',
-            border: '1px solid var(--color-border-default)',
+            border: '1px solid var(--color-border-subtle)',
             color: 'var(--color-text-secondary)',
             borderRadius: 6,
             padding: '4px 8px',

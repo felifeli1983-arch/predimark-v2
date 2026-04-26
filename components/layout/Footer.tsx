@@ -25,7 +25,7 @@ const langButtonStyle: React.CSSProperties = {
   fontSize: '12px',
   color: 'var(--color-text-muted)',
   background: 'var(--color-bg-tertiary)',
-  border: '1px solid var(--color-border-default)',
+  border: '1px solid var(--color-border-subtle)',
   borderRadius: '6px',
   padding: '4px 10px',
   cursor: 'not-allowed',

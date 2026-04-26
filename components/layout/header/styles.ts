@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react'
 export const HEADER_OUTER: CSSProperties = {
   flexShrink: 0,
   background: 'var(--color-bg-primary)',
-  borderBottom: '1px solid var(--color-border-default)',
+  borderBottom: '1px solid var(--color-border-subtle)',
   zIndex: 50,
   position: 'relative',
 }

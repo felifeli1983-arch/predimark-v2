@@ -25,7 +25,7 @@ const cardStyle: React.CSSProperties = {
   flexDirection: 'column',
   height: CARD_HEIGHT,
   background: 'var(--color-bg-secondary)',
-  border: '1px solid var(--color-border-default)',
+  border: '1px solid var(--color-border-subtle)',
   borderRadius: 12,
   overflow: 'hidden',
   textDecoration: 'none',
