@@ -4,6 +4,7 @@ import { NavTabs } from '@/components/home/NavTabs'
 import { HeroZone } from '@/components/home/HeroZone'
 import { MarketsSection } from '@/components/home/MarketsSection'
 import { Sidebar } from '@/components/home/Sidebar'
+import { MobileSidebarRails } from '@/components/home/MobileSidebarRails'
 
 interface SearchParams {
   category?: string
@@ -41,6 +42,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       >
         <main style={{ minWidth: 0 }}>
           <HeroZone events={heroEvents} />
+          <MobileSidebarRails />
           <MarketsSection initialEvents={filtered} />
         </main>
         <div style={{ padding: '12px 16px 0 0' }}>
