@@ -18,8 +18,10 @@ export function DonutChart({ probability, size = 80, strokeWidth = 10, color }: 
   const label = isYes ? 'Yes' : 'No'
   const percent = Math.round(clamped * 100)
 
-  const pctFontSize = Math.round(size * 0.26)
-  const labelFontSize = Math.round(size * 0.14)
+  // Font ridotti di 2 punti per evitare che debordino dal cerchio
+  // (size 80 → percentuale 18px, label 9px)
+  const pctFontSize = Math.round(size * 0.22)
+  const labelFontSize = Math.round(size * 0.12)
 
   return (
     <svg
