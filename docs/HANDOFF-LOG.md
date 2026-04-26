@@ -7,15 +7,53 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: prossimo sprint MA1 da decidere
+- **Sprint corrente**: MA2 — prossimo sprint da definire
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
-- **Macro Area attiva**: MA1 — Foundation & Setup
+- **Macro Area attiva**: MA2 — Database & Auth
 - **Blockers attivi**: nessuno
-- **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata. Migration 013 + 014 applicate da Cowork.
+- **Note speciali**: MA1 completata ✅ (12/12 sprint). Vercel production env vars corrette ✅ (puntano a DB production vlrvixndaeqcxftovzmw). TypeScript types placeholder (2 tabelle) — rigenerare con `npm run types:gen` prima di toccare tabelle non mappate in MA2.
 
 ---
 
 ## Sprint completati
+
+### ✅ Fix Vercel Production Env Vars (fuori-sprint, post MA1)
+
+- **Chiuso**: 2026-04-26
+- **Eseguito da**: Claude in VS Code via Vercel CLI
+- **Output**:
+  - Rimosse: `NEXT_PUBLIC_SUPABASE_URL_STAGING`, `NEXT_PUBLIC_SUPABASE_ANON_KEY_STAGING` da Production
+  - Aggiunte su Production: `NEXT_PUBLIC_SUPABASE_URL` (→ vlrvixndaeqcxftovzmw), `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `PRIVY_APP_SECRET`, `NEXT_PUBLIC_APP_URL` (→ auktora.com)
+  - Commit `42c9d99` (empty) pushato → Vercel auto-deploy su `main`
+- **Env vars Production finali** (da `vercel env ls production`):
+  - `NEXT_PUBLIC_SUPABASE_URL` ✅ production
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY` ✅ production
+  - `SUPABASE_SERVICE_ROLE_KEY` ✅ production
+  - `PRIVY_APP_SECRET` ✅ production
+  - `NEXT_PUBLIC_APP_URL` ✅ production
+  - `NEXT_PUBLIC_PRIVY_APP_ID` ✅ production+preview
+- **Incidente**: `commander v14.0.3` (dep transitiva di lint-staged) era corrotta in `node_modules` — probabilmente da scrittura concorrente durante `npx vercel` + `npm install` paralleli. Fix: `rm -rf node_modules/commander && npm install commander && npm uninstall commander`. `package.json` tornato pulito (zero diff vs HEAD).
+- **PR**: N/A
+
+### ✅ Sprint 1.4.3 — TypeScript types Supabase + clienti tipati
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente + commit confermato)
+- **Output**:
+  - `lib/supabase/database.types.ts` — tipo `Database` con `users` (24 colonne) + `achievements` + helpers `Tables/TablesInsert/TablesUpdate/Enums/Constants`
+  - `lib/supabase/client.ts` — `createBrowserClient<Database>`
+  - `lib/supabase/server.ts` — `createServerClient<Database>`
+  - `lib/supabase/admin.ts` — `createClient<Database>`
+  - `lib/actions/syncUser.ts` — payload usa `TablesInsert<'users'>` (zero `any` impliciti)
+  - `package.json` — script `types:gen` aggiunto
+  - 13 test passati, `npm run build` exit 0 (5 route static), `npm run validate` exit 0
+  - Commit `e8d1af3` pushato su `main` (8 file, +821/-19)
+- **Deviazioni dal prompt**:
+  - `npx supabase gen types` richiede `supabase login` interattivo (non eseguibile da Claude in VS Code senza token). Usato fallback strutturale dal prompt che mappa `users` (24 col) + `achievements`. Corretto e atteso.
+- **Note**:
+  - I tipi coprono solo `users` e `achievements`. Per MA2 con tabelle `markets`, `positions`, `trades` ecc. servirà rigenerare: `npx supabase login` (una tantum, browser) → `npm run types:gen`
+  - Vercel env vars (Step 7): da verificare manualmente su dashboard — Vercel MCP non supporta account personali (richiede team Pro)
+- **PR**: N/A
 
 ### ✅ Sprint 1.3.2 — Privy ↔ Supabase sync — upsert users al login
 
@@ -265,7 +303,7 @@
 
 | MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
 | --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
-| MA1 | Foundation & Setup            | 10                | 12            | ⏳ In corso                              |
+| MA1 | Foundation & Setup            | 12                | 12            | ✅ Completata                            |
 | MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
 | MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
 | MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
@@ -274,7 +312,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
 
-**Totale sprint**: 10 / 92
+**Totale sprint**: 12 / 92
 
 ---
 
