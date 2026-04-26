@@ -16,23 +16,20 @@ export function BottomNav() {
   const pathname = usePathname()
 
   return (
+    /*
+     * PWA: BottomNav è in flow nel flex column dell'app shell.
+     * NON usa position:fixed — è sempre in fondo perché il flex column
+     * spinge <main> a riempire lo spazio rimasto. Zero jank garantito.
+     * md:hidden nasconde su desktop (≥768px).
+     */
     <nav
-      className="md:hidden flex"
+      className="md:hidden"
       style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        flexShrink: 0,
+        display: 'flex',
         background: 'var(--color-bg-secondary)',
         borderTop: '1px solid var(--color-border-default)',
-        zIndex: 50,
         paddingBottom: 'env(safe-area-inset-bottom)',
-        /* GPU layer promotion — previene jitter durante scroll su mobile */
-        transform: 'translateZ(0)',
-        WebkitTransform: 'translateZ(0)',
-        willChange: 'transform',
-        backfaceVisibility: 'hidden',
-        WebkitBackfaceVisibility: 'hidden',
       }}
     >
       {NAV_ITEMS.map(({ href, icon: Icon, label }) => {

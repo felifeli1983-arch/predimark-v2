@@ -50,24 +50,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PrivyProvider>
             <ThemeProvider>
               {/*
-               * App shell — flex column che occupa sempre almeno l'intera viewport.
-               * Header sticky in cima, main cresce per riempire lo spazio disponibile,
-               * BottomNav fixed in fondo (solo mobile).
+               * PWA App Shell — struttura rigida a schermo intero.
+               * html + body = overflow:hidden (non scrollano mai).
+               * Solo <main> scrolla — Header e BottomNav sono in flow, sempre visibili.
+               * Nessun position:fixed → zero jank su mobile.
                */}
               <div
                 style={{
+                  height: '100dvh',
                   display: 'flex',
                   flexDirection: 'column',
-                  minHeight: '100dvh',
+                  overflow: 'hidden',
                   background: 'var(--color-bg-primary)',
                 }}
               >
                 <Header />
-                <main className="pb-16 md:pb-0" style={{ flex: 1 }}>
+                <main
+                  style={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    overscrollBehavior: 'contain',
+                  }}
+                >
                   {children}
                 </main>
+                <BottomNav />
               </div>
-              <BottomNav />
             </ThemeProvider>
           </PrivyProvider>
         </ReactQueryProvider>
