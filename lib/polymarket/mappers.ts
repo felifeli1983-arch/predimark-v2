@@ -8,12 +8,26 @@ export type CardKind =
   | 'h2h_sport' // 2 outcomes, titoli tipo "Team A vs Team B"
   | 'crypto_up_down' // binary su crypto price, ha round con scadenza
 
+/** Singolo outcome di un mercato (es. "Yes", "No", "Lakers", "Draw", "≥$130k") */
+export interface AuktoraOutcome {
+  name: string
+  /** Probabilità implicita 0-1 */
+  price: number
+}
+
 export interface AuktoraMarket {
   id: string
   question: string
   slug: string
-  yesPrice: number // 0-1
-  noPrice: number
+  yesPrice: number // 0-1, alias di outcomes[0].price
+  noPrice: number // alias di outcomes[1].price
+  /**
+   * Tutti gli outcome del mercato.
+   * - Binary: 2 elementi (Yes/No)
+   * - H2H sport: 2 (Team A / Team B) o 3 (con Draw)
+   * - Multi-strike: nome è la soglia
+   */
+  outcomes: AuktoraOutcome[]
   volume: number
   liquidity: number
   endDate: Date
@@ -101,9 +115,17 @@ export function classifyEvent(event: GammaEvent): CardKind {
 }
 
 export function mapGammaMarket(raw: GammaMarket): AuktoraMarket {
-  const prices = safeParseJsonArray(raw.outcomePrices)
-  const yesPrice = prices[0] ? parseFloat(prices[0]) : 0
-  const noPrice = prices[1] ? parseFloat(prices[1]) : 0
+  const names = safeParseJsonArray(raw.outcomes)
+  const priceStrings = safeParseJsonArray(raw.outcomePrices)
+
+  const outcomes: AuktoraOutcome[] = names.map((name, i) => {
+    const priceStr = priceStrings[i]
+    const price = priceStr ? parseFloat(priceStr) : 0
+    return { name, price: Number.isFinite(price) ? price : 0 }
+  })
+
+  const yesPrice = outcomes[0]?.price ?? 0
+  const noPrice = outcomes[1]?.price ?? 0
 
   let clobTokenIds: [string, string] | null = null
   if (raw.clobTokenIds) {
@@ -117,8 +139,9 @@ export function mapGammaMarket(raw: GammaMarket): AuktoraMarket {
     id: raw.id,
     question: raw.question,
     slug: raw.slug,
-    yesPrice: Number.isFinite(yesPrice) ? yesPrice : 0,
-    noPrice: Number.isFinite(noPrice) ? noPrice : 0,
+    yesPrice,
+    noPrice,
+    outcomes,
     volume: parseFloat(raw.volume) || 0,
     liquidity: parseFloat(raw.liquidity) || 0,
     endDate: new Date(raw.endDate),

@@ -5,6 +5,7 @@ import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { BinaryCard } from './cards/BinaryCard'
 import { MultiOutcomeCard } from './cards/MultiOutcomeCard'
 import { MultiStrikeCard } from './cards/MultiStrikeCard'
+import { H2HCard } from './cards/H2HCard'
 
 interface EventCardProps {
   event: AuktoraEvent
@@ -59,7 +60,9 @@ export function EventCard({ event, onBookmark, onAddToSlip }: EventCardProps) {
       {event.kind === 'multi_strike' && (
         <MultiStrikeCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
       )}
-      {event.kind === 'h2h_sport' && <PlaceholderCard label="H2H Sport — coming soon" />}
+      {event.kind === 'h2h_sport' && (
+        <H2HCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
+      )}
       {event.kind === 'crypto_up_down' && <PlaceholderCard label="Crypto — coming soon" />}
     </Link>
   )

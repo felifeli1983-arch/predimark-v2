@@ -7,15 +7,29 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.2 (EventCard Multi-outcome + Multi-strike)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.3 (EventCard H2H Sport)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout ✅. Step 3.2 Polymarket API + WS layer ✅ (3.2.1/3.2.3/3.2.4). Sprint 3.3.1 EventCard Binary ✅. Prossimo: 3.3.2 → 3.3.3 → 3.3.4 card → 3.4.1 Home layout. Badge Slip rinviato a MA4.
+- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout ✅. Step 3.2 WS layer completo ✅. Sprint 3.3.1/3.3.2 EventCard ✅. Prossimo: 3.3.3 H2H → 3.3.4 Crypto → 3.4.1 Home layout. Badge Slip rinviato a MA4.
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 3.3.2 — EventCard Multi-outcome + Multi-strike
+
+- **Chiuso**: 2026-04-26
+- **Commit**: `febb39b` — feat: EventCard Multi-outcome + Multi-strike variants (3.3.2)
+- **Output**:
+  - `components/markets/cards/MultiOutcomeCard.tsx` (145 righe) — top 3 outcome per `yesPrice` desc, barra orizzontale proporzionale, `+ N altri →`. Euristica `looksLikeDate` per variante 2b: se ≥50% label top sembrano date → `showEndDate=false` nel footer
+  - `components/markets/cards/MultiStrikeCard.tsx` (173 righe) — top 4 soglie per strike value desc (`extractStrike` regex su `$130,000`/`100k`/`$1.5M`/`2B`). Soglia "corrente" (prima con `yesPrice>0.5`) highlighted con `color-success` + bold. `showEndDate=false` sempre (Pattern 2)
+  - `components/markets/EventCard.tsx` aggiornato — `multi_outcome` → `MultiOutcomeCard`, `multi_strike` → `MultiStrikeCard`. Placeholder rimasto solo per `h2h_sport` e `crypto_up_down`
+- **Acceptance criteria**: tutti ✅ — sort desc ✅, `+ N altri →` ✅, variante 2b no endDate ✅, highlighted current strike ✅, Pattern 2 no endDate ✅, `stopPropagation` sui click outcome/strike ✅, nessun colore hardcoded ✅, nessun `display` inline su elementi responsive ✅, `tsc --noEmit` exit 0 ✅, 38/38 test ✅
+- **Decisioni**:
+  - `onAddToSlip` riceve `marketId` (non `'yes'/'no'`) — ogni outcome/strike è un mercato distinto con il proprio id
+  - Il click su outcome/strike chiama `onAddToSlip` ma non naviga — `preventDefault + stopPropagation` evita il Link wrapper
+- **PR**: N/A
 
 ### ✅ Sprint 3.2.4 — WebSocket RTDS singleton
 
