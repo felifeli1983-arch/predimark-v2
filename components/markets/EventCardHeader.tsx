@@ -70,17 +70,15 @@ export function EventCardHeader({
       {/* Title + tags */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <h3
+          className="line-clamp-2"
           style={{
             margin: 0,
             fontSize: 14,
             fontWeight: 600,
             lineHeight: 1.3,
             color: 'var(--color-text-primary)',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
+            wordBreak: 'break-word',
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
           }}
         >
           {title}
