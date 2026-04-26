@@ -23,6 +23,8 @@ export function formatEndDate(date: Date): string {
   if (!(date instanceof Date) || Number.isNaN(date.getTime())) return ''
   const now = Date.now()
   const diff = date.getTime() - now
+  // Past markets: don't surface a misleading "Closes <past-date>" — caller hides the row.
+  if (diff < -ONE_DAY_MS) return ''
   if (diff < ONE_DAY_MS && diff > -ONE_DAY_MS) return 'Today'
   if (diff >= ONE_DAY_MS && diff < 2 * ONE_DAY_MS) return 'Tomorrow'
   if (diff > 0 && diff < 7 * ONE_DAY_MS) {

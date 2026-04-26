@@ -67,6 +67,8 @@ export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
           flexDirection: 'column',
           gap: 12,
           flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
           justifyContent: 'center',
         }}
       >

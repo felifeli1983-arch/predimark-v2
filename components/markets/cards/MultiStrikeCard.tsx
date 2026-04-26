@@ -55,7 +55,7 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
       />
 
-      <div style={{ padding: '4px 12px 8px', flex: 1 }}>
+      <div style={{ padding: '4px 12px 8px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         {top.map((m, i) => (
           <StrikeRow
             key={m.id}
@@ -81,7 +81,6 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
       <EventCardFooter
         volume={event.totalVolume}
         endDate={event.endDate}
-        showEndDate={false}
         onAddToSlip={onAddToSlip && top[0] ? () => onAddToSlip(event.id, top[0]!.id) : undefined}
       />
     </div>

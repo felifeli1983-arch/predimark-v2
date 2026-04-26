@@ -31,13 +31,15 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
         style={{
           padding: '8px 12px 12px',
           alignItems: 'center',
-          gap: 12,
+          gap: 8,
           flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
           justifyContent: 'center',
         }}
         className="flex flex-col"
       >
-        <DonutChart probability={yesPrice} size={80} />
+        <DonutChart probability={yesPrice} size={70} />
 
         <div className="flex w-full" style={{ gap: 8 }}>
           <button

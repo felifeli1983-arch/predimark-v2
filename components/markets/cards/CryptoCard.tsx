@@ -108,94 +108,104 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
       />
 
-      <div style={{ padding: '8px 12px 12px', display: 'flex', gap: 12, flex: 1 }}>
-        {/* Sezione sinistra: prezzi + bottoni */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
-          {/* Prezzo target */}
-          <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
-            Battere:{' '}
-            <strong
-              style={{ color: 'var(--color-text-primary)', fontVariantNumeric: 'tabular-nums' }}
-            >
-              {formatUsd(target)}
-            </strong>
-          </div>
-
-          {/* Prezzo live + delta */}
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              fontVariantNumeric: 'tabular-nums',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            {formatUsd(livePrice)}
-            {livePriceDelta !== null && (
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: livePriceDelta >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
-                }}
-              >
-                {livePriceDelta >= 0 ? '↗' : '↘'} {livePriceDelta >= 0 ? '+' : ''}
-                {livePriceDelta.toFixed(2)}
-              </span>
-            )}
-          </div>
-
-          {/* Bottoni Up/Down */}
-          <div style={{ display: 'flex', gap: 6 }}>
-            <ActionButton
-              label="Up"
-              icon={<TrendingUp size={11} />}
-              percent={upPct}
-              variant="up"
-              lastAmount={lastTrade?.side === 'BUY' ? lastTrade.amount : null}
-              onClick={onAddToSlip ? () => onAddToSlip(event.id, market?.id ?? 'yes') : undefined}
-            />
-            <ActionButton
-              label="Down"
-              icon={<TrendingDown size={11} />}
-              percent={downPct}
-              variant="down"
-              lastAmount={lastTrade?.side === 'SELL' ? lastTrade.amount : null}
-              onClick={onAddToSlip ? () => onAddToSlip(event.id, market?.id ?? 'no') : undefined}
-            />
-          </div>
-        </div>
-
-        {/* Sezione destra: termometro */}
-        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-          <Thermometer upProbability={upProb} />
-        </div>
-      </div>
-
-      {/* Countdown */}
       <div
         style={{
-          padding: '6px 12px',
+          padding: '8px 12px',
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: 'column',
           gap: 6,
-          fontSize: 11,
-          color: expired ? 'var(--color-danger)' : 'var(--color-text-muted)',
-          borderTop: '1px solid var(--color-border-subtle)',
-          fontVariantNumeric: 'tabular-nums',
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
         }}
       >
-        <Clock size={11} />
-        {expired ? 'Round terminato — caricamento prossimo…' : `Round termina in ${countdownText}`}
+        <div style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0 }}>
+          {/* Sezione sinistra: prezzi + bottoni */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
+            {/* Prezzo target */}
+            <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
+              Battere:{' '}
+              <strong
+                style={{ color: 'var(--color-text-primary)', fontVariantNumeric: 'tabular-nums' }}
+              >
+                {formatUsd(target)}
+              </strong>
+            </div>
+
+            {/* Prezzo live + delta */}
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--color-text-primary)',
+                fontVariantNumeric: 'tabular-nums',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              {formatUsd(livePrice)}
+              {livePriceDelta !== null && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: livePriceDelta >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
+                  }}
+                >
+                  {livePriceDelta >= 0 ? '↗' : '↘'} {livePriceDelta >= 0 ? '+' : ''}
+                  {livePriceDelta.toFixed(2)}
+                </span>
+              )}
+            </div>
+
+            {/* Bottoni Up/Down */}
+            <div style={{ display: 'flex', gap: 6 }}>
+              <ActionButton
+                label="Up"
+                icon={<TrendingUp size={11} />}
+                percent={upPct}
+                variant="up"
+                lastAmount={lastTrade?.side === 'BUY' ? lastTrade.amount : null}
+                onClick={onAddToSlip ? () => onAddToSlip(event.id, market?.id ?? 'yes') : undefined}
+              />
+              <ActionButton
+                label="Down"
+                icon={<TrendingDown size={11} />}
+                percent={downPct}
+                variant="down"
+                lastAmount={lastTrade?.side === 'SELL' ? lastTrade.amount : null}
+                onClick={onAddToSlip ? () => onAddToSlip(event.id, market?.id ?? 'no') : undefined}
+              />
+            </div>
+          </div>
+
+          {/* Sezione destra: termometro */}
+          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+            <Thermometer upProbability={upProb} />
+          </div>
+        </div>
+
+        {/* Countdown — dentro il body, senza divider proprio */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 10,
+            color: expired ? 'var(--color-danger)' : 'var(--color-text-muted)',
+            fontVariantNumeric: 'tabular-nums',
+            flexShrink: 0,
+          }}
+        >
+          <Clock size={10} />
+          {expired ? 'Round terminato' : `Round termina in ${countdownText}`}
+        </div>
       </div>
 
       <EventCardFooter
         volume={event.totalVolume}
         endDate={event.endDate}
-        showEndDate={false}
         onAddToSlip={onAddToSlip ? () => onAddToSlip(event.id, market?.id ?? '') : undefined}
       />
     </div>
