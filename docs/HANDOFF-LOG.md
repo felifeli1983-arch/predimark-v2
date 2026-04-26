@@ -7,15 +7,32 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.2 (MultiOutcome + MultiStrike cards) oppure 3.4.1 (Home layout completo)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.2.4 (WebSocket RTDS)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout globale ✅. Step 3.2 Polymarket API ✅. Sprint 3.3.1 EventCard Binary ✅ — Home page ora mostra griglia reale Polymarket. Rename Predimark→Auktora ✅. Fix tema dark/light ✅. Badge Slip rinviato a MA4 (richiede slipStore). WebSocket (3.2.3/3.2.4) rinviato a prima di Sprint 3.3.4 (Crypto card — unica variante che richiede prezzi live).
+- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout globale ✅. Step 3.2 Polymarket API ✅. Sprint 3.2.3 WebSocket CLOB ✅. Sprint 3.3.1 EventCard Binary ✅. Rename→Auktora ✅. Fix tema ✅. Badge Slip rinviato a MA4. Prossimo: 3.2.4 RTDS WS → poi 3.3.2/3.3.3/3.3.4 card → poi 3.4.1 Home layout.
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 3.2.3 — WebSocket CLOB singleton
+
+- **Chiuso**: 2026-04-26
+- **Commit**: `26eb8a3` — feat: WebSocket CLOB singleton — live prices + orderbook hooks (3.2.3)
+- **Output**:
+  - `lib/ws/SingletonWS.ts` (137 righe) — manager generico: `Map<url, ManagedWS>` module-level, reference counting, auto-reconnect exponential backoff (max 30s), pending messages queue per subscribe durante CONNECTING, server-safe guard `typeof window`
+  - `lib/ws/clob.ts` (99 righe) — wrapper CLOB: `subscribeToPriceChange`, `subscribeToBook`. URL: `wss://ws-subscriptions-clob.polymarket.com/ws/market`. Filter per `asset_id` nel listener — più hook con asset diversi coesistono sulla stessa connessione
+  - `lib/ws/hooks/useLiveMidpoint.ts` (52 righe) — `'use client'`, ritorna `{ midpoint, change }` per `assetId | null`
+  - `lib/ws/hooks/useLiveOrderbook.ts` (56 righe) — `'use client'`, ritorna `{ bids, asks }` normalizzati, gestisce alias `buys/sells` Polymarket
+- **Acceptance criteria**: `npx tsc --noEmit` exit 0 ✅, `npx eslint .` exit 0 ✅, 38/38 test pass ✅, `npm run build` exit 0 ✅, tutti i file ≤150 righe ✅
+- **Decisioni architetturali**:
+  - Singleton via module-level Map, non Context/Zustand — hook trasparenti al pattern
+  - Connessione si chiude solo quando `refCount === 0` — multi-componenti condividono 1 WS
+  - 2 `eslint-disable` mirati documentati per pattern `setState` in `useEffect` su reset subscription
+- **Test manuale** (da fare quando UI 3.3.4 è pronta): DevTools → Network → WS → 1 sola connessione `wss://ws-subscriptions-clob...` anche con più componenti che usano lo stesso asset
+- **PR**: N/A
 
 ### ✅ Fix audit post-3.3.1 — Colori hardcoded + inline display (Cowork)
 
