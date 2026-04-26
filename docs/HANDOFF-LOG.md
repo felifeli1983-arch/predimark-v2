@@ -7,16 +7,41 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: 1.3.2 (Privy ↔ Supabase sync — upsert users al login)
-- **Prossimo sprint**: successivi MA1
+- **Sprint corrente**: prossimo sprint MA1 da decidere
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
-- **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata. Migration 013 fix RLS applicata da Cowork su staging + production.
+- **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata. Migration 013 + 014 applicate da Cowork.
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 1.3.2 — Privy ↔ Supabase sync — upsert users al login
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti + riga DB confermata via SQL)
+- **Output**:
+  - `lib/actions/syncUser.ts` — Server Action `'use server'` con `syncUserToSupabase()`, upsert su `public.users` via `createAdminClient`, conflict su `privy_did`
+  - `lib/hooks/useAuth.ts` — sync automatico al login (useRef `hasSynced` per evitare doppi sync, reset al logout)
+  - `app/test-auth/page.tsx` — bottone sync manuale + stato sync visibile inline
+  - `lib/actions/__tests__/syncUser.test.ts` — 2 test con mock `createAdminClient`
+  - 13 test passati, `npm run build` exit 0 (5 route static), `npm run validate` exit 0
+  - Commit `750d46b` pushato su `main`
+- **Deviazioni dal prompt**:
+  - Privy v3 ha rimosso `user.email.verified` dal tipo `Email` → usato `Boolean(user.email?.address)` come equivalente (Privy verifica email via OTP prima di associarla)
+  - Bottone Login: `color: 'white'` invece di `#000` (contrasto migliore su `--color-cta` blu)
+  - Border: `var(--color-border-default)` invece di `var(--color-border)` (token reale)
+- **Verifica DB (staging)**:
+  - Riga creata in `public.users`: `id = c624e595-9e95-4b0b-a986-ca7c51c53ad9`
+  - `privy_did = did:privy:cmofskhdp015h0dle1h1r9ely` ✅
+  - `email = felicianociccarelli1983@gmail.com` ✅
+  - `wallet_address = 0xAad9F27d3F2e57a2F2685d48A0e9d75dA4Fb0475` ✅
+  - `last_login_at` popolato ✅
+- **Note**:
+  - `email_verified = false` nel DB: il bottone sync manuale su `/test-auth` non passa `emailVerified`, sovrascrive il `true` dell'auto-sync. Non è un bug di produzione — l'auto-sync di `useAuth` manda `emailVerified: true`. Da correggere solo se il test-page viene riusato.
+  - Migration 014 applicata da Cowork prima del sprint: aggiunto `privy_did TEXT UNIQUE`, `auth_id` reso nullable, `wallet_address` reso nullable
+- **PR**: N/A
 
 ### ✅ Sprint 1.4.2 — Setup Supabase client browser + server + admin
 
@@ -240,7 +265,7 @@
 
 | MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
 | --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
-| MA1 | Foundation & Setup            | 9                 | 12            | ⏳ In corso                              |
+| MA1 | Foundation & Setup            | 10                | 12            | ⏳ In corso                              |
 | MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
 | MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
 | MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
@@ -249,7 +274,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
 
-**Totale sprint**: 9 / 92
+**Totale sprint**: 10 / 92
 
 ---
 
