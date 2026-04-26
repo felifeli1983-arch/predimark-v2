@@ -16,9 +16,9 @@ interface EventCardProps {
 
 /*
  * Altezza fissa standard per TUTTE le 5 variants.
- * header 110 + body 130 + footer 40 = 280.
+ * header 80 + body 140 + footer 40 = 260.
  */
-const CARD_HEIGHT = 280
+const CARD_HEIGHT = 260
 
 const cardStyle: React.CSSProperties = {
   display: 'flex',
