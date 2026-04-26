@@ -102,6 +102,7 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
     <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
         title={event.title}
+        subtitle={event.description ?? null}
         image={event.image}
         tags={event.tags}
         isLive={isLive}
