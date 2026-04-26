@@ -96,14 +96,14 @@ export function HeroCard({ event, size = 'small' }: Props) {
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)',
+            'linear-gradient(0deg, var(--color-hero-overlay-strong) 0%, var(--color-hero-overlay-soft) 55%, transparent 100%)',
         }}
       />
       <div style={{ position: 'relative', padding: isBig ? '20px 22px' : '12px 14px' }}>
         <h3
           style={{
             margin: 0,
-            color: '#fff',
+            color: 'var(--color-text-on-image)',
             fontSize: isBig ? 26 : 15,
             fontWeight: 700,
             lineHeight: 1.2,
@@ -122,7 +122,7 @@ export function HeroCard({ event, size = 'small' }: Props) {
               margin: '6px 0 0',
               fontSize: 13,
               fontWeight: 400,
-              color: 'rgba(255,255,255,0.85)',
+              color: 'var(--color-text-on-image-muted)',
               lineHeight: 1.4,
               display: '-webkit-box',
               WebkitLineClamp: 2,
@@ -149,13 +149,13 @@ export function HeroCard({ event, size = 'small' }: Props) {
                   fontSize: isBig ? 14 : 12,
                   fontVariantNumeric: 'tabular-nums',
                   fontWeight: 700,
-                  color: '#fff',
+                  color: 'var(--color-text-on-image)',
                 }}
               >
                 Yes {yesPct}%
               </span>
             )}
-            <span style={{ fontSize: isBig ? 12 : 10, color: 'rgba(255,255,255,0.7)' }}>
+            <span style={{ fontSize: isBig ? 12 : 10, color: 'var(--color-text-on-image-faint)' }}>
               ${(event.totalVolume / 1_000_000).toFixed(1)}M Vol
             </span>
           </div>
@@ -167,8 +167,8 @@ export function HeroCard({ event, size = 'small' }: Props) {
                 gap: 4,
                 fontSize: 12,
                 fontWeight: 600,
-                color: '#fff',
-                background: 'rgba(255,255,255,0.18)',
+                color: 'var(--color-text-on-image)',
+                background: 'var(--color-hero-cta-bg)',
                 backdropFilter: 'blur(4px)',
                 padding: '6px 12px',
                 borderRadius: 999,

@@ -56,6 +56,14 @@
   --color-cat-economy: #047857;
   --color-cat-tech: #6d28d9;
 
+  /* On-image / hero overlays (theme-invariant: hero always overlays a dark gradient on imagery) */
+  --color-hero-overlay-strong: rgba(0, 0, 0, 0.7);
+  --color-hero-overlay-soft: rgba(0, 0, 0, 0.2);
+  --color-text-on-image: #ffffff;
+  --color-text-on-image-muted: rgba(255, 255, 255, 0.85);
+  --color-text-on-image-faint: rgba(255, 255, 255, 0.7);
+  --color-hero-cta-bg: rgba(255, 255, 255, 0.18);
+
   /* ----------------------------------------------------------
      TYPOGRAPHY
   ---------------------------------------------------------- */
