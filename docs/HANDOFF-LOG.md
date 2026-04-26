@@ -9,7 +9,7 @@
 
 - **Sprint corrente**: 1.4.1 (Vercel deploy) — se account pronto, altrimenti 1.3.2 (Privy + Supabase sync)
 - **Prossimo sprint**: l'altro tra i due sopra
-- **Nota**: verifica manuale modal Privy su `/test-auth` pendente (da fare nel browser)
+- **Nota**: verifica E2E Privy completata ✅
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
 - **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata
@@ -34,7 +34,9 @@
 - **Note**:
   - Privy v3 API breaking change: `embeddedWallets.createOnLogin` → `embeddedWallets.ethereum.createOnLogin` — corretta da Claude in VS Code
   - `module` → `mod` in test per ESLint `@next/next/no-assign-module-variable` — corretta da Claude in VS Code
-  - Verifica manuale modal Privy su `/test-auth` **pendente** — Feliciano deve verificare nel browser
+  - Fix post-verifica browser (commit `a489f41`): rimosso `logo: '/logo.png'` (404), sostituito `var(--color-brand-primary)` con `var(--color-cta)` (token inesistente), aggiunto pannello debug e bottone disabled pre-ready
+  - **`--color-brand-primary` NON esiste nel design system** — usare `--color-cta` per il colore primario CTA
+  - Verifica E2E browser completata: login email+OTP ✅, embedded wallet ETH creato ✅ (`0xAad9F27d3F2e57a2F2685d48A0e9d75dA4Fb0475`), DID Privy: `did:privy:cmofskhdp015h0dle1h1r9ely`
 - **PR**: N/A
 
 ### ✅ Sprint 1.5.3 — Docs in cartella progetto + README
