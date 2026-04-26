@@ -1,71 +1,34 @@
-export default function HomePage() {
+import { fetchFeaturedEvents } from '@/lib/polymarket/queries'
+import { mapGammaEvent } from '@/lib/polymarket/mappers'
+import { EventCard } from '@/components/markets/EventCard'
+
+export default async function HomePage() {
+  const rawEvents = await fetchFeaturedEvents(12)
+  const events = rawEvents.map(mapGammaEvent)
+
   return (
-    <main
-      className="min-h-screen flex flex-col items-center justify-center gap-8 p-8"
-      style={{ background: 'var(--color-bg-primary)' }}
-    >
-      <div className="text-center">
-        <h1
-          className="font-bold mb-2"
-          style={{
-            color: 'var(--color-cta)',
-            fontSize: 'var(--text-4xl)',
-            fontWeight: 'var(--font-weight-bold)',
-          }}
-        >
-          Auktora
-        </h1>
-        <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-lg)' }}>
-          Prediction markets, simplified.
-        </p>
-      </div>
-
-      <div className="flex gap-3">
-        {[
-          {
-            label: 'Next.js ✓',
-            bg: 'var(--color-success-bg)',
-            color: 'var(--color-success)',
-            border: 'var(--color-success)',
-          },
-          {
-            label: 'Tailwind 4 ✓',
-            bg: 'var(--color-cta-bg)',
-            color: 'var(--color-cta)',
-            border: 'var(--color-cta)',
-          },
-          {
-            label: 'TypeScript ✓',
-            bg: '#a855f715',
-            color: 'var(--color-cat-culture)',
-            border: 'var(--color-cat-culture)',
-          },
-        ].map(({ label, bg, color, border }) => (
-          <span
-            key={label}
-            className="px-3 py-1 font-medium"
-            style={{
-              background: bg,
-              color,
-              border: `1px solid ${border}`,
-              borderRadius: 'var(--radius-full)',
-              fontSize: 'var(--text-sm)',
-            }}
-          >
-            {label}
-          </span>
-        ))}
-      </div>
-
-      <a
-        href="/test-design-system"
+    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <h1
         style={{
-          color: 'var(--color-cta)',
-          fontSize: 'var(--text-sm)',
+          color: 'var(--color-text-primary)',
+          marginBottom: '24px',
+          fontSize: '20px',
+          fontWeight: 700,
         }}
       >
-        → Apri test design system
-      </a>
-    </main>
+        Markets
+      </h1>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: '16px',
+        }}
+      >
+        {events.map((event) => (
+          <EventCard key={event.id} event={event} />
+        ))}
+      </div>
+    </div>
   )
 }

@@ -7,7 +7,7 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.2.1 (Polymarket API client)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.1 (EventCard Binary)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
@@ -16,6 +16,28 @@
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 3.2.2 — classifyEvent → 5 CardKind
+
+- **Chiuso**: 2026-04-26
+- **Note**: implementato dentro Sprint 3.2.1 (mappers.ts). `classifyEvent`, `CardKind`, `AuktoraEvent`, `AuktoraMarket` già presenti e testati (12 test mappers). Sprint 3.2.2 marcato completato per definizione.
+- **PR**: N/A
+
+### ✅ Sprint 3.2.1 — Polymarket Gamma API client
+
+- **Chiuso**: 2026-04-26
+- **Commit**: `4035f1c` — 7 file, +951 righe
+- **Output**:
+  - `lib/polymarket/types.ts` — GammaEvent, GammaMarket, GammTag, GammaSeries, GammaEventsParams
+  - `lib/polymarket/client.ts` — `gammaGet` con timeout 8s, MAX_RETRIES=2, GammaApiError, no-retry su 4xx
+  - `lib/polymarket/queries.ts` — fetchEvents, fetchEventBySlug, fetchEventById, fetchFeaturedEvents, searchEvents (revalidate 15-60s)
+  - `lib/polymarket/mappers.ts` — CardKind, AuktoraMarket, AuktoraEvent, classifyEvent, mapGammaMarket, mapGammaEvent, safeParseJsonArray
+  - `lib/polymarket/__tests__/client.test.ts` — 5 test
+  - `lib/polymarket/__tests__/mappers.test.ts` — 12 test (5 CardKind + parsing + edge cases)
+  - 38 test totali in 9 file, `npm run validate` exit 0, `npm run build` exit 0
+- **Smoke test live**: `fetchFeaturedEvents(3)` → 3 eventi reali, primo titolo "2026 NBA Champion" ✅
+- **Decisioni**: `safeParseJsonArray` per outcomes/outcomePrices/clobTokenIds (stringhe JSON nella API); retry logic 3 tentativi totali; type cast `ParamRecord` per compatibilità TypeScript
+- **PR**: N/A
 
 ### ✅ Fix tema dark/light + rename Auktora + icone (Cowork, fuori-sprint)
 
@@ -460,7 +482,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                               |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                               |
 
-**Totale sprint**: 16 / 92
+**Totale sprint**: 18 / 92
 
 ---
 
