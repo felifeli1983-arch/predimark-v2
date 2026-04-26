@@ -103,7 +103,7 @@ export function Footer() {
             margin: 0,
           }}
         >
-          Predimark is not a licensed broker. Prediction markets involve risk.
+          Auktora is not a licensed broker. Prediction markets involve risk.
         </p>
 
         <p
@@ -113,7 +113,7 @@ export function Footer() {
             margin: 0,
           }}
         >
-          © {year} Predimark. All rights reserved.
+          © {year} Auktora. All rights reserved.
         </p>
       </div>
     </footer>

@@ -21,7 +21,7 @@ export const useThemeStore = create<ThemeStore>()(
       setAnimationsEnabled: (enabled) => set({ animationsEnabled: enabled }),
     }),
     {
-      name: 'predimark-theme',
+      name: 'auktora-theme',
     }
   )
 )

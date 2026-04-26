@@ -1,4 +1,4 @@
-# Predimark V2
+# Auktora
 
 Prediction markets platform — powered by Polymarket.
 

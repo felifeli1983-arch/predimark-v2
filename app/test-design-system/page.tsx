@@ -11,7 +11,7 @@ export default function TestDesignSystem() {
         className="mb-12"
         style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}
       >
-        Predimark V2 — Sprint 1.1.3
+        Auktora — Sprint 1.1.3
       </p>
 
       {/* PALETTE */}

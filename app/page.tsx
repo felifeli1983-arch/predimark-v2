@@ -13,7 +13,7 @@ export default function HomePage() {
             fontWeight: 'var(--font-weight-bold)',
           }}
         >
-          Predimark V2
+          Auktora
         </h1>
         <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-lg)' }}>
           Prediction markets, simplified.

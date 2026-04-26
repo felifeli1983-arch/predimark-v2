@@ -6,7 +6,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 <!-- END:nextjs-agent-rules -->
 
-# Predimark V2 — Istruzioni per agenti
+# Auktora — Istruzioni per agenti
+
+## Nome app
+
+Il nome dell'app è **Auktora** (non Predimark). Ogni volta che scrivi nuovo codice usa "Auktora".
+Se incontri "Predimark" in file di codice (non nei docs storici in `docs/`), sostituiscilo con "Auktora".
+La cartella `predimark-v2/` e il repo GitHub restano invariati — sono nomi infrastrutturali.
 
 ## Regole generali
 
@@ -91,7 +97,7 @@ components/trade/
     MarketTab.tsx             ← tab Mercato (importo, quick amounts, preview)
     LimitTab.tsx              ← tab Limite (slider prezzo, preset scadenza)
     TradeConfirmModal.tsx     ← modal conferma prima di submit
-    SignalBanner.tsx          ← banner segnale Predimark se attivo
+    SignalBanner.tsx          ← banner segnale Auktora se attivo
 ```
 
 #### Admin panel (`app/admin/`)
