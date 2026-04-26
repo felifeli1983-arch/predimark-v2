@@ -7,15 +7,27 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.3 (EventCard H2H Sport)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.4 (EventCard Crypto Up/Down)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout ✅. Step 3.2 WS layer completo ✅. Sprint 3.3.1/3.3.2 EventCard ✅. Prossimo: 3.3.3 H2H → 3.3.4 Crypto → 3.4.1 Home layout. Badge Slip rinviato a MA4.
+- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 ✅. Step 3.2 WS ✅. Sprint 3.3.1/3.3.2/3.3.3 EventCard ✅. Prossimo: Fix 3.3.3-A (test outcomes[]) → 3.3.4 Crypto → 3.4.1 Home.
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 3.3.3 — EventCard H2H Sport
+
+- **Chiuso**: 2026-04-26
+- **Commit**: `d9b0ce6` — feat: EventCard H2H Sport variant (3.3.3)
+- **Output**:
+  - `lib/polymarket/mappers.ts` — refactor additivo: aggiunto `AuktoraOutcome { name, price }` e campo `outcomes: AuktoraOutcome[]` su `AuktoraMarket`. `yesPrice`/`noPrice` restano come alias di `outcomes[0].price`/`outcomes[1].price` — retrocompatibili. Necessario per H2H 3-way (Home/Draw/Away)
+  - `components/markets/cards/H2HCard.tsx` (216 righe) — variante H2H Sport: 2 team affiancati, rilevamento Draw da `DRAW_HINTS = ['draw','tie','pareggio']`, team favorito (prob>50%) in verde bold, Draw in centro muted. Badge LIVE se `event.active && !event.closed`. `stopPropagation` sui click. Zero colori hardcoded
+  - `components/markets/EventCard.tsx` aggiornato — `h2h_sport` → `H2HCard`. Solo `crypto_up_down` resta placeholder
+- **Acceptance criteria**: `tsc --noEmit` exit 0 ✅, zero colori hardcoded ✅, `stopPropagation` ✅, badge LIVE ✅, Draw 3-way ✅
+- **Fix pendente**: `docs/PROMPT-FIX-3.3.3-A.md` — 2 test mancanti per `AuktoraMarket.outcomes[]`. Da eseguire in VS Code prima o durante 3.3.4
+- **PR**: N/A
 
 ### ✅ Sprint 3.3.2 — EventCard Multi-outcome + Multi-strike
 

@@ -6,6 +6,7 @@ import { BinaryCard } from './cards/BinaryCard'
 import { MultiOutcomeCard } from './cards/MultiOutcomeCard'
 import { MultiStrikeCard } from './cards/MultiStrikeCard'
 import { H2HCard } from './cards/H2HCard'
+import { CryptoCard } from './cards/CryptoCard'
 
 interface EventCardProps {
   event: AuktoraEvent
@@ -23,25 +24,6 @@ const cardStyle: React.CSSProperties = {
   color: 'inherit',
   transition: 'border-color 150ms, box-shadow 150ms',
   cursor: 'pointer',
-}
-
-function PlaceholderCard({ label }: { label: string }) {
-  return (
-    <div
-      style={{
-        height: 160,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--color-bg-tertiary)',
-        color: 'var(--color-text-muted)',
-        fontSize: 13,
-        fontStyle: 'italic',
-      }}
-    >
-      {label}
-    </div>
-  )
 }
 
 export function EventCard({ event, onBookmark, onAddToSlip }: EventCardProps) {
@@ -63,7 +45,9 @@ export function EventCard({ event, onBookmark, onAddToSlip }: EventCardProps) {
       {event.kind === 'h2h_sport' && (
         <H2HCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
       )}
-      {event.kind === 'crypto_up_down' && <PlaceholderCard label="Crypto — coming soon" />}
+      {event.kind === 'crypto_up_down' && (
+        <CryptoCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
+      )}
     </Link>
   )
 }
