@@ -153,6 +153,39 @@ describe('mapGammaMarket', () => {
     expect(m.endDate).toBeInstanceOf(Date)
     expect(m.endDate.getUTCFullYear()).toBe(2027)
   })
+
+  it('outcomes[] 2-way: nomi e prezzi paralleli a outcomes/outcomePrices Yes/No', () => {
+    const m = mapGammaMarket(
+      makeMarket({
+        outcomes: '["Yes","No"]',
+        outcomePrices: '["0.72","0.28"]',
+      })
+    )
+    expect(m.outcomes).toHaveLength(2)
+    expect(m.outcomes[0]?.name).toBe('Yes')
+    expect(m.outcomes[0]?.price).toBeCloseTo(0.72)
+    expect(m.outcomes[1]?.name).toBe('No')
+    expect(m.outcomes[1]?.price).toBeCloseTo(0.28)
+  })
+
+  it('outcomes[] 3-way (H2H soccer): nomi/prezzi corretti, yes/noPrice alias index 0/1', () => {
+    const m = mapGammaMarket(
+      makeMarket({
+        outcomes: '["Lakers","Draw","Celtics"]',
+        outcomePrices: '["0.55","0.10","0.35"]',
+      })
+    )
+    expect(m.outcomes).toHaveLength(3)
+    expect(m.outcomes[0]?.name).toBe('Lakers')
+    expect(m.outcomes[0]?.price).toBeCloseTo(0.55)
+    expect(m.outcomes[1]?.name).toBe('Draw')
+    expect(m.outcomes[1]?.price).toBeCloseTo(0.1)
+    expect(m.outcomes[2]?.name).toBe('Celtics')
+    expect(m.outcomes[2]?.price).toBeCloseTo(0.35)
+    // Retrocompatibilità: yesPrice/noPrice sono alias di index 0/1
+    expect(m.yesPrice).toBeCloseTo(0.55)
+    expect(m.noPrice).toBeCloseTo(0.1)
+  })
 })
 
 describe('mapGammaEvent', () => {
