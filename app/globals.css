@@ -348,11 +348,45 @@
 }
 
 /* ----------------------------------------------------------
-   THEME OVERRIDE — light mode via data-theme attribute
-   (manual toggle via Zustand store; coexiste con @media prefers-color-scheme)
+   THEME OVERRIDE — manual toggle via data-theme attribute
+   (Zustand store → ThemeProvider → html[data-theme])
+
+   Problema Tailwind 4: @theme compila in @layer base (:root).
+   Se il browser di sistema è in light mode, @media(prefers-color-scheme:light)
+   ha la stessa specificità di :root e vince sull'ordine sorgente.
+   Fix: html[data-theme='dark'] usa !important per battere il media query di sistema.
+   html[data-theme='light'] non ha bisogno di !important (stesso comportamento del sistema).
 ---------------------------------------------------------- */
 
-[data-theme='light'] {
+/* Dark mode esplicito — batte prefers-color-scheme:light se l'utente sceglie dark */
+html[data-theme='dark'] {
+  --color-bg-primary: #0a0e1a !important;
+  --color-bg-secondary: #141a2a !important;
+  --color-bg-tertiary: #1c2333 !important;
+  --color-bg-elevated: #232b3d !important;
+  --color-text-primary: #ffffff !important;
+  --color-text-secondary: #b8c2d4 !important;
+  --color-text-tertiary: #7a849a !important;
+  --color-text-muted: #4a5169 !important;
+  --color-border-default: #2a3142 !important;
+  --color-border-strong: #3a4258 !important;
+  --color-border-subtle: #1f2535 !important;
+  --color-success: #10b981 !important;
+  --color-success-bg: #10b98115 !important;
+  --color-danger: #ef4444 !important;
+  --color-danger-bg: #ef444415 !important;
+  --color-cta: #3b82f6 !important;
+  --color-cta-hover: #2563eb !important;
+  --color-cta-bg: #3b82f615 !important;
+  --color-live: #dc2626 !important;
+  --color-hot: #f97316 !important;
+  --color-info: #06b6d4 !important;
+  --color-warning: #fbbf24 !important;
+  --color-warning-bg: #fbbf2415 !important;
+}
+
+/* Light mode esplicito */
+html[data-theme='light'] {
   --color-bg-primary: #ffffff;
   --color-bg-secondary: #f9fafb;
   --color-bg-tertiary: #f3f4f6;

@@ -7,15 +7,33 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.1.3 (Footer minimal)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.2.1 (Polymarket API client)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Sprint 3.1.1-R ✅ Header split 9 file. Sprint 3.1.2 ✅ BottomNav completo (badge Slip rinviato a MA4 — richiede slipStore). Bug noto: dark/light toggle cambia icona ma non colori CSS (Tailwind 4 specificity, deferrito).
+- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout globale ✅ (Header split + BottomNav + Footer). Rename Predimark→Auktora ✅. Fix tema dark/light ✅ (html[data-theme] + !important su dark override). Badge Slip rinviato a MA4 (richiede slipStore).
 
 ---
 
 ## Sprint completati
+
+### ✅ Fix tema dark/light + rename Auktora + icone (Cowork, fuori-sprint)
+
+- **Chiuso**: 2026-04-26
+- **Eseguito da**: Cowork (modifiche dirette ai file)
+- **Output**:
+  - `app/globals.css` — fix tema: aggiunto `html[data-theme='dark']` con tutti i colori dark + `!important` per battere `prefers-color-scheme: light` del browser di sistema. `html[data-theme='light']` già presente. Causa root: Tailwind 4 compila `@theme` in `@layer base (:root)` — stesso livello specificità del media query di sistema → source order determinava il vincitore → light mode di sistema batteva il toggle manuale.
+  - `components/layout/header/RealDemoToggle.tsx` — icona `Zap` → `Banknote` (REAL) / `Coins` (DEMO)
+  - `components/layout/BottomNav.tsx` — icona `ShoppingCart` → `Ticket` (schedina)
+  - Rename Predimark → Auktora in: `README.md`, `app/page.tsx`, `app/test-design-system/page.tsx`, `app/globals.css` (commenti), `components/layout/Footer.tsx`, `lib/stores/themeStore.ts` (localStorage key `auktora-theme`), `AGENTS.md`
+- **PR**: N/A
+
+### ✅ Sprint 3.1.3 — Footer minimal
+
+- **Chiuso**: 2026-04-26
+- **Commit**: `a654918`
+- **Output**: `components/layout/Footer.tsx` (107 righe) — link Privacy/Terms/Help/About, disclaimer, lingua placeholder, copyright dinamico. Visibile solo desktop (`hidden md:block`). Inserito in `<main>` con `marginTop: auto`. `app/layout.tsx` aggiornato con `display: flex; flexDirection: column` su `<main>`.
+- **PR**: N/A
 
 ### ✅ Sprint 3.1.2 — BottomNav mobile completo
 
@@ -442,7 +460,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                               |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                               |
 
-**Totale sprint**: 15 / 92
+**Totale sprint**: 16 / 92
 
 ---
 
