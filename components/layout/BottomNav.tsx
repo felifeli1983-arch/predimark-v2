@@ -153,7 +153,7 @@ export function BottomNav() {
           {/* Backdrop */}
           <div
             onClick={() => setMoreOpen(false)}
-            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)' }}
+            style={{ position: 'absolute', inset: 0, background: 'var(--color-overlay)' }}
           />
 
           {/* Sheet */}

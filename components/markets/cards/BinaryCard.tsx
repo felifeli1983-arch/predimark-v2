@@ -19,7 +19,7 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
   const noPct = Math.round(noPrice * 100)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="flex flex-col">
       <EventCardHeader
         title={event.title}
         image={event.image}
@@ -30,15 +30,14 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
       <div
         style={{
           padding: '8px 12px 12px',
-          display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           gap: 12,
         }}
+        className="flex flex-col"
       >
         <DonutChart probability={yesPrice} size={80} />
 
-        <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+        <div className="flex w-full" style={{ gap: 8 }}>
           <button
             type="button"
             onClick={(e) => {

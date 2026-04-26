@@ -7,15 +7,42 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.1 (EventCard Binary)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.2 (MultiOutcome + MultiStrike cards) oppure 3.4.1 (Home layout completo)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout globale ✅ (Header split + BottomNav + Footer). Rename Predimark→Auktora ✅. Fix tema dark/light ✅ (html[data-theme] + !important su dark override). Badge Slip rinviato a MA4 (richiede slipStore).
+- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout globale ✅. Step 3.2 Polymarket API ✅. Sprint 3.3.1 EventCard Binary ✅ — Home page ora mostra griglia reale Polymarket. Rename Predimark→Auktora ✅. Fix tema dark/light ✅. Badge Slip rinviato a MA4 (richiede slipStore). WebSocket (3.2.3/3.2.4) rinviato a prima di Sprint 3.3.4 (Crypto card — unica variante che richiede prezzi live).
 
 ---
 
 ## Sprint completati
+
+### ✅ Fix audit post-3.3.1 — Colori hardcoded + inline display (Cowork)
+
+- **Chiuso**: 2026-04-26
+- **Trovato da**: audit sistematico codebase vs docs
+- **Output**:
+  - `app/globals.css` — aggiunta `--color-overlay` in dark (0.65) e light (0.55) mode
+  - `components/layout/header/MobileDrawer.tsx` — backdrop `rgba(0,0,0,0.65)` → `var(--color-overlay)`
+  - `components/layout/BottomNav.tsx` — backdrop `rgba(0,0,0,0.65)` → `var(--color-overlay)`
+  - `components/markets/cards/BinaryCard.tsx` — `style={{ display: 'flex' }}` inline → `className="flex flex-col"` / `className="flex w-full"` (rispetta regola AGENTS.md)
+- **TypeScript**: `npx tsc --noEmit` exit 0 ✅
+- **PR**: N/A
+
+### ✅ Sprint 3.3.1 — EventCard Binary variant + DonutChart + shared Header/Footer
+
+- **Chiuso**: 2026-04-26
+- **Commit**: `88433d6` — `feat: EventCard Binary variant + DonutChart + shared Header/Footer (3.3.1)`
+- **Output**:
+  - `components/markets/charts/DonutChart.tsx` — SVG puro (no librerie): arco stroke-dasharray con rotazione -90°, percentuale centrata, label Yes/No, colori via CSS vars (--color-success/>0.5, --color-danger/<0.5), no animazioni
+  - `components/markets/EventCardHeader.tsx` — immagine rotonda 40px con fallback iniziale, titolo 2-righe clamp, tag separati da ·, badge LIVE/HOT/NEW, bookmark Lucide con stopPropagation
+  - `components/markets/EventCardFooter.tsx` — formatVolume ($X.XB/$X.XM/$X.XK/$X), formatEndDate (Today/Tomorrow/in N days/MMM D YYYY), bottone [+ Slip] con icon Plus
+  - `components/markets/cards/BinaryCard.tsx` — usa EventCardHeader + DonutChart + EventCardFooter; bottoni Yes/No con colori success/danger, onAddToSlip con stopPropagation
+  - `components/markets/EventCard.tsx` — container Link → /event/[slug]; switcha su event.kind: binary → BinaryCard, altri 4 → PlaceholderCard "coming soon"
+  - `app/page.tsx` — Server Component: fetchFeaturedEvents(12) → mapGammaEvent → griglia EventCard responsive (auto-fill minmax 300px)
+- **Acceptance criteria**: `npm run validate` ✅, `npm run build` ✅, griglia live con dati reali Polymarket, card binary con DonutChart + Yes/No reali, placeholder per non-binary, click card → /event/[slug] (404 ok), bookmark stopPropagation ✅
+- **Note**: `app/page.tsx` è smoke test che diventa base reale in Sprint 3.4.1 (Home layout completo con hero, sidebar, filtri, CryptoLiveRail). Sprint 3.2.3/3.2.4 (WebSocket) rinviati — binary/multi/h2h funzionano con prezzi statici API (30s revalidate).
+- **PR**: N/A
 
 ### ✅ Sprint 3.2.2 — classifyEvent → 5 CardKind
 

@@ -21,7 +21,7 @@ export function MobileDrawer({ open, onClose, pathname }: Props) {
       {/* Backdrop */}
       <div
         onClick={onClose}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)' }}
+        style={{ position: 'absolute', inset: 0, background: 'var(--color-overlay)' }}
       />
 
       {/* Pannello */}
