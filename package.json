@@ -19,6 +19,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@privy-io/react-auth": "^3.22.2",
     "@tanstack/react-query": "^5.100.5",
     "lucide-react": "^1.11.0",
     "next": "16.2.4",

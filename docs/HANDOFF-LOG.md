@@ -7,8 +7,8 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: 1.5.3 (da iniziare — Docs + README)
-- **Prossimo sprint**: 1.3.1 (Privy, se account pronto) / 1.4.1 (Vercel, se account pronto)
+- **Sprint corrente**: 1.3.1 (Privy) o 1.4.1 (Vercel) — dipende da quale account è pronto
+- **Prossimo sprint**: l'altro tra 1.3.1 e 1.4.1
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
 - **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata
@@ -16,6 +16,18 @@
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 1.5.3 — Docs in cartella progetto + README
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente)
+- **Output**:
+  - `README.md` riscritto (era template `create-next-app`) con stack, comandi, struttura cartelle, env setup, note
+  - `docs/ARCHITECTURE.md` creato con tabella stack, struttura cartelle, info DB Supabase, roadmap MA1-MA8
+  - `AGENTS.md` aggiornato — mantenuto blocco `<!-- BEGIN:nextjs-agent-rules -->` (Next.js 16 breaking changes) + aggiunte regole Predimark V2 (regole generali, comandi, conventions)
+  - Commit `7384a00` pushato su `main`
+- **Note**: Claude in VS Code ha correttamente preservato il blocco auto-generato `BEGIN:nextjs-agent-rules` in cima ad `AGENTS.md` invece di sovrascriverlo — importante per orientare agenti AI sui breaking changes di Next.js 16
+- **PR**: N/A
 
 ### ✅ Sprint 1.5.2 — Vitest + React Testing Library
 
@@ -156,7 +168,7 @@
 
 | MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
 | --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
-| MA1 | Foundation & Setup            | 5                 | 12            | ⏳ In corso                              |
+| MA1 | Foundation & Setup            | 6                 | 12            | ⏳ In corso                              |
 | MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
 | MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
 | MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
@@ -165,7 +177,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
 
-**Totale sprint**: 5 / 92
+**Totale sprint**: 6 / 92
 
 ---
 

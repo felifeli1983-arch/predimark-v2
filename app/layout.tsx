@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { PrivyProvider } from '@/providers/PrivyProvider'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -10,14 +11,16 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Predimark V2',
-  description: 'Prediction markets, simplified.',
+  title: 'Predimark',
+  description: 'Prediction markets platform',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body>{children}</body>
+    <html lang="en">
+      <body className={inter.variable}>
+        <PrivyProvider>{children}</PrivyProvider>
+      </body>
     </html>
   )
 }
