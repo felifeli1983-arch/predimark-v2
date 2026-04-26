@@ -7,8 +7,8 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: 1.5.1 (da iniziare — ESLint, Prettier, Husky)
-- **Prossimo sprint**: 1.5.2 (Vitest)
+- **Sprint corrente**: 1.5.2 (da iniziare — Vitest + React Testing Library)
+- **Prossimo sprint**: 1.5.3 / 1.3.1 (Privy, se account pronto)
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
 - **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata
@@ -16,6 +16,20 @@
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 1.5.1 — ESLint + Prettier + Husky pre-commit
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente)
+- **Output**:
+  - ESLint flat config nativa (`defineConfig`) con next/core-web-vitals + typescript + prettier
+  - Regole custom: `no-explicit-any: error`, `no-unused-vars: error` (con `^_` ignore pattern)
+  - Prettier: `singleQuote`, no `semi`, `trailingComma: es5`, `printWidth: 100`
+  - Husky 9.x pre-commit con lint-staged (ts/tsx: eslint+prettier / json,md,css: prettier)
+  - Script npm: `lint`, `lint:fix`, `format`, `format:check`, `typecheck`, `validate`
+  - Commit `1261883` pushato su `main`
+- **Note**: FlatCompat sostituito con `defineConfig` nativo — meglio, meno deps. Pre-commit testato e funzionante (blocca `any` esplicito).
+- **PR**: N/A
 
 ### ✅ Sprint 1.1.3 — Setup design tokens globals.css completi
 
@@ -125,7 +139,7 @@
 
 | MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
 | --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
-| MA1 | Foundation & Setup            | 3                 | 12            | ⏳ In corso                              |
+| MA1 | Foundation & Setup            | 4                 | 12            | ⏳ In corso                              |
 | MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
 | MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
 | MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
@@ -134,7 +148,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
 
-**Totale sprint**: 3 / 92
+**Totale sprint**: 4 / 92
 
 ---
 
