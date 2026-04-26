@@ -14,6 +14,7 @@
 Questo documento descrive la **Pagina evento** (`/event/[slug]`) di Predimark V2 — la pagina che si apre quando l'utente clicca su una EventCard nella home, nei filtri, nella search, o arriva via link diretto (notifica, Telegram, condivisione).
 
 La pagina evento ha **5 layout dedicati** in base al CardKind del mercato:
+
 1. Binary
 2. Multi-outcome (con sotto-tipo "date come outcome")
 3. Multi-strike
@@ -114,13 +115,13 @@ L'utente può scrollare la pagina (chart, comments, etc.) e la sidebar rimane vi
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-| Tab | Contenuto |
-|---|---|
-| **Comments** | Feed commenti utenti (real-time, tipo Reddit/Twitter). Like, reply, segnala. |
-| **News** | Notizie collegate al mercato (Reuters, WSJ, NYT, ecc.). Click apre la news. |
-| **Holders** | Top 20 trader con posizione aperta. Avatar, address, posizione, P&L pubblico. |
-| **Rules** | Regole di risoluzione (resolver, criteri, fonte ufficiale). Testo statico. |
-| **Activity** | Feed live trade recenti via WebSocket. Animation fade-in/out. |
+| Tab          | Contenuto                                                                     |
+| ------------ | ----------------------------------------------------------------------------- |
+| **Comments** | Feed commenti utenti (real-time, tipo Reddit/Twitter). Like, reply, segnala.  |
+| **News**     | Notizie collegate al mercato (Reuters, WSJ, NYT, ecc.). Click apre la news.   |
+| **Holders**  | Top 20 trader con posizione aperta. Avatar, address, posizione, P&L pubblico. |
+| **Rules**    | Regole di risoluzione (resolver, criteri, fonte ufficiale). Testo statico.    |
+| **Activity** | Feed live trade recenti via WebSocket. Animation fade-in/out.                 |
 
 ---
 
@@ -129,6 +130,7 @@ L'utente può scrollare la pagina (chart, comments, etc.) e la sidebar rimane vi
 Il widget è **lo stesso** per tutti i CardKind. Cambia solo l'identità mercato che mostra (chip outcome selezionato).
 
 Posizionamento:
+
 - **Desktop**: sidebar fissa destra in cima, sempre visibile
 - **Mobile**: bottom sheet che sale dal basso quando l'utente clicca un bottone Yes/No/Up/Down/Team
 
@@ -167,18 +169,21 @@ Posizionamento:
 ### Toggle 1 — Compra/Vendi
 
 Dropdown in alto sinistra:
+
 - **Compra** (default): l'utente apre nuova posizione
 - **Vendi**: l'utente liquida posizione esistente (visibile solo se ha posizione attiva)
 
 ### Toggle 2 — Mercato/Limite
 
 Dropdown in alto destra (default Mercato):
+
 - **Mercato**: ordine eseguito subito al miglior prezzo disponibile
 - **Limite**: ordine eseguito solo quando il mercato raggiunge il prezzo target
 
 ### Identità mercato
 
 Riga sempre visibile per dare contesto:
+
 - **Icona mercato** (logo BTC, foto evento, logo team, bandiere paese)
 - **Titolo evento** (1 riga, tronca con `...` se lungo)
 - **Chip outcome selezionato** sotto:
@@ -204,6 +209,7 @@ L'icona `⟲` permette di **switchare side** rapidamente senza chiudere e riapri
 ```
 
 **Caratteristiche**:
+
 - Importo USDC al centro, grande, con bottoni `-` e `+` ai lati
 - Tap su importo apre tastiera numerica (mobile) o input editabile (desktop)
 - "Per vincere" calcolato live in base a importo + prezzo medio mercato
@@ -230,6 +236,7 @@ L'icona `⟲` permette di **switchare side** rapidamente senza chiudere e riapri
 ```
 
 **Caratteristiche**:
+
 - **Prezzo limit**: prezzo share desiderato (in centesimi, da 1¢ a 99¢). Tap su numero apre keypad.
 - **Azioni**: quante share vuoi comprare. Tap su numero apre keypad.
 - **Quick amounts dinamici**: cambiano in base al prezzo limit. Logica:
@@ -271,14 +278,17 @@ L'icona `⟲` permette di **switchare side** rapidamente senza chiudere e riapri
 Sempre visibile in entrambe le modalità:
 
 **Saldo USDC disponibile**:
+
 ```
 Saldo: $124.50
 ```
+
 Mostra USDC reale o demo a seconda della modalità attiva. Aiuta l'utente a non spendere più di quanto ha.
 
 **Banner Segnale Predimark** (se attivo per questo mercato):
 
 In modalità Mercato (banner espanso):
+
 ```
 ┌─────────────────────────────────────┐
 │ ✓ Segnale Predimark: BUY UP +14%   │
@@ -288,6 +298,7 @@ In modalità Mercato (banner espanso):
 ```
 
 In modalità Limit (banner compatto):
+
 ```
 ┌─────────────────────────────────────┐
 │ ✓ Segnale: BUY UP +14% [→]          │
@@ -295,17 +306,20 @@ In modalità Limit (banner compatto):
 ```
 
 Quando il segnale suggerisce il **side opposto** alla scelta utente:
+
 ```
 ┌─────────────────────────────────────┐
 │ ⓘ Segnale suggerisce UP (opposto)  │
 │   [Vedi perché →]                   │
 └─────────────────────────────────────┘
 ```
+
 - Colore beige/giallo soft (`#fbbf2415` background)
 - Icona ⓘ neutra (NON ⚠️ allarme, NON ✗ rosso)
 - Non blocca l'utente, solo informa
 
 Quando NON c'è segnale attivo:
+
 - Niente banner (lo spazio è libero per altro)
 
 ### Bottone CTA "Trading"
@@ -341,13 +355,14 @@ Se prezzo limit = 5¢:
 ```
 
 Implementazione:
+
 ```typescript
 function getQuickAmounts(priceLimitCents: number): number[] {
-  const targetUSDC = 200; // dollari per "buy big" tap
-  const bigAmount = Math.round(targetUSDC * 100 / priceLimitCents);
+  const targetUSDC = 200 // dollari per "buy big" tap
+  const bigAmount = Math.round((targetUSDC * 100) / priceLimitCents)
   // Round to nearest sensible number (100, 200, 500, 1000, 2000, 5000)
-  const roundedBig = roundToSensible(bigAmount);
-  return [-100, -10, +10, +100, roundedBig];
+  const roundedBig = roundToSensible(bigAmount)
+  return [-100, -10, +10, +100, roundedBig]
 }
 ```
 
@@ -578,6 +593,7 @@ Ispirato direttamente al pattern Polymarket "Pace USA-Iran" che ti ho mostrato.
 ### Variante: outcome con date come outcome
 
 È **lo stesso layout** (non un layout separato). Solo il contenuto degli outcome è diverso:
+
 - Outcome nominali: "Real Madrid", "Manchester City", ...
 - Outcome date: "30 aprile", "31 maggio", "30 giugno", ...
 
@@ -703,6 +719,7 @@ PRIMA di arrivare alla pagina evento, l'utente passa per l'**Hub Sport** (se vie
 #### Card sport nell'Hub
 
 Ogni card mostra:
+
 - **Status**: ●LIVE Q3-09:44 oppure orario futuro (21:30) oppure FINAL
 - **Volume** $X.XXM Vol.
 - **2 team affiancati**:
@@ -984,11 +1001,13 @@ Importante chiarire (come avevamo discusso):
 - **Segnale Predimark**: è un **consiglio finale automatico** generato dal nostro algoritmo. Combina indicatori + dati storici + backtest + altri input. Output: "BUY UP +14% Edge".
 
 Sono complementari:
+
 - Trader esperti vedono indicatori + segnale e fanno la loro valutazione
 - Trader normali guardano solo il segnale e decidono
 - Stessa pagina, due strumenti che si completano
 
 Visivamente sono in **zone diverse**:
+
 - Indicatori: dentro/sopra il chart (toggle)
 - Segnale Predimark: card laterale (sidebar desktop) o sezione dedicata (mobile sotto bottoni)
 
@@ -1117,6 +1136,7 @@ TRADE YES                          [icona ordina ⇕]
 ```
 
 Filtra il libro ordini per side:
+
 - **"Fai trading su Sì"** (default): mostra book per chi vuole comprare Sì (asks/bids del side Yes)
 - **"Fai trading su No"**: mostra book per chi vuole comprare No (asks/bids del side No)
 
@@ -1169,6 +1189,7 @@ Per i crypto round Up/Down, sotto il chart aggiungiamo una **navigation tra roun
 ### Vantaggi vs il "Round navigation 3 chip" che avevo proposto
 
 Il pattern Polymarket con pallini + orari è **molto più potente** del semplice "< Round 4520 / 4521 LIVE / 4522 >" che avevo proposto. Permette di:
+
 - Vedere a colpo d'occhio il **trend recente** (verde/verde/rosso/verde/rosso = mix bilanciato)
 - Saltare a un round specifico senza scorrere uno a uno
 - Identificare pattern (es. "ultimi 5 round tutti Up = momentum bullish")
@@ -1180,18 +1201,22 @@ Lo adottiamo come pattern definitivo per Predimark V2.
 ## STATI DELLA PAGINA EVENTO
 
 ### Default (loggato, mercato aperto, dati live)
+
 Layout completo con dati real-time via WebSocket.
 
 ### Loading (primo caricamento)
+
 - Skeleton placeholder per hero, chart, lista outcome
 - Caricamento progressivo
 
 ### Error (problema rete/API)
+
 - Banner "Connessione interrotta, riprovo automaticamente..."
 - Mostra ultimi dati cached
 - Recovery silenzioso
 
 ### Mercato chiuso (closed/resolved)
+
 - Hero mostra "RESOLVED" o "CLOSED"
 - Esito mostrato chiaramente (es. "Yes won" verde grande / "No won" rosso grande)
 - Bottoni trade disabilitati (grigi) con tooltip "Market resolved"
@@ -1200,18 +1225,21 @@ Layout completo con dati real-time via WebSocket.
 - Sidebar mantiene Sentiment + Correlati (per esplorazione)
 
 ### Geo-blocked
+
 - Banner persistente "Trading not available in your region"
 - Bottoni Trade tooltip "Available in Demo only"
 - Sidebar trade widget sostituito con CTA "Try Demo Mode"
 - Tutto il resto consultabile (chart, comments, news, ecc.)
 
 ### Non loggato (visitatore)
+
 - Tutto identico al loggato
 - Click su bottoni Trade → dialog signup
 - Bet Slip e Trade Widget chiedono login al primo trade
 - Sidebar mostra Trade Widget visualizzabile ma azione bloccata
 
 ### Modalità Demo
+
 - Banner persistente "Modalità Demo"
 - Saldo visualizzato è virtuale (paper money)
 - Tutto funzionante, ordini in demo store separato
@@ -1224,6 +1252,7 @@ Layout completo con dati real-time via WebSocket.
 ### Real-time updates
 
 Aggiornamenti via WebSocket per:
+
 - **Prezzi share** (CLOB `price_change`): aggiornamento bottoni Yes/No/Up/Down/Team
 - **Chart price storia**: aggiornamento linea live (per crypto round, ogni secondo)
 - **Score live sport**: WebSocket Sport WS
@@ -1235,11 +1264,13 @@ Aggiornamenti via WebSocket per:
 ### Click su bottoni Trade
 
 Desktop:
+
 - Click su bottone Yes/No/Up/Down/Team → il **side viene pre-selezionato** nel widget sidebar
 - Se modalità Mercato attiva: importo focus, l'utente digita
 - Se modalità Limite attiva: prezzo limit focus
 
 Mobile:
+
 - Click su bottone Yes/No/Up/Down/Team → **bottom sheet sale dal basso** con widget pre-compilato
 - Pagina dietro oscurata (ma countdown, prezzo live, chart restano leggibili sopra)
 - Swipe down chiude il bottom sheet
@@ -1247,6 +1278,7 @@ Mobile:
 ### Switch outcome dentro il widget
 
 Click sull'icona `⟲` accanto al chip outcome:
+
 - Apre selector con tutti gli outcome disponibili
 - L'utente sceglie un outcome diverso senza chiudere widget
 - Importo/prezzo si resetta automaticamente
@@ -1254,6 +1286,7 @@ Click sull'icona `⟲` accanto al chip outcome:
 ### Tabs intermediate (H2H Sport)
 
 Click su un tab (es. "Punti"):
+
 - Cambia il contenuto della sezione mercati
 - Mostra solo i mercati di quel tipo
 - Trade widget si aggiorna se ha un side selezionato di un altro tab
@@ -1261,17 +1294,20 @@ Click su un tab (es. "Punti"):
 ### Round navigation (Crypto Up/Down)
 
 Click su `[< Round 4520]`:
+
 - Naviga alla pagina del round precedente (closed/resolved)
 - Mostra esito (Up won / Down won) e chart finale
 - Trade widget mostra "This round is closed" + bottone "Go to LIVE round"
 
 Click su `[Round 4522 >]` (futuro):
+
 - Bottone disabilitato finché non parte
 - Quando parte (es. countdown attivo precedente arriva a 0): si attiva automaticamente
 
 ### Pattern 1 auto-refresh (Crypto Round)
 
 Quando l'utente è sulla pagina del round 4521 LIVE e il countdown arriva a 0:
+
 - Il mercato si risolve (Up won o Down won)
 - Toast notification: "Round 4521 ended! Up won. Round 4522 is now LIVE."
 - Pagina si aggiorna automaticamente al **round 4522** (nuovo LIVE)
@@ -1282,6 +1318,7 @@ Quando l'utente è sulla pagina del round 4521 LIVE e il countdown arriva a 0:
 ### Pattern 2 promozione outcome (Multi-outcome con date, Multi-strike)
 
 Quando un outcome dentro l'evento si risolve:
+
 - L'outcome scompare dalla lista visibile
 - Gli altri outcome si riordinano
 - Toast notification (se l'utente è sulla pagina): "Outcome [nome] resolved as [Yes/No]"
@@ -1293,19 +1330,19 @@ Quando un outcome dentro l'evento si risolve:
 
 La pagina evento è una **deep view** dell'evento. Differenze chiave dalla Home:
 
-| Aspetto | Home | Pagina Evento |
-|---|---|---|
-| Vista | Lista di EventCard (compatte) | 1 evento espanso completamente |
-| Trade | Bottone "+" → Bet Slip | Bottoni inline + widget sidebar/bottom sheet |
-| Chart | Sparkline o niente | Chart completo storia |
-| Comments | Niente | Tab dedicato |
-| Holders | Niente | Tab dedicato |
-| Rules | Niente | Tab dedicato |
-| Sentiment | Sidebar minimale | Sidebar dettagliata |
-| Indicatori tecnici | Niente | Sì (solo crypto round) |
-| Round navigation | Niente | Sì (solo crypto round) |
-| Sub-tabs mercati interni | Niente | Sì (solo H2H sport) |
-| Slider spread/totali | Niente | Sì (solo H2H sport) |
+| Aspetto                  | Home                          | Pagina Evento                                |
+| ------------------------ | ----------------------------- | -------------------------------------------- |
+| Vista                    | Lista di EventCard (compatte) | 1 evento espanso completamente               |
+| Trade                    | Bottone "+" → Bet Slip        | Bottoni inline + widget sidebar/bottom sheet |
+| Chart                    | Sparkline o niente            | Chart completo storia                        |
+| Comments                 | Niente                        | Tab dedicato                                 |
+| Holders                  | Niente                        | Tab dedicato                                 |
+| Rules                    | Niente                        | Tab dedicato                                 |
+| Sentiment                | Sidebar minimale              | Sidebar dettagliata                          |
+| Indicatori tecnici       | Niente                        | Sì (solo crypto round)                       |
+| Round navigation         | Niente                        | Sì (solo crypto round)                       |
+| Sub-tabs mercati interni | Niente                        | Sì (solo H2H sport)                          |
+| Slider spread/totali     | Niente                        | Sì (solo H2H sport)                          |
 
 ---
 
@@ -1395,5 +1432,5 @@ Documenti che verranno costruiti nelle prossime sessioni:
 
 ---
 
-*Fine Documento 4 — Wireframes — Pagina 2 (Pagina evento) v3*
-*Continua con Pagina 3 (Profilo /me) nella sessione successiva*
+_Fine Documento 4 — Wireframes — Pagina 2 (Pagina evento) v3_
+_Continua con Pagina 3 (Profilo /me) nella sessione successiva_

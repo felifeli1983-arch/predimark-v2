@@ -24,11 +24,13 @@ L'obiettivo è massimizzare la **conversion** mantenendo qualità: l'utente deve
 Adottiamo un approccio **ibrido** in 2 fasi:
 
 **Fase 1 — Signup minimo (30 secondi)**:
+
 - Email/Google/Apple/Twitter via Privy
 - Wallet creato automaticamente in background
 - L'utente entra subito nella home
 
 **Fase 2 — Onboarding soft (skippabile, 2 minuti se completato)**:
+
 - Banner non-bloccante in cima alla home
 - Modal soft con step opzionali (profilo, preferenze, primo trade demo)
 - Skip facile in qualsiasi momento
@@ -36,6 +38,7 @@ Adottiamo un approccio **ibrido** in 2 fasi:
 ### Default modalità: DEMO
 
 Il nuovo utente atterra in **modalità Demo** con $10,000 paper money. Può:
+
 - Esplorare la home con dati live (prezzi, segnali, leaderboard)
 - Fare trade demo per familiarizzare
 - Switch a REAL quando vuole (richiede deposit USDC)
@@ -45,6 +48,7 @@ Questo abbassa drasticamente la barriera psicologica all'ingresso.
 ### Geo-block trasparente
 
 Pattern doppio:
+
 - **Banner soft al signup** (trasparente: "Da Italia, real trading non disponibile, ma demo sì")
 - **Redirect concreto al trade**: quando prova a fare un trade real, redirect a demo con tooltip esplicativo
 
@@ -223,6 +227,7 @@ Domanda smart unica nell'onboarding soft: "Cosa ti interessa?" con chip categori
 ### Flussi alternativi
 
 #### Flusso Email
+
 1. Click "Continue with Email" → input email
 2. Privy invia codice OTP (6 cifre)
 3. Redirect a `/signup/verify` per inserire codice
@@ -230,12 +235,14 @@ Domanda smart unica nell'onboarding soft: "Cosa ti interessa?" con chip categori
 5. Redirect a `/home` con DEMO mode attivo
 
 #### Flusso OAuth (Google/Apple/X)
+
 1. Click "Continue with X" → OAuth popup/redirect
 2. Authorize → callback Privy
 3. Wallet creato automaticamente
 4. Redirect a `/home`
 
 #### Flusso External Wallet
+
 1. Click "Connect external wallet" → modal con lista wallet
 2. Click su MetaMask (es.) → richiesta firma
 3. User firma message → autenticazione
@@ -245,6 +252,7 @@ Domanda smart unica nell'onboarding soft: "Cosa ti interessa?" con chip categori
 ### Geo-block check (in background)
 
 Mentre l'utente firma/verifica, il backend fa **geo-check** via IP:
+
 - Paese **allowed**: signup completato normalmente, accesso REAL + DEMO
 - Paese **demo-only** (es. Italy): signup completato, banner permanente "Real trading not available", DEMO completo
 - Paese **blocked** (es. sanzioni): signup bloccato con messaggio "Service not available in your region"
@@ -317,6 +325,7 @@ Vedi sezione successiva.
 #### 3. Tooltip contestuali (smart hints)
 
 Per i primi minuti, alcuni elementi della UI hanno **tooltip contestuali**:
+
 - Hover su "Bet Slip" → "Add markets here to bet on multiple outcomes"
 - Hover su switch REAL/DEMO → "You're in DEMO mode. Switch to REAL when ready."
 - Hover su Segnale Predimark → "Algorithmic signal calibrated on real performance"
@@ -382,6 +391,7 @@ You can change this later in settings.
 ```
 
 **Caratteristiche**:
+
 - Multi-select chip layout grid 4x2
 - Hover/active state con bordo blu
 - Almeno 1 selezione ottimale ma skippabile
@@ -410,6 +420,7 @@ You can sell later if you change your mind.
 ```
 
 **Caratteristiche**:
+
 - Mercato selezionato dinamicamente (uno popolare al momento)
 - 2 bottoni grandi: Buy YES / Buy NO
 - Click su uno → esegue trade demo, mostra animazione success, passa a Step 4
@@ -434,6 +445,7 @@ Premium tier ($5/month):
 ```
 
 **Caratteristiche**:
+
 - Click "Connect Telegram" → apre Telegram bot in nuova tab/finestra
 - Click "Maybe later" → finisce onboarding, ricorda di proporlo dopo 7 giorni
 - Click "Skip onboarding" → finisce onboarding senza promemoria
@@ -445,7 +457,7 @@ You're all set! 🎉
 
 What you can do now:
 ✓ Explore featured markets
-✓ Make demo trades freely  
+✓ Make demo trades freely
 ✓ Switch to REAL anytime
 
 [Start exploring]
@@ -456,6 +468,7 @@ Click "Start exploring" → chiude modal, l'utente è in home pronto a usare il 
 ### Skip flow
 
 Se l'utente clicca "Skip onboarding" in qualsiasi step:
+
 - Modal si chiude
 - Toast: "You can complete onboarding later from your profile"
 - Banner welcome rimane visibile in home
@@ -511,7 +524,7 @@ Mostrato già al signup (no signup permesso):
 ```
 Service not available in your region.
 
-Predimark is not available in your country due to international 
+Predimark is not available in your country due to international
 sanctions or local regulations.
 
 If you believe this is an error, please contact support.
@@ -528,6 +541,7 @@ If you believe this is an error, please contact support.
 L'utente clicca switch REAL nell'header (era in DEMO):
 
 #### Caso A — Saldo $0 USDC
+
 ```
 ┌──────────────────────────────────────────────────┐
 │ You need USDC to trade in REAL mode              │
@@ -540,6 +554,7 @@ L'utente clicca switch REAL nell'header (era in DEMO):
 ```
 
 #### Caso B — Saldo > $0 USDC
+
 Switch immediato a REAL, toast "You're now in REAL mode."
 
 ### Pagina `/me/deposit`
@@ -574,6 +589,7 @@ Switch immediato a REAL, toast "You're now in REAL mode."
 KYC richiesto solo per **withdraw** (non per signup, non per deposit, non per trade).
 
 Quando l'utente prova a fare withdraw:
+
 1. Form withdraw → input importo + destination
 2. Se KYC non fatto: redirect a `/me/kyc/start`
 3. Wizard KYC (3 step: ID upload, selfie, address proof)
@@ -586,9 +602,11 @@ Quando l'utente prova a fare withdraw:
 ## STATI DELLE PAGINE
 
 ### Default (utente nuovo, signup completato)
+
 DEMO mode attivo, banner welcome, modal onboarding soft.
 
 ### Loading durante signup
+
 - Spinner durante OAuth callback
 - "Creating your wallet..." durante Privy embedded wallet creation
 - Skeleton placeholder per home iniziale
@@ -596,29 +614,34 @@ DEMO mode attivo, banner welcome, modal onboarding soft.
 ### Errori comuni
 
 #### Errore email OTP scaduto
+
 ```
 Code expired. [Request new code]
 ```
 
 #### Errore OAuth fallito
+
 ```
 Authentication failed. Please try again.
 [Back to signup]
 ```
 
 #### Errore wallet connection
+
 ```
 Wallet connection rejected. Please try again or use email signup.
 [Try again] [Use email instead]
 ```
 
 #### Errore geo-block (paese sanzionato)
+
 ```
 Service not available in your region.
 [Contact support]
 ```
 
 #### Errore network during signup
+
 ```
 Network error. Please check your connection and try again.
 [Retry]
@@ -635,6 +658,7 @@ Quando l'utente digita una cifra nell'input OTP, il focus passa automaticamente 
 ### Onboarding modal close
 
 Click su `[×]` o ESC → conferma:
+
 ```
 Skip onboarding?
 You can replay it later from your profile.
@@ -648,6 +672,7 @@ Switch in header → se saldo $0, dialog deposit. Altrimenti switch immediato.
 ### Signup multi-tab
 
 Se l'utente apre signup in 2 tab e completa in una, l'altra mostra:
+
 ```
 You're already signed in.
 [Go to home]
@@ -678,6 +703,7 @@ Per ottimizzare la conversion, tracciamo:
 13. **First real trade**: count + time from signup
 
 Funnel target (D30):
+
 - Signup → first demo trade: 60%
 - Signup → first real deposit: 15%
 - Signup → first real trade: 12%
@@ -707,6 +733,7 @@ EN (English) · ES (Español) · PT (Português) · IT (Italiano) · FR (França
 ### Detection automatica
 
 Al primo atterraggio:
+
 1. Check browser language (`Accept-Language` header)
 2. Match con lingue supportate
 3. Default a EN se nessun match
@@ -714,6 +741,7 @@ Al primo atterraggio:
 ### Switch manuale
 
 Footer di `/signup` ha switch lingua (dropdown):
+
 ```
 🌐 English ▼
    English
@@ -745,6 +773,7 @@ Cambio lingua → reload pagina con cookie persistente.
 ### Integrazione Privy
 
 Privy gestisce:
+
 - Email OTP signup
 - OAuth (Google, Apple, X)
 - External wallet connection
@@ -753,6 +782,7 @@ Privy gestisce:
 - JWT generation
 
 Configurazione Privy:
+
 - Project ID: definito in `/admin/settings/integrations`
 - Login methods: email, google, apple, twitter, wallet
 - Embedded wallet: auto-create on signup
@@ -813,15 +843,15 @@ Questa è l'ultima pagina del Documento 4 — Wireframes.
 
 ### Riepilogo finale
 
-| # | Pagina | Status |
-|---|---|---|
-| 1 | Home v2 | ✅ |
-| 2 | Pagina evento v3 | ✅ |
-| 3 | Profilo /me v1 | ✅ |
-| 4 | Profilo creator v1 | ✅ |
-| 5 | Leaderboard v1 | ✅ |
-| 6 | Admin overview v1 | ✅ |
-| 7 | Signup + onboarding v1 | ✅ adesso |
+| #   | Pagina                 | Status    |
+| --- | ---------------------- | --------- |
+| 1   | Home v2                | ✅        |
+| 2   | Pagina evento v3       | ✅        |
+| 3   | Profilo /me v1         | ✅        |
+| 4   | Profilo creator v1     | ✅        |
+| 5   | Leaderboard v1         | ✅        |
+| 6   | Admin overview v1      | ✅        |
+| 7   | Signup + onboarding v1 | ✅ adesso |
 
 **Documento 4 — Wireframes — COMPLETO**
 
@@ -836,5 +866,5 @@ Questa è l'ultima pagina del Documento 4 — Wireframes.
 
 ---
 
-*Fine Documento 4 — Wireframes — Pagina 7 (Signup + onboarding)*
-*Documento 4 completato al 100%*
+_Fine Documento 4 — Wireframes — Pagina 7 (Signup + onboarding)_
+_Documento 4 completato al 100%_

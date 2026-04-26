@@ -6,6 +6,7 @@
 > Status: bozza v3 — incorporata leaderboard ibrida adattiva e service fee External
 >
 > **Changelog v3 (rispetto a v2)**:
+>
 > - Pilastro 3 (Copy Trading) riscritto con architettura adattiva 1→2 leaderboard, delay 30 min, service fee 1%
 > - Demo Mode promosso da sezione standalone a Pilastro 5
 > - Sezione "Cosa Predimark NON è" estesa con disclosure trasparente su External Traders
@@ -24,7 +25,7 @@
 
 **Predimark aiuta chiunque a fare predizioni sui mercati che contano — elezioni, sport, crypto, cultura — in modo veloce, automatizzato, e accessibile anche senza wallet.**
 
-In una sola riga: *"Polymarket, ma con segnali, copy trading, e senza la complessità crypto."*
+In una sola riga: _"Polymarket, ma con segnali, copy trading, e senza la complessità crypto."_
 
 ---
 
@@ -66,21 +67,25 @@ Polymarket mostra prezzi e volumi, ma è una tabula rasa: nessuna analisi, nessu
 Predimark V2 ha **un target primario** e tre target secondari complementari.
 
 ### Target primario — Il "newbie curioso ma non crypto-native"
+
 Una persona di 25-45 anni che ha sentito parlare di Polymarket dopo le elezioni 2024/2028 o vede screenshot di trade su Twitter. Vuole partecipare ma non ha mai usato un wallet crypto. È a suo agio con app fintech (Revolut, Robinhood, Wise) e vorrebbe un'esperienza simile per i prediction markets.
 
 **Per questo target costruiamo**: signup email, fiat onramp, segnali "ti aiutano a scegliere", demo mode per imparare, design pulito mobile-first.
 
 ### Target secondario 1 — Il "user-friendly seeker"
+
 Già usa Polymarket ma non gli piace. Trova l'interfaccia confusa, mobile pessimo, mancano alert. È disposto a cambiare se trova qualcosa di meglio.
 
 **Per questo target costruiamo**: layout dedicati per CardKind, bot Telegram, copy trading dei top trader, notifiche real-time, search e filtri migliori.
 
 ### Target secondario 2 — Il "trader sportivo che migra"
+
 Gioca a Bet365, Betfair, scommesse tradizionali. Sta scoprendo che i prediction markets pagano meglio delle scommesse classiche. Conosce odds e probabilità ma non blockchain.
 
 **Per questo target costruiamo**: vista sport dedicata con score live, moneyline + spreads + totals + player props, payout chiari in dollari.
 
 ### Target secondario 3 — Il "crypto-native esperto"
+
 Ha già wallet, sa cos'è USDC e gas fee. Vuole un terminale migliore di Polymarket diretto.
 
 **Per questo target costruiamo**: connect wallet esterno (MetaMask, Phantom, Rabby, Coinbase), trading widget veloce, copy trading semi-auto con session keys avanzate, segnali API.
@@ -123,12 +128,14 @@ Su tante cose competiamo. Su quattro vinciamo.
 ### 1. Segnali algoritmici real-time con trasparenza totale
 
 Ogni mercato attivo riceve un segnale dal nostro motore. Per i round crypto brevi, il segnale è continuo. Per gli altri, frequente. Ogni segnale ha:
+
 - Una **direzione** consigliata (Buy Yes, Buy No, Hold)
 - Un **edge stimato** in punti percentuali
 - Una **confidence** basata su backtest sui dati storici Polymarket
 - Una **strategia** che lo ha generato (es. "Final Period Momentum", "Mean Reversion", "Panic Fade")
 
 E soprattutto:
+
 - Un **log pubblico** di tutti i segnali passati con il loro outcome reale
 - Un **calibration score** aggiornato che mostra quanto siamo affidabili
 
@@ -136,9 +143,10 @@ Nessun altro builder Polymarket lo fa con questo livello di trasparenza. Polymar
 
 ### 2. Layout dedicati per ogni tipo di mercato
 
-I mercati Polymarket non sono tutti uguali. Una previsione binaria (*"Trump vincerà?"*) è diversa da una multi-outcome (*"Chi vincerà la Champions?"*) che è diversa da uno sport h2h (*"Lakers vs Celtics"*) che è diversa da un round crypto 5m.
+I mercati Polymarket non sono tutti uguali. Una previsione binaria (_"Trump vincerà?"_) è diversa da una multi-outcome (_"Chi vincerà la Champions?"_) che è diversa da uno sport h2h (_"Lakers vs Celtics"_) che è diversa da un round crypto 5m.
 
 Polymarket usa **lo stesso layout per tutti**. Predimark usa **layout dedicati**:
+
 - **Binary**: donut probabilità, history price, trade widget Yes/No
 - **Multi-outcome**: lista candidates con barra orizzontale, ranking dinamico
 - **H2H sport**: ScoreCard live in cima, prob 2 team affiancate, sub-tabs Moneyline/Spread/Totals/Player Props
@@ -162,6 +170,7 @@ L'utente può copiare i trade dei migliori trader in due categorie complementari
 Tutti i top trader Polymarket sono visibili nella nostra leaderboard, perché i loro wallet sono on-chain e i trade sono pubblici. Importiamo i dati via Polymarket Data API.
 
 **Caratteristiche**:
+
 - Profilo `/trader/[address]` con avatar generico (gradient da hash) e address troncato
 - **Niente delay**: posizioni in real-time (sono già on-chain)
 - **Disclaimer permanente** "External Trader · Non partner Predimark" su ogni profilo
@@ -173,6 +182,7 @@ Tutti i top trader Polymarket sono visibili nella nostra leaderboard, perché i 
 Trader che si registrano consapevolmente al programma. Profilo verificato `/creator/[username]` con foto, bio, social links, score Predimark (87/100), tier (Gold/Silver/Bronze/Rising/Standard), achievements.
 
 **Win-win**:
+
 - Il creator riceve **30% delle builder fee** generate dai trade dei suoi follower
 - I follower hanno trader top selezionati con SLA implicito
 - Predimark vince con più volume e qualità
@@ -182,6 +192,7 @@ Trader che si registrano consapevolmente al programma. Profilo verificato `/crea
 #### Modalità di esecuzione configurabili dall'utente
 
 Per ogni trader seguito (sia Verified che External):
+
 - **Manuale** — Notifica + 1 click per replicare con firma classica. Massima sicurezza.
 - **Auto 24 ore** — Pre-autorizzi i trade copy per 24h, poi rinnovi
 - **Auto 7 giorni** — Pre-autorizzi per la settimana
@@ -191,6 +202,7 @@ Per ogni trader seguito (sia Verified che External):
 Tutto basato su **Privy Session Keys**: l'utente firma off-chain una volta sola, viene generata una chiave temporanea con vincoli stringenti (budget max, max per trade, mercati ammessi, scadenza), il backend usa quella chiave per firmare i trade copy fino a scadenza o revoca. Mai custodial, sempre revocabile.
 
 **Tutele utente obbligatorie**:
+
 - Notifica push per ogni trade copy automatico (sai sempre cosa succede)
 - Pagina "Le mie session" sempre accessibile, con stato e tasto "Revoca"
 - Email summary settimanale con tutti i trade copy fatti
@@ -203,6 +215,7 @@ Tutto basato su **Privy Session Keys**: l'utente firma off-chain una volta sola,
 I prediction markets si muovono spesso fuori orario. Polymarket ti chiede di stare incollato al sito.
 
 Predimark V2 ha un **bot Telegram** che ti notifica:
+
 - Segnali nuovi sui mercati nella tua watchlist
 - Movimenti grossi di prezzo (es. >5% in 1h)
 - Trade dei creator che segui (in modalità Manuale)
@@ -218,6 +231,7 @@ Tier free: notifiche con delay 5min. Tier paid ($5/mese): real-time + segnali pr
 Ogni utente Predimark **atterra in modalità Demo di default** dopo il signup, con $10.000 di paper money virtuale. Questa è la nostra strategia principale per abbassare la barriera psicologica all'ingresso.
 
 **Caratteristiche**:
+
 - $10.000 di **paper money** virtuale al primo accesso
 - **Prezzi reali e live** presi dai feed Polymarket (zero simulazione)
 - **Segnali reali e live** dal nostro motore (stessi degli utenti reali)
@@ -236,6 +250,7 @@ Ogni utente Predimark **atterra in modalità Demo di default** dopo il signup, c
 5. **A/B testing infrastruttura**: possiamo provare nuove feature (algoritmi, UI, segnali) sui demo user prima del rollout real.
 
 **Chi lo usa**:
+
 - **Newbie**: capiscono il prodotto prima di depositare
 - **Utenti geo-bloccati**: esperienza completa anche senza poter tradare real
 - **Trader esperti**: testano nuove strategie senza rischio
@@ -250,6 +265,7 @@ Ogni utente Predimark **atterra in modalità Demo di default** dopo il signup, c
 **1. Builder fees Polymarket (revenue principale a regime)**
 
 Per ogni trade fatto da utenti Predimark, Polymarket ci paga una builder fee.
+
 - **Limite massimo Polymarket**: 1.0% del volume tradato
 - **Promo lancio (primi 30 giorni)**: 0% — incentivo all'adozione
 - **Target a regime**: 0.5% — sostenibile, competitivo (Betmoar applica ~0.25%, Polymtrade 0%)
@@ -291,6 +307,7 @@ Verified Creators registrati al programma ricevono **30% delle builder fee** gen
 Esempio: follower fa $1000 di volume copiando Creator @theo4 → builder fee Predimark $5 → @theo4 riceve $1.50, Predimark $3.50.
 
 Win-win:
+
 - Creator: incentivo a tradare bene e attirare follower
 - Follower: hanno trader top selezionati con SLA implicito
 - Predimark: più volume tradato, qualità della classifica
@@ -300,10 +317,12 @@ Win-win:
 Va detto chiaramente: **a 3 mesi dal lancio, le sole builder fees non bastano per sostenere i costi**. I conti realistici aggiornati:
 
 **Scenario conservativo a 3 mesi** (basato su 100 utenti attivi/settimana):
+
 - 100 utenti attivi/settimana × $50 volume medio = $5.000/settimana = $20k/mese di volume
 - Builder fee 0.5% = **$100/mese** dalle builder fees pure
 
 **Scenario con copy trading External attivo**:
+
 - Aggiunta: copy trading External Trader genera volume incrementale stimato +20-30% (utenti che copiano whale Polymarket fanno volume più alto del trader medio)
 - Service fee 1% sui profitti = revenue extra stimato **$50-100/mese** a 3 mesi
 - Cold start risolto: leaderboard piena dal day 1 = utenti vedono valore subito = retention migliore
@@ -337,6 +356,7 @@ Polymarket ha avuto questo problema nel 2020-2022 e l'ha risolto con anni di cre
 ### Il problema concreto
 
 Senza una strategia esplicita, al lancio avremmo:
+
 - Leaderboard vuota (0 trader nostri)
 - 0 Verified Creators
 - 0 trade history per stats / calibration / score
@@ -377,14 +397,14 @@ L'admin gestisce il trigger runtime senza deploy. Pattern di **graceful upgrade*
 
 ### Tempistica realistica
 
-| Tempo | Verified Creators | Top Traders importati | Tab leaderboard |
-|---|---|---|---|
-| Lancio | 0-5 | ~1,000 | 1 unificata |
-| Mese 1 | 5-15 | ~1,500 | 1 unificata |
-| Mese 3 | 15-30 | ~2,000 | 1 unificata |
-| Mese 6 | 30-50 | ~3,000 | 1 unificata (border) |
-| Mese 9 | 50-80 | ~4,000 | **2 tab attivate** |
-| Mese 12 | 80-150 | ~5,000 | 2 tab consolidate |
+| Tempo   | Verified Creators | Top Traders importati | Tab leaderboard      |
+| ------- | ----------------- | --------------------- | -------------------- |
+| Lancio  | 0-5               | ~1,000                | 1 unificata          |
+| Mese 1  | 5-15              | ~1,500                | 1 unificata          |
+| Mese 3  | 15-30             | ~2,000                | 1 unificata          |
+| Mese 6  | 30-50             | ~3,000                | 1 unificata (border) |
+| Mese 9  | 50-80             | ~4,000                | **2 tab attivate**   |
+| Mese 12 | 80-150            | ~5,000                | 2 tab consolidate    |
 
 Stime conservative basate su tasso di onboarding manuale Verified e crescita organica.
 
@@ -406,16 +426,19 @@ Questo approccio è la nostra **interpretazione etica** di un'opportunità di me
 Lancio agosto 2026. A novembre 2026 vogliamo:
 
 **Metriche di adozione utenti**:
+
 - **1.000 utenti registrati**
 - **100 utenti attivi a settimana** (login almeno 1 volta nei 7 giorni)
 - **30% W1 retention** sugli utenti registrati
 
 **Metriche economiche**:
+
 - **$100.000 di volume tradato totale** (sia da volume medio diffuso che da whale; entrambi contano)
 - **50 abbonati al bot Telegram premium** ($250 MRR base)
 - **5 creator attivi nel programma** con almeno 10 follower ciascuno
 
 **Metriche di prodotto**:
+
 - **Calibration score segnali ≥ 0.55** (i segnali devono essere meglio del random per essere credibili)
 - **NPS utenti attivi ≥ 30** (feedback positivo della base utenti reali)
 
@@ -426,26 +449,31 @@ Sono numeri **realistici per una nicchia**, non per un consumer mass-market. Il 
 ## Lingue e geo-targeting
 
 ### Lingue supportate al lancio
+
 **EN, ES, PT, IT, FR** — interfaccia completamente tradotta. L'utente sceglie nella signup, può cambiare in qualunque momento.
 
 ### Cosa è tradotto, cosa no (V1)
+
 - ✅ UI Predimark (bottoni, menu, label, errori, tooltip, onboarding, email)
 - ❌ Titoli/descrizioni mercati Polymarket → restano in inglese originale al lancio
 - ❌ Rules di risoluzione → restano sempre in inglese originale (anche in V2, per evitare ambiguità legali in caso di dispute)
 
 ### Cosa pianifichiamo per V2 (post-lancio)
+
 - Traduzione automatica titoli/descrizioni Polymarket con cache permanente in DB
 - Provider candidato: Claude API (qualità) o ibrido con DeepL
 - Tempistica: 2-3 mesi dopo il lancio V1, basandoci sulle richieste utenti
 
 ### Geo-blocking
+
 Predimark è builder sopra Polymarket. **Seguiamo le regole geo di Polymarket** (USA, UK, FR, DE, IT, AU, SG, RU, e altri). Da quei IP:
+
 - ✅ Navigazione consentita (vedere mercati, segnali, dati)
 - ✅ Demo mode consentito (paper trading)
 - ❌ Trading reale disabilitato (no creazione ordini)
 - ❌ Onramp fiat disabilitato
 
-L'utente da paese geo-bloccato vede l'app in modalità "Read + Demo Only" con disclaimer: *"Trading not available in your region. You can still browse markets, follow signals, and use demo mode. Predimark follows Polymarket's geo restrictions."*
+L'utente da paese geo-bloccato vede l'app in modalità "Read + Demo Only" con disclaimer: _"Trading not available in your region. You can still browse markets, follow signals, and use demo mode. Predimark follows Polymarket's geo restrictions."_
 
 ---
 
@@ -454,6 +482,7 @@ L'utente da paese geo-bloccato vede l'app in modalità "Read + Demo Only" con di
 ### Modello: Privy embedded primary + external wallet supportati
 
 **Per utenti newbie (target primario)**:
+
 1. Signup con email/Google/Apple (Privy)
 2. Privy crea silenziosamente un wallet embedded a nome dell'utente
 3. UI mostra "Saldo: $0", non parla di wallet a meno che l'utente lo cerchi
@@ -461,6 +490,7 @@ L'utente da paese geo-bloccato vede l'app in modalità "Read + Demo Only" con di
 5. Trade
 
 **Per utenti crypto-native**:
+
 1. Click "Connect Wallet" nella signup
 2. Sceglie tra MetaMask, Phantom, Coinbase Wallet, Rabby, WalletConnect
 3. Firma il messaggio di login
@@ -468,7 +498,8 @@ L'utente da paese geo-bloccato vede l'app in modalità "Read + Demo Only" con di
 5. Trade senza depositi
 
 ### Dichiarazione di non-custodia
-> *"Predimark non è custodial. Il tuo wallet è tuo, le tue chiavi sono tue. Puoi sempre esportare la chiave privata e portare via i tuoi fondi. Predimark è solo un'interfaccia che ti aiuta a usare il tuo wallet su Polymarket."*
+
+> _"Predimark non è custodial. Il tuo wallet è tuo, le tue chiavi sono tue. Puoi sempre esportare la chiave privata e portare via i tuoi fondi. Predimark è solo un'interfaccia che ti aiuta a usare il tuo wallet su Polymarket."_
 
 Importante legalmente (UE/MiCA) e per fiducia utente.
 
@@ -479,24 +510,31 @@ Importante legalmente (UE/MiCA) e per fiducia utente.
 Quando dobbiamo scegliere tra A e B in fase di sviluppo, applichiamo questi principi:
 
 ### 1. Trasparenza prima di tutto
+
 Mostriamo le nostre fee. Mostriamo le performance dei nostri segnali (anche quelli che hanno perso). Mostriamo che non siamo custodial. Niente trick, niente dark pattern.
 
 ### 2. Mobile-first, sempre
+
 Il 70%+ degli utenti web sono mobile. Ogni decisione UX si valuta sul mobile prima che su desktop. Se non funziona su uno schermo da 380px, non funziona.
 
 ### 3. Onboarding come una banca moderna, trading come un terminale serio
+
 L'onboarding deve essere semplice come Revolut. Il trading deve essere preciso come un terminale Bloomberg.
 
 ### 4. Velocità prima della perfezione visiva
+
 Predimark V2 deve caricare in <2 secondi su 4G. I dati devono essere live. Quando in dubbio tra "bello e lento" e "essenziale e veloce", scegliamo veloce.
 
 ### 5. Mai fare l'utente sentire stupido
-Niente messaggi tipo *"Insufficient liquidity for slippage tolerance"*. Diciamo *"Il tuo ordine è troppo grande per il momento. Prova con un importo più piccolo o usa un ordine limite."*. Il gergo finanziario è opzionale, mai obbligatorio.
+
+Niente messaggi tipo _"Insufficient liquidity for slippage tolerance"_. Diciamo _"Il tuo ordine è troppo grande per il momento. Prova con un importo più piccolo o usa un ordine limite."_. Il gergo finanziario è opzionale, mai obbligatorio.
 
 ### 6. Respect the data source
+
 I prezzi che mostriamo vengono da Polymarket o da Chainlink/Binance per crypto. Non li manipoliamo, non li ritardiamo. Se la fonte dice X, mostriamo X. Sempre.
 
 ### 7. Sicurezza > Funzionalità
+
 Quando una feature aggiunge rischio (custodia, copy trading aggressivo, automazione), scegliamo sempre la versione più sicura anche se meno fluida. Meglio perdere 5 secondi di UX che esporre i fondi degli utenti.
 
 ---
@@ -505,18 +543,18 @@ Quando una feature aggiunge rischio (custodia, copy trading aggressivo, automazi
 
 Dettaglio nel **Documento 9 — Roadmap completa**. Sintesi qui:
 
-| Settimana | Focus |
-|---|---|
-| 1-2 | Setup repo, Supabase, autenticazione Privy, geoblocking |
-| 3-4 | Home con eventi live, layout cards per CardKind, navigazione |
-| 5-7 | 5 pagine evento dedicate (binary, multi-outcome, h2h sport, crypto round, multi-strike) |
-| 8 | Trade widget completo con builder code Polymarket V2 + Privy Session Keys |
-| 9 | Integrazione MoonPay onramp |
-| 10-11 | Motore segnali (estensione PolymarketBTC15mAssistant a 7 coin × 4 timeframe) |
-| 12 | Demo mode con paper trading |
-| 13 | Copy trading: leaderboard, profili creator, session keys configurabili |
-| 14 | Bot Telegram con notifiche e tier premium |
-| 15 | i18n complete (5 lingue), polish finale, beta privata |
+| Settimana | Focus                                                                                   |
+| --------- | --------------------------------------------------------------------------------------- |
+| 1-2       | Setup repo, Supabase, autenticazione Privy, geoblocking                                 |
+| 3-4       | Home con eventi live, layout cards per CardKind, navigazione                            |
+| 5-7       | 5 pagine evento dedicate (binary, multi-outcome, h2h sport, crypto round, multi-strike) |
+| 8         | Trade widget completo con builder code Polymarket V2 + Privy Session Keys               |
+| 9         | Integrazione MoonPay onramp                                                             |
+| 10-11     | Motore segnali (estensione PolymarketBTC15mAssistant a 7 coin × 4 timeframe)            |
+| 12        | Demo mode con paper trading                                                             |
+| 13        | Copy trading: leaderboard, profili creator, session keys configurabili                  |
+| 14        | Bot Telegram con notifiche e tier premium                                               |
+| 15        | i18n complete (5 lingue), polish finale, beta privata                                   |
 
 **Stima totale: 15 settimane** dal kickoff al lancio pubblico, lavorando con setup Cowork.
 
@@ -528,7 +566,7 @@ Dettaglio nel **Documento 9 — Roadmap completa**. Sintesi qui:
 
 Riassumo in un paragrafo perché Predimark V2 ha senso oggi:
 
-> *Polymarket sta diventando l'unicorn dei prediction markets ($600M+ volume mensile a metà 2026). Ha aperto il programma builder per consentire interfacce alternative sopra di loro. Esistono già builder generalisti (Betmoar) e specialisti (terminali Telegram, Polymtrade). Quello che manca è un builder che combini: onboarding facile per non-crypto-native (Polymtrade ha questo), segnali algoritmici trasparenti (nessuno ha questo), copy trading con session keys configurabili (nessuno ha questo), demo mode (nessuno ha questo), multilingua nativo (pochi hanno questo). Predimark V2 è l'unico builder che fa tutto questo insieme. La concorrenza diretta su questa combinazione è zero. Lo stack tecnico esiste già (Polymarket V2 SDK, Privy Session Keys, Supabase, NautilusTrader). I 5 codici di riferimento che abbiamo (poly-data, poly-maker, prediction-market-analysis, prediction-market-backtesting-3, PolymarketBTC15mAssistant) ci danno un vantaggio iniziale di mesi. Il momento è adesso.*
+> _Polymarket sta diventando l'unicorn dei prediction markets ($600M+ volume mensile a metà 2026). Ha aperto il programma builder per consentire interfacce alternative sopra di loro. Esistono già builder generalisti (Betmoar) e specialisti (terminali Telegram, Polymtrade). Quello che manca è un builder che combini: onboarding facile per non-crypto-native (Polymtrade ha questo), segnali algoritmici trasparenti (nessuno ha questo), copy trading con session keys configurabili (nessuno ha questo), demo mode (nessuno ha questo), multilingua nativo (pochi hanno questo). Predimark V2 è l'unico builder che fa tutto questo insieme. La concorrenza diretta su questa combinazione è zero. Lo stack tecnico esiste già (Polymarket V2 SDK, Privy Session Keys, Supabase, NautilusTrader). I 5 codici di riferimento che abbiamo (poly-data, poly-maker, prediction-market-analysis, prediction-market-backtesting-3, PolymarketBTC15mAssistant) ci danno un vantaggio iniziale di mesi. Il momento è adesso._
 
 ---
 
@@ -542,4 +580,4 @@ Riassumo in un paragrafo perché Predimark V2 ha senso oggi:
 
 ---
 
-*Fine Documento 1 — Vision & Product (versione 2)*
+_Fine Documento 1 — Vision & Product (versione 2)_

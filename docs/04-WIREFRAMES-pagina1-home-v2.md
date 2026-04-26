@@ -12,6 +12,7 @@
 Questo documento descrive **come appaiono visivamente** le pagine principali di Predimark V2. Non è un design Figma, è un **wireframe testuale dettagliato** che Cowork e i designer possono usare per costruire l'UI corretta.
 
 Per ogni pagina principale descriviamo:
+
 - Layout desktop (>1024px) e mobile (<768px)
 - Posizione e gerarchia degli elementi
 - Comportamenti interattivi
@@ -20,6 +21,7 @@ Per ogni pagina principale descriviamo:
 - Riferimenti incrociati a user stories e sitemap
 
 **Pagine documentate in questo file:**
+
 - Pagina 1 — Home (`/`) ✅ completa v2
 - Pagine 2-8 — In sessioni successive
 
@@ -28,14 +30,17 @@ Per ogni pagina principale descriviamo:
 ## DECISIONI DI STILE GLOBALI (applicabili a tutte le pagine)
 
 ### Direzione visiva
+
 Predimark V2 prende ispirazione dal **concept design Dribbble** stile "magazine moderno con sidebar task-oriented", combinato con **identità propria** che lo differenzia da Polymarket reale e da altri builder.
 
 **Cosa NON facciamo**:
+
 - Niente copia 1:1 di Polymarket reale
 - Niente giallo Binance (esclusione esplicita)
 - Niente UI minimalista austera (vogliamo personalità)
 
 **Cosa facciamo**:
+
 - Color blocking tematico per categoria
 - Sidebar adattiva basata su stato utente
 - Card grandi con donut probability prominenti
@@ -82,6 +87,7 @@ Predimark V2 prende ispirazione dal **concept design Dribbble** stile "magazine 
 ### Regole d'uso colori (UNIFORMITÀ ASSOLUTA)
 
 **Uso semantico stretto**:
+
 - 🟢 **Verde = SOLO** Yes / Up / Win / Profit positivo / Buy
 - 🔴 **Rosso = SOLO** No / Down / Loss / Profit negativo / Sell
 - 🔵 **Blu = SOLO** CTA primario, link, badge informativi
@@ -94,16 +100,16 @@ Predimark V2 prende ispirazione dal **concept design Dribbble** stile "magazine 
 
 Per dare identità visiva forte e differenziare la home da Polymarket, le **Hero card** usano un mood color basato sulla categoria del mercato in primo piano:
 
-| Tema mercato | Color hero | Atmosfera |
-|---|---|---|
-| Sport | Blu acceso `#3b82f6` | Energetico, action |
-| Politica/Elezioni | Rosso dignitoso `#dc2626` | Serio, formale |
-| Crypto | Arancione `#f97316` | Trading, adrenalina |
-| Cultura/Pop | Viola `#8b5cf6` | Creativo, fresh |
-| News/World | Verde acqua `#0d9488` | Calmo, informativo |
-| Geopolitica | Blu scuro `#1e40af` | Strategico, denso |
-| Economia/Finanza | Verde scuro `#15803d` | Stabilità, fiducia |
-| Tech | Viola scuro `#5b21b6` | Innovazione |
+| Tema mercato      | Color hero                | Atmosfera           |
+| ----------------- | ------------------------- | ------------------- |
+| Sport             | Blu acceso `#3b82f6`      | Energetico, action  |
+| Politica/Elezioni | Rosso dignitoso `#dc2626` | Serio, formale      |
+| Crypto            | Arancione `#f97316`       | Trading, adrenalina |
+| Cultura/Pop       | Viola `#8b5cf6`           | Creativo, fresh     |
+| News/World        | Verde acqua `#0d9488`     | Calmo, informativo  |
+| Geopolitica       | Blu scuro `#1e40af`       | Strategico, denso   |
+| Economia/Finanza  | Verde scuro `#15803d`     | Stabilità, fiducia  |
+| Tech              | Viola scuro `#5b21b6`     | Innovazione         |
 
 **Importante**: il color blocking si applica **solo alle Hero card** della home. La UI generale (header, navigation, card normali, sidebar) usa la palette base dark/light. Questo crea contrasto visivo forte: hero "tematica e colorata", resto "neutro e pulito".
 
@@ -141,13 +147,13 @@ Per dare identità visiva forte e differenziare la home da Polymarket, le **Hero
 
 Ricapitolo qui i 5 tipi di card che useremo in tutta l'app.
 
-| # | CardKind | Quando si usa | Esempio |
-|---|---|---|---|
-| 1 | **Binary** | Domanda Yes/No semplice | "Will Trump win 2028?" |
-| 2 | **Multi-outcome** | N candidati esclusivi (anche date) | "Champions winner" o "Quando finisce la guerra entro...?" |
-| 3 | **Multi-strike** | N soglie prezzo | "BTC max May ≥$100k, ≥$110k..." |
-| 4 | **H2H Sport** | Sport con team affiancati | "Lakers vs OKC" |
-| 5 | **Crypto Up/Down** | Round breve crypto | "BTC su o giù 5m" |
+| #   | CardKind           | Quando si usa                      | Esempio                                                   |
+| --- | ------------------ | ---------------------------------- | --------------------------------------------------------- |
+| 1   | **Binary**         | Domanda Yes/No semplice            | "Will Trump win 2028?"                                    |
+| 2   | **Multi-outcome**  | N candidati esclusivi (anche date) | "Champions winner" o "Quando finisce la guerra entro...?" |
+| 3   | **Multi-strike**   | N soglie prezzo                    | "BTC max May ≥$100k, ≥$110k..."                           |
+| 4   | **H2H Sport**      | Sport con team affiancati          | "Lakers vs OKC"                                           |
+| 5   | **Crypto Up/Down** | Round breve crypto                 | "BTC su o giù 5m"                                         |
 
 I mercati con date come outcome (es. "Quando finisce X entro... 30 aprile / 31 maggio") sono trattati come **Multi-outcome** standard. La differenza è solo nel contenuto degli outcome (date invece di nomi).
 
@@ -169,14 +175,14 @@ I mercati con date come outcome (es. "Quando finisce X entro... 30 aprile / 31 m
 
 ### Tabella riassuntiva
 
-| CardKind | Pattern refresh | "Scadenza" mostrata |
-|---|---|---|
-| Binary | Nessuno | "Closes [data]" o countdown <24h |
-| Multi-outcome (nominali) | Nessuno | "Closes [data]" |
-| Multi-outcome (date come outcome) | Pattern 2 | NIENTE data footer, date dentro outcome |
-| Multi-strike | Pattern 2 | NIENTE data footer, soglie con prob |
-| H2H Sport | Nessuno | "Live · HT" / "Game ends ~9pm" / "Final" |
-| Crypto Up/Down | Pattern 1 | Countdown "Round ends in MM:SS" |
+| CardKind                          | Pattern refresh | "Scadenza" mostrata                      |
+| --------------------------------- | --------------- | ---------------------------------------- |
+| Binary                            | Nessuno         | "Closes [data]" o countdown <24h         |
+| Multi-outcome (nominali)          | Nessuno         | "Closes [data]"                          |
+| Multi-outcome (date come outcome) | Pattern 2       | NIENTE data footer, date dentro outcome  |
+| Multi-strike                      | Pattern 2       | NIENTE data footer, soglie con prob      |
+| H2H Sport                         | Nessuno         | "Live · HT" / "Game ends ~9pm" / "Final" |
+| Crypto Up/Down                    | Pattern 1       | Countdown "Round ends in MM:SS"          |
 
 ---
 
@@ -270,6 +276,7 @@ I mercati con date come outcome (es. "Quando finisce X entro... 30 aprile / 31 m
 ```
 
 **Hero Big** (sinistra, 60%):
+
 - Mood color tematico (blu sport, rosso politica, arancio crypto, ecc.)
 - Titolo grande tipografia bold
 - Sottotitolo descrittivo
@@ -279,11 +286,13 @@ I mercati con date come outcome (es. "Quando finisce X entro... 30 aprile / 31 m
 - Frecce sinistra/destra per navigare tra hero
 
 **Hero 2 e Hero 3** (destra, 40%, impilate):
+
 - Stesso pattern ma più piccole
 - Mood color tematico diverso da Hero Big (varietà visiva)
 - CTA dedicate
 
 **Cosa contengono le hero**:
+
 - Hero Big: evento più importante del giorno (algoritmico: volume + movimento + liquidità + tempo)
 - Hero 2: tema editoriale rilevante (es. "New Year predictions", "AI race")
 - Hero 3: dashboard/dossier curato (es. "Trump Admin tracker", "Crypto big movements")
@@ -375,6 +384,7 @@ La sidebar ha **5 sezioni**, ma l'**ordine cambia** in base allo stato utente.
 ```
 
 **Caratteristiche della sidebar**:
+
 - **Ordine adattivo** in base allo stato utente
 - **5 sezioni** sempre presenti (Portfolio/Demo, Signals, Watchlist/Hot, News/Hot, Activity)
 - **Sticky scroll**: la sidebar resta visibile mentre l'utente scrolla la home
@@ -560,6 +570,7 @@ Card compatte per **peek della successiva** (engagement scroll).
 ```
 
 **Elementi sempre presenti**:
+
 - Foto evento (avatar 32-48px)
 - Titolo (1-2 righe max)
 - Categoria + tag
@@ -569,6 +580,7 @@ Card compatte per **peek della successiva** (engagement scroll).
 - Click intera card → `/event/[slug]`
 
 **Elementi condizionali**:
+
 - Badge "● LIVE" / "● HOT" / "● NEW"
 - Badge "Signal Active" (se motore Predimark ha segnale forte)
 - Foto stacked (es. 2 bandiere per Iran+USA)
@@ -726,6 +738,7 @@ Card compatte per **peek della successiva** (engagement scroll).
 ```
 
 **Comportamento**:
+
 - Click "+" su qualunque card → aggiunge al drawer
 - Persistenza tra navigazioni (Zustand persist)
 - **Click finale**: batch sign Privy (1 firma per N ordini)
@@ -737,25 +750,31 @@ Card compatte per **peek della successiva** (engagement scroll).
 ## STATI DELLA HOME
 
 ### Default (loggato, dati live)
+
 Layout completo con dati real-time via WebSocket.
 
 ### Loading (primo caricamento)
+
 - Skeleton placeholder per ogni rail
 - Skeleton per hero
 - Caricamento progressivo
 
 ### Empty (filtri restrittivi)
+
 "Nessun mercato corrisponde ai tuoi filtri." [Reset]
 
 ### Error (problema rete/API)
+
 Banner non bloccante "Connessione interrotta, riprovo automaticamente..." + dati cached.
 
 ### Geo-blocked
+
 - Banner persistente "Trading not available in your region. Demo and signals fully accessible."
 - Bottoni Trade tooltip "Available in Demo only"
 - CTA "Try Demo Mode"
 
 ### Non loggato (visitatore)
+
 - Header diverso (Accedi/Registrati invece di Profile)
 - Sidebar con Demo Mode in cima
 - Banner blu "Come funziona — crea account in 30 secondi"
@@ -763,6 +782,7 @@ Banner non bloccante "Connessione interrotta, riprovo automaticamente..." + dati
 - Bet Slip disabilitato
 
 ### Modalità Demo
+
 - Banner persistente "Modalità Demo — i tuoi soldi non sono in gioco"
 - Switch DEMO prominente
 - Tutto funzionante con paper money
@@ -772,6 +792,7 @@ Banner non bloccante "Connessione interrotta, riprovo automaticamente..." + dati
 ## COMPORTAMENTI INTERATTIVI
 
 ### Real-time updates (via WebSocket)
+
 - Termometri probabilità → CLOB `price_change`
 - Live betting feed crypto round → RTDS `activity`
 - Score live sport → Sport WS
@@ -780,12 +801,14 @@ Banner non bloccante "Connessione interrotta, riprovo automaticamente..." + dati
 - Sidebar Activity feed → RTDS `activity` filtrato per creator seguiti
 
 ### Performance
+
 - Card virtualizzate (solo visibili in DOM)
 - Lazy loading immagini
 - Throttle WS updates (max 1 update/200ms per card)
 - Animation con transform + opacity (GPU-accelerated)
 
 ### Persistenza
+
 - Filtri attivi in URL (sharable)
 - Bet Slip in localStorage (Zustand persist)
 - Tema dark/light in localStorage
@@ -809,6 +832,7 @@ Banner non bloccante "Connessione interrotta, riprovo automaticamente..." + dati
 ## NOTE TECNICHE PER COWORK
 
 Quando costruirai la Home, ricorda:
+
 - **EventCard polimorfo** (5 varianti) — `<EventCard kind="binary" data={...} />` con switch interno
 - **Card via WebSocket**, NON polling
 - **Pattern 1 e Pattern 2 di refresh** sono diversi — applicali correttamente
@@ -847,5 +871,5 @@ Documenti che verranno costruiti nelle prossime sessioni:
 
 ---
 
-*Fine Documento 4 — Wireframes — Pagina 1 (Home) versione 2*
-*Continua con Pagina 2 nella sessione successiva*
+_Fine Documento 4 — Wireframes — Pagina 1 (Home) versione 2_
+_Continua con Pagina 2 nella sessione successiva_

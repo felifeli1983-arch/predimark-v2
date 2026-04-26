@@ -14,6 +14,7 @@
 Questo documento è il **contratto formale tra frontend e backend** di Predimark V2.
 
 Definisce ESATTAMENTE:
+
 - Tutti gli **endpoint REST** API (Next.js API routes + Supabase Edge Functions)
 - I **WebSocket channels** (Polymarket WS + Supabase Realtime)
 - I **payload** di request e response per ogni endpoint
@@ -26,18 +27,18 @@ Una volta scritto, frontend e backend possono lavorare in parallelo conoscendo e
 
 ## DECISIONI ARCHITETTURALI
 
-| Decisione | Scelta |
-|---|---|
-| Naming convention | **REST resourceful con versioning**: `/api/v1/...` |
-| Response format | **Mix**: envelope `{data, meta}` per liste, direct per singoli |
-| Error handling | **HTTP status + error object structured**: `{error: {code, message, details}}` |
-| Pagination | **Mix**: cursor per long lists (history, leaderboard), page-based per UI semplici |
-| Real-time | **WebSocket per tutto** (Polymarket WS + Supabase Realtime) con singleton manager |
-| Auth | **Privy JWT in `Authorization` header → verifica server-side → Supabase RLS** |
-| Content-Type | **`application/json`** sempre |
-| Date format | **ISO 8601** UTC (`2026-04-25T14:30:00Z`) |
-| Numeric IDs | **UUID v4** sempre (mai integer auto-increment) |
-| Versioning | **`/api/v1/`** prefix. Breaking changes → `/api/v2/` |
+| Decisione         | Scelta                                                                            |
+| ----------------- | --------------------------------------------------------------------------------- |
+| Naming convention | **REST resourceful con versioning**: `/api/v1/...`                                |
+| Response format   | **Mix**: envelope `{data, meta}` per liste, direct per singoli                    |
+| Error handling    | **HTTP status + error object structured**: `{error: {code, message, details}}`    |
+| Pagination        | **Mix**: cursor per long lists (history, leaderboard), page-based per UI semplici |
+| Real-time         | **WebSocket per tutto** (Polymarket WS + Supabase Realtime) con singleton manager |
+| Auth              | **Privy JWT in `Authorization` header → verifica server-side → Supabase RLS**     |
+| Content-Type      | **`application/json`** sempre                                                     |
+| Date format       | **ISO 8601** UTC (`2026-04-25T14:30:00Z`)                                         |
+| Numeric IDs       | **UUID v4** sempre (mai integer auto-increment)                                   |
+| Versioning        | **`/api/v1/`** prefix. Breaking changes → `/api/v2/`                              |
 
 ---
 
@@ -45,11 +46,11 @@ Una volta scritto, frontend e backend possono lavorare in parallelo conoscendo e
 
 ### Base URL
 
-| Environment | URL |
-|---|---|
-| Development | `http://localhost:3000/api/v1` |
-| Staging | `https://staging.predimark.com/api/v1` |
-| Production | `https://predimark.com/api/v1` |
+| Environment | URL                                    |
+| ----------- | -------------------------------------- |
+| Development | `http://localhost:3000/api/v1`         |
+| Staging     | `https://staging.predimark.com/api/v1` |
+| Production  | `https://predimark.com/api/v1`         |
 
 ### Authentication
 
@@ -60,6 +61,7 @@ Authorization: Bearer <PRIVY_JWT>
 ```
 
 Il backend:
+
 1. Estrae JWT dall'header
 2. Verifica con Privy server SDK (validità + scadenza + signature)
 3. Cerca o crea utente Supabase corrispondente
@@ -116,70 +118,72 @@ Per endpoint che ritornano **liste paginate**:
 }
 ```
 
-| HTTP Code | Quando |
-|---|---|
-| `200 OK` | Success |
-| `201 Created` | Resource creata |
-| `204 No Content` | Success senza body (es. delete) |
-| `400 Bad Request` | Payload invalido |
-| `401 Unauthorized` | JWT mancante o invalido |
-| `403 Forbidden` | JWT valido ma no permission |
-| `404 Not Found` | Resource non esistente |
-| `409 Conflict` | Conflict (es. username già preso) |
-| `422 Unprocessable Entity` | Validation failed |
-| `429 Too Many Requests` | Rate limit superato |
-| `500 Internal Server Error` | Errore server |
-| `503 Service Unavailable` | Polymarket/MoonPay down |
+| HTTP Code                   | Quando                            |
+| --------------------------- | --------------------------------- |
+| `200 OK`                    | Success                           |
+| `201 Created`               | Resource creata                   |
+| `204 No Content`            | Success senza body (es. delete)   |
+| `400 Bad Request`           | Payload invalido                  |
+| `401 Unauthorized`          | JWT mancante o invalido           |
+| `403 Forbidden`             | JWT valido ma no permission       |
+| `404 Not Found`             | Resource non esistente            |
+| `409 Conflict`              | Conflict (es. username già preso) |
+| `422 Unprocessable Entity`  | Validation failed                 |
+| `429 Too Many Requests`     | Rate limit superato               |
+| `500 Internal Server Error` | Errore server                     |
+| `503 Service Unavailable`   | Polymarket/MoonPay down           |
 
 ### Error codes (custom)
 
 ```typescript
 enum ErrorCode {
   // Auth
-  AUTH_MISSING = "AUTH_MISSING",
-  AUTH_INVALID = "AUTH_INVALID",
-  AUTH_EXPIRED = "AUTH_EXPIRED",
-  PERMISSION_DENIED = "PERMISSION_DENIED",
-  
+  AUTH_MISSING = 'AUTH_MISSING',
+  AUTH_INVALID = 'AUTH_INVALID',
+  AUTH_EXPIRED = 'AUTH_EXPIRED',
+  PERMISSION_DENIED = 'PERMISSION_DENIED',
+
   // Resources
-  USER_NOT_FOUND = "USER_NOT_FOUND",
-  MARKET_NOT_FOUND = "MARKET_NOT_FOUND",
-  CREATOR_NOT_FOUND = "CREATOR_NOT_FOUND",
-  
+  USER_NOT_FOUND = 'USER_NOT_FOUND',
+  MARKET_NOT_FOUND = 'MARKET_NOT_FOUND',
+  CREATOR_NOT_FOUND = 'CREATOR_NOT_FOUND',
+
   // Validation
-  VALIDATION_FAILED = "VALIDATION_FAILED",
-  USERNAME_TAKEN = "USERNAME_TAKEN",
-  INVALID_AMOUNT = "INVALID_AMOUNT",
-  
+  VALIDATION_FAILED = 'VALIDATION_FAILED',
+  USERNAME_TAKEN = 'USERNAME_TAKEN',
+  INVALID_AMOUNT = 'INVALID_AMOUNT',
+
   // Trading
-  INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE",
-  MARKET_CLOSED = "MARKET_CLOSED",
-  TRADE_FAILED = "TRADE_FAILED",
-  
+  INSUFFICIENT_BALANCE = 'INSUFFICIENT_BALANCE',
+  MARKET_CLOSED = 'MARKET_CLOSED',
+  TRADE_FAILED = 'TRADE_FAILED',
+
   // Geo
-  GEO_BLOCKED = "GEO_BLOCKED",
-  KYC_REQUIRED = "KYC_REQUIRED",
-  
+  GEO_BLOCKED = 'GEO_BLOCKED',
+  KYC_REQUIRED = 'KYC_REQUIRED',
+
   // Rate limit
-  RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED",
-  
+  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
+
   // External
-  POLYMARKET_API_ERROR = "POLYMARKET_API_ERROR",
-  MOONPAY_API_ERROR = "MOONPAY_API_ERROR",
-  
+  POLYMARKET_API_ERROR = 'POLYMARKET_API_ERROR',
+  MOONPAY_API_ERROR = 'MOONPAY_API_ERROR',
+
   // Generic
-  INTERNAL_ERROR = "INTERNAL_ERROR",
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
 }
 ```
 
 ### Pagination — cursor-based (per long lists)
 
 Request:
+
 ```http
 GET /api/v1/leaderboard?limit=50&cursor=eyJpZCI6InV1aWQtMjAifQ==
 ```
 
 Response:
+
 ```json
 {
   "data": [...],
@@ -195,11 +199,13 @@ Cursor è base64-encoded JSON con info per query successiva (es. `{"id": "uuid-2
 ### Pagination — page-based (per UI semplici)
 
 Request:
+
 ```http
 GET /api/v1/notifications?page=2&per_page=20
 ```
 
 Response:
+
 ```json
 {
   "data": [...],
@@ -222,19 +228,20 @@ X-RateLimit-Remaining: 87
 X-RateLimit-Reset: 1714056000
 ```
 
-| Tipo endpoint | Rate limit |
-|---|---|
-| Public (no auth) | 60 req/min per IP |
-| Authenticated reads | 300 req/min per user |
-| Authenticated writes | 60 req/min per user |
-| Trade execution | 30 req/min per user |
-| Admin | 600 req/min per admin |
+| Tipo endpoint        | Rate limit            |
+| -------------------- | --------------------- |
+| Public (no auth)     | 60 req/min per IP     |
+| Authenticated reads  | 300 req/min per user  |
+| Authenticated writes | 60 req/min per user   |
+| Trade execution      | 30 req/min per user   |
+| Admin                | 600 req/min per admin |
 
 Implementato via **Upstash Redis** + middleware Next.js.
 
 ### Filtering & sorting
 
 Query params standard:
+
 - `?filter[field]=value` — filtri (es. `?filter[category]=crypto`)
 - `?sort=field` — ascending (es. `?sort=created_at`)
 - `?sort=-field` — descending (es. `?sort=-volume`)
@@ -247,11 +254,13 @@ Query params standard:
 ### 2.1 — Auth
 
 #### `POST /api/v1/auth/session`
+
 Crea/aggiorna sessione Supabase da Privy JWT.
 
 **Auth**: required (Privy JWT)
 
 **Response 200**:
+
 ```json
 {
   "user": {
@@ -271,10 +280,12 @@ Crea/aggiorna sessione Supabase da Privy JWT.
 ```
 
 **Errori**:
+
 - `401 AUTH_INVALID` — JWT non valido
 - `403 GEO_BLOCKED` — paese full block
 
 #### `POST /api/v1/auth/logout`
+
 Invalida sessione.
 
 **Auth**: required
@@ -286,6 +297,7 @@ Invalida sessione.
 ### 2.2 — Users
 
 #### `GET /api/v1/users/me`
+
 Profilo dell'utente loggato.
 
 **Auth**: required
@@ -293,11 +305,13 @@ Profilo dell'utente loggato.
 **Response 200**: oggetto user completo (vedi `/auth/session` per schema).
 
 #### `PATCH /api/v1/users/me`
+
 Aggiorna profilo proprio.
 
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "username": "theo4",
@@ -312,35 +326,40 @@ Aggiorna profilo proprio.
 **Response 200**: oggetto user aggiornato
 
 **Errori**:
+
 - `409 USERNAME_TAKEN` — username già preso
 
 #### `GET /api/v1/users/me/balances`
+
 Saldo USDC reale e demo.
 
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "real": {
-    "usdc_balance": 124.50,
-    "usdc_locked": 12.30,
-    "total_pnl": 245.80,
-    "volume_total": 5234.20
+    "usdc_balance": 124.5,
+    "usdc_locked": 12.3,
+    "total_pnl": 245.8,
+    "volume_total": 5234.2
   },
   "demo": {
-    "demo_balance": 10523.40,
+    "demo_balance": 10523.4,
     "demo_locked": 0,
-    "total_pnl": 523.40,
-    "volume_total": 8200.00
+    "total_pnl": 523.4,
+    "volume_total": 8200.0
   }
 }
 ```
 
 #### `GET /api/v1/users/me/positions`
+
 Posizioni aperte dell'utente.
 
 **Query params**:
+
 - `is_demo` (default false)
 - `filter[category]`
 - `sort` (default `-opened_at`)
@@ -349,6 +368,7 @@ Posizioni aperte dell'utente.
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -362,18 +382,18 @@ Posizioni aperte dell'utente.
       },
       "side": "yes",
       "shares": 100,
-      "avg_price": 0.50,
-      "total_cost": 50.00,
+      "avg_price": 0.5,
+      "total_cost": 50.0,
       "current_price": 0.62,
-      "current_value": 62.00,
-      "unrealized_pnl": 12.00,
-      "unrealized_pnl_pct": 24.00,
+      "current_value": 62.0,
+      "unrealized_pnl": 12.0,
+      "unrealized_pnl_pct": 24.0,
       "opened_at": "2026-04-22T10:00:00Z"
     }
   ],
   "meta": {
-    "total_value": 832.40,
-    "total_pnl": 48.20,
+    "total_value": 832.4,
+    "total_pnl": 48.2,
     "page": 1,
     "per_page": 20,
     "total": 12,
@@ -383,9 +403,11 @@ Posizioni aperte dell'utente.
 ```
 
 #### `GET /api/v1/users/me/trades`
+
 Storico trade chiusi.
 
 **Query params**:
+
 - `is_demo`
 - `filter[type]` ('buy' | 'sell' | 'resolution')
 - `filter[is_win]` (true | false)
@@ -395,6 +417,7 @@ Storico trade chiusi.
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -421,26 +444,29 @@ Storico trade chiusi.
 ```
 
 #### `GET /api/v1/users/me/stats`
+
 Statistiche aggregate utente.
 
 **Query params**:
+
 - `period` ('7d' | '30d' | '90d' | '1y' | 'all')
 - `is_demo`
 
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "period": "30d",
   "metrics": {
-    "total_pnl": 345.20,
-    "total_pnl_pct": 28.50,
+    "total_pnl": 345.2,
+    "total_pnl_pct": 28.5,
     "win_rate": 62.0,
     "avg_roi": 4.8,
     "trade_count": 487,
     "volume_total": 12450,
-    "drawdown_max": -87.30,
+    "drawdown_max": -87.3,
     "drawdown_max_pct": -7.0,
     "sharpe_ratio": 1.84,
     "calibration_brier_score": 0.18,
@@ -450,25 +476,24 @@ Statistiche aggregate utente.
     { "category": "crypto", "pnl": 120, "trades": 200 },
     { "category": "sport", "pnl": 80, "trades": 150 }
   ],
-  "best_trades": [
-    { "id": "uuid", "market_title": "Trump 2024", "pnl": 245 }
-  ],
-  "worst_trades": [
-    { "id": "uuid", "market_title": "Lakers vs Boston", "pnl": -87 }
-  ]
+  "best_trades": [{ "id": "uuid", "market_title": "Trump 2024", "pnl": 245 }],
+  "worst_trades": [{ "id": "uuid", "market_title": "Lakers vs Boston", "pnl": -87 }]
 }
 ```
 
 #### `GET /api/v1/users/me/equity-curve`
+
 Storia valore portfolio per grafico.
 
 **Query params**:
+
 - `period` ('1d' | '1w' | '1m' | '3m' | '1y' | 'all')
 - `is_demo`
 
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "period": "30d",
@@ -481,11 +506,13 @@ Storia valore portfolio per grafico.
 ```
 
 #### `GET /api/v1/users/me/calibration`
+
 Calibration curve (differenziatore Predimark).
 
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "brier_score": 0.18,
@@ -499,6 +526,7 @@ Calibration curve (differenziatore Predimark).
 ```
 
 #### `GET /api/v1/users/me/preferences`
+
 Preferenze utente.
 
 **Auth**: required
@@ -506,6 +534,7 @@ Preferenze utente.
 **Response 200**: oggetto `user_preferences` (vedi Doc 6 schema).
 
 #### `PATCH /api/v1/users/me/preferences`
+
 Aggiorna preferenze.
 
 **Auth**: required
@@ -513,6 +542,7 @@ Aggiorna preferenze.
 **Request body**: subset di campi da aggiornare.
 
 #### `POST /api/v1/users/me/onboarding-complete`
+
 Marca onboarding come completato.
 
 **Auth**: required
@@ -524,9 +554,11 @@ Marca onboarding come completato.
 ### 2.3 — Markets
 
 #### `GET /api/v1/markets`
+
 Lista mercati attivi (per home).
 
 **Query params**:
+
 - `filter[category]`
 - `filter[card_kind]`
 - `filter[is_featured]`
@@ -538,6 +570,7 @@ Lista mercati attivi (per home).
 **Auth**: optional (mostra anche a non loggati)
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -565,6 +598,7 @@ Lista mercati attivi (per home).
 ```
 
 #### `GET /api/v1/markets/:slug`
+
 Dettaglio singolo mercato (o evento con N market).
 
 **Auth**: optional
@@ -572,19 +606,22 @@ Dettaglio singolo mercato (o evento con N market).
 **Response 200**: oggetto market completo + array di market interni se evento.
 
 #### `GET /api/v1/markets/:slug/orderbook`
+
 Orderbook completo (per espansione inline).
 
 **Query params**:
+
 - `side` ('yes' | 'no')
 - `depth` (default 10)
 
 **Auth**: optional
 
 **Response 200**:
+
 ```json
 {
   "asks": [
-    { "price": 0.68, "shares": 403.70, "total": 745.84 },
+    { "price": 0.68, "shares": 403.7, "total": 745.84 },
     { "price": 0.67, "shares": 320.88, "total": 471.32 }
   ],
   "bids": [
@@ -598,15 +635,18 @@ Orderbook completo (per espansione inline).
 ```
 
 #### `GET /api/v1/markets/:slug/price-history`
+
 Storia prezzi per chart.
 
 **Query params**:
+
 - `period` ('1H' | '6H' | '1D' | '1W' | '1M' | 'ALL')
 - `interval` ('1m' | '5m' | '1h' | '1d')
 
 **Auth**: optional
 
 **Response 200**:
+
 ```json
 {
   "period": "1D",
@@ -618,15 +658,18 @@ Storia prezzi per chart.
 ```
 
 #### `GET /api/v1/markets/:slug/holders`
+
 Top holders del mercato.
 
 **Query params**:
+
 - `side` ('yes' | 'no')
 - `limit` (default 20)
 
 **Auth**: optional
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -646,13 +689,16 @@ Top holders del mercato.
 ```
 
 #### `GET /api/v1/markets/:slug/comments`
+
 Commenti del mercato (sia Predimark che Polymarket).
 
 **Query params**:
+
 - `source` ('all' | 'predimark' | 'polymarket')
 - `cursor`, `limit` (default 50)
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -670,11 +716,13 @@ Commenti del mercato (sia Predimark che Polymarket).
 ```
 
 #### `POST /api/v1/markets/:slug/comments`
+
 Posta commento (solo utenti Predimark loggati).
 
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "body": "Going up — RSI oversold",
@@ -683,9 +731,11 @@ Posta commento (solo utenti Predimark loggati).
 ```
 
 #### `GET /api/v1/markets/search`
+
 Cerca mercati.
 
 **Query params**:
+
 - `q` (search query)
 - `filter[category]`
 - `limit` (default 20)
@@ -703,18 +753,19 @@ Cerca mercati.
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "market_id": "uuid",
   "side": "yes",
-  "amount_usdc": 5.00,
+  "amount_usdc": 5.0,
   "order_type": "market",
   "is_demo": false,
-  
+
   "// Per limit orders:": "",
-  "limit_price": 0.50,
+  "limit_price": 0.5,
   "expires_at": "2026-04-25T15:00:00Z",
-  
+
   "// Per copy trade:": "",
   "source": "manual",
   "copied_from_creator_id": null,
@@ -723,13 +774,14 @@ Cerca mercati.
 ```
 
 **Response 201**:
+
 ```json
 {
   "trade_id": "uuid",
   "status": "pending",
   "polymarket_order_id": "...",
   "estimated_shares": 9.62,
-  "estimated_total": 5.00,
+  "estimated_total": 5.0,
   "fees": {
     "builder_fee": 0.025,
     "service_fee": 0
@@ -738,6 +790,7 @@ Cerca mercati.
 ```
 
 **Errori**:
+
 - `400 INVALID_AMOUNT` — amount fuori range
 - `400 MARKET_CLOSED` — mercato chiuso
 - `403 INSUFFICIENT_BALANCE` — saldo insufficiente
@@ -751,6 +804,7 @@ Vendi shares posseduti.
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "position_id": "uuid",
@@ -762,6 +816,7 @@ Vendi shares posseduti.
 **Response 201**: trade object.
 
 #### `GET /api/v1/trades/:id`
+
 Dettaglio singolo trade (post-execution).
 
 **Auth**: required (utente o admin)
@@ -773,9 +828,11 @@ Dettaglio singolo trade (post-execution).
 ### 2.5 — Creators
 
 #### `GET /api/v1/creators`
+
 Lista Verified Creators.
 
 **Query params**:
+
 - `filter[tier]` ('gold' | 'silver' | 'bronze' | 'rising' | 'standard')
 - `filter[specialization]` (array es. `?filter[specialization]=crypto,sport`)
 - `sort` (default `-score`)
@@ -784,6 +841,7 @@ Lista Verified Creators.
 **Auth**: optional
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -808,6 +866,7 @@ Lista Verified Creators.
 ```
 
 #### `GET /api/v1/creators/:username`
+
 Profilo pubblico Verified Creator.
 
 **Auth**: optional
@@ -815,6 +874,7 @@ Profilo pubblico Verified Creator.
 **Response 200**: oggetto creator completo + user pubblico + stats aggregate.
 
 #### `GET /api/v1/creators/:username/positions`
+
 Posizioni del creator (con delay 30 min applicato server-side).
 
 **Auth**: optional
@@ -822,6 +882,7 @@ Posizioni del creator (con delay 30 min applicato server-side).
 **Response 200**: lista positions (filtrate `WHERE opened_at < NOW() - INTERVAL '30 minutes'`).
 
 #### `GET /api/v1/creators/:username/trades`
+
 Storico trade del creator.
 
 **Auth**: optional
@@ -829,6 +890,7 @@ Storico trade del creator.
 **Response 200**: lista trades pubbliche.
 
 #### `GET /api/v1/creators/:username/stats`
+
 Stats pubbliche del creator.
 
 **Auth**: optional
@@ -836,11 +898,13 @@ Stats pubbliche del creator.
 **Response 200**: simile a `/users/me/stats` ma per il creator.
 
 #### `POST /api/v1/creators/apply`
+
 Applica al programma Verified Creator.
 
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "bio_creator": "Crypto trader · Sport fan",
@@ -855,6 +919,7 @@ Applica al programma Verified Creator.
 ```
 
 **Response 201**:
+
 ```json
 {
   "creator_id": "uuid",
@@ -864,11 +929,13 @@ Applica al programma Verified Creator.
 ```
 
 #### `POST /api/v1/creators/:username/follow`
+
 Segui creator.
 
 **Auth**: required
 
 **Request body** (opzionale):
+
 ```json
 {
   "notify_new_position": true,
@@ -880,6 +947,7 @@ Segui creator.
 **Response 201**: follow object.
 
 #### `DELETE /api/v1/creators/:username/follow`
+
 Unfollow creator.
 
 **Auth**: required
@@ -891,11 +959,13 @@ Unfollow creator.
 ### 2.6 — Traders esterni Polymarket
 
 #### `GET /api/v1/traders/:address`
+
 Profilo Top Trader esterno.
 
 **Auth**: optional
 
 **Response 200**:
+
 ```json
 {
   "id": "uuid",
@@ -913,6 +983,7 @@ Profilo Top Trader esterno.
 ```
 
 #### `GET /api/v1/traders/:address/positions`
+
 Posizioni real-time del trader esterno (no delay, sono on-chain).
 
 **Auth**: optional
@@ -920,6 +991,7 @@ Posizioni real-time del trader esterno (no delay, sono on-chain).
 **Response 200**: lista positions da Polymarket Data API (cache 60s).
 
 #### `GET /api/v1/traders/:address/trades`
+
 Trade storici on-chain.
 
 **Auth**: optional
@@ -927,6 +999,7 @@ Trade storici on-chain.
 **Response 200**: lista trades.
 
 #### `POST /api/v1/traders/:address/follow`
+
 Segui trader esterno.
 
 **Auth**: required
@@ -938,9 +1011,11 @@ Segui trader esterno.
 ### 2.7 — Leaderboard
 
 #### `GET /api/v1/leaderboard`
+
 Classifica unificata (Verified + External) o tab specifica.
 
 **Query params**:
+
 - `period` ('today' | '7d' | '30d' | 'all') — default '7d'
 - `sort` ('volume' | 'profit' | 'roi' | 'win_rate' | 'sharpe') — default 'volume'
 - `filter[category]`
@@ -951,6 +1026,7 @@ Classifica unificata (Verified + External) o tab specifica.
 **Auth**: optional
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -1004,6 +1080,7 @@ Classifica unificata (Verified + External) o tab specifica.
 **Note**: `meta.leaderboard_mode` è `"unified"` o `"two_tab"` in base a admin setting.
 
 #### `GET /api/v1/leaderboard/me`
+
 Posizione dell'utente loggato in classifica.
 
 **Query params**: stessi della leaderboard.
@@ -1011,6 +1088,7 @@ Posizione dell'utente loggato in classifica.
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "rank": 487,
@@ -1032,11 +1110,13 @@ Posizione dell'utente loggato in classifica.
 ```
 
 #### `GET /api/v1/leaderboard/stats`
+
 Statistiche live in cima alla pagina.
 
 **Auth**: optional
 
 **Response 200**:
+
 ```json
 {
   "volume_today": 2400000,
@@ -1051,11 +1131,13 @@ Statistiche live in cima alla pagina.
 ### 2.8 — Copy Trading
 
 #### `GET /api/v1/copy/sessions`
+
 Lista session keys attive dell'utente.
 
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -1070,20 +1152,22 @@ Lista session keys attive dell'utente.
       "expires_at": "2026-05-25T...",
       "status": "active",
       "budget_max_usdc": 500,
-      "budget_spent_usdc": 87.30,
+      "budget_spent_usdc": 87.3,
       "trades_executed_count": 12,
-      "total_pnl": 23.40
+      "total_pnl": 23.4
     }
   ]
 }
 ```
 
 #### `POST /api/v1/copy/sessions`
+
 Crea nuova session key.
 
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "target_creator_id": "uuid",
@@ -1093,13 +1177,14 @@ Crea nuova session key.
   "max_per_trade_usdc": 50,
   "max_trades_per_day": 10,
   "allowed_categories": ["crypto", "sport"],
-  
+
   "// Per External Trader, acknowledge obbligatorio:": "",
   "external_acknowledged": false
 }
 ```
 
 **Response 201**:
+
 ```json
 {
   "session_id": "uuid",
@@ -1112,11 +1197,13 @@ Crea nuova session key.
 **Note**: per External trader serve `external_acknowledged: true`.
 
 #### `DELETE /api/v1/copy/sessions/:id`
+
 Revoca session immediata.
 
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "reason": "Changing strategy"
@@ -1130,9 +1217,11 @@ Revoca session immediata.
 ### 2.9 — Signals
 
 #### `GET /api/v1/signals`
+
 Lista segnali Predimark attivi.
 
 **Query params**:
+
 - `filter[market_id]`
 - `filter[algorithm_name]`
 - `filter[category]`
@@ -1141,6 +1230,7 @@ Lista segnali Predimark attivi.
 **Auth**: optional
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -1161,6 +1251,7 @@ Lista segnali Predimark attivi.
 ```
 
 #### `GET /api/v1/signals/:id`
+
 Dettaglio singolo segnale con metadata algoritmico.
 
 **Auth**: optional
@@ -1168,15 +1259,18 @@ Dettaglio singolo segnale con metadata algoritmico.
 **Response 200**: signal completo.
 
 #### `GET /api/v1/signals/performance`
+
 Performance storica algoritmi (per trasparenza pubblica).
 
 **Query params**:
+
 - `period` ('7d' | '30d' | 'all')
 - `algorithm_name`
 
 **Auth**: optional
 
 **Response 200**:
+
 ```json
 {
   "period": "30d",
@@ -1197,9 +1291,11 @@ Performance storica algoritmi (per trasparenza pubblica).
 ### 2.10 — Notifications
 
 #### `GET /api/v1/notifications`
+
 Notifiche dell'utente.
 
 **Query params**:
+
 - `filter[is_read]`
 - `filter[type]`
 - `cursor`, `limit` (default 20)
@@ -1207,6 +1303,7 @@ Notifiche dell'utente.
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "data": [
@@ -1230,6 +1327,7 @@ Notifiche dell'utente.
 ```
 
 #### `POST /api/v1/notifications/:id/read`
+
 Marca come letta.
 
 **Auth**: required
@@ -1237,6 +1335,7 @@ Marca come letta.
 **Response 204**.
 
 #### `POST /api/v1/notifications/read-all`
+
 Marca tutte come lette.
 
 **Auth**: required
@@ -1248,6 +1347,7 @@ Marca tutte come lette.
 ### 2.11 — Watchlist
 
 #### `GET /api/v1/watchlist`
+
 Mercati seguiti.
 
 **Auth**: required
@@ -1255,11 +1355,13 @@ Mercati seguiti.
 **Response 200**: lista markets con info watchlist (notify_price_change_pct, etc.).
 
 #### `POST /api/v1/watchlist`
+
 Aggiunge market a watchlist.
 
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "market_id": "uuid",
@@ -1272,6 +1374,7 @@ Aggiunge market a watchlist.
 **Response 201**.
 
 #### `DELETE /api/v1/watchlist/:market_id`
+
 Rimuove dalla watchlist.
 
 **Auth**: required
@@ -1283,11 +1386,13 @@ Rimuove dalla watchlist.
 ### 2.12 — Deposit / Withdraw
 
 #### `POST /api/v1/deposit/moonpay-session`
+
 Crea sessione MoonPay per deposit USDC.
 
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "amount_usd": 100
@@ -1295,6 +1400,7 @@ Crea sessione MoonPay per deposit USDC.
 ```
 
 **Response 200**:
+
 ```json
 {
   "moonpay_url": "https://buy.moonpay.com/...",
@@ -1304,11 +1410,13 @@ Crea sessione MoonPay per deposit USDC.
 ```
 
 #### `POST /api/v1/withdraw`
+
 Avvia withdraw USDC.
 
 **Auth**: required + KYC approved
 
 **Request body**:
+
 ```json
 {
   "amount_usdc": 50,
@@ -1317,6 +1425,7 @@ Avvia withdraw USDC.
 ```
 
 **Response 201**:
+
 ```json
 {
   "withdraw_id": "uuid",
@@ -1326,6 +1435,7 @@ Avvia withdraw USDC.
 ```
 
 **Errori**:
+
 - `403 KYC_REQUIRED` — KYC non approvato
 
 ---
@@ -1333,17 +1443,20 @@ Avvia withdraw USDC.
 ### 2.13 — KYC
 
 #### `POST /api/v1/kyc/submit`
+
 Sottomette documenti KYC.
 
 **Auth**: required
 
 **Request body**: FormData multipart (file upload)
+
 - `id_front`: file
 - `id_back`: file
 - `selfie`: file
 - `address_proof`: file
 
 **Response 201**:
+
 ```json
 {
   "submission_id": "uuid",
@@ -1354,11 +1467,13 @@ Sottomette documenti KYC.
 ```
 
 #### `GET /api/v1/kyc/status`
+
 Stato KYC corrente.
 
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "status": "approved",
@@ -1373,11 +1488,13 @@ Stato KYC corrente.
 ### 2.14 — Referrals
 
 #### `GET /api/v1/referrals/me`
+
 Info referral programma utente.
 
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "referral_code": "FELIC2026",
@@ -1386,8 +1503,8 @@ Info referral programma utente.
     "total_referrals": 12,
     "active_referrals": 8,
     "total_volume_generated": 24000,
-    "total_payout_received": 24.50,
-    "pending_payout": 5.20
+    "total_payout_received": 24.5,
+    "pending_payout": 5.2
   }
 }
 ```
@@ -1397,11 +1514,13 @@ Info referral programma utente.
 ### 2.15 — Telegram bot
 
 #### `POST /api/v1/telegram/connect`
+
 Connette account Telegram.
 
 **Auth**: required
 
 **Request body**:
+
 ```json
 {
   "telegram_chat_id": "1234567890"
@@ -1411,11 +1530,13 @@ Connette account Telegram.
 **Response 200**: user preferences aggiornate.
 
 #### `POST /api/v1/telegram/upgrade-premium`
+
 Avvia upgrade a Telegram Premium ($5/mese).
 
 **Auth**: required
 
 **Response 200**:
+
 ```json
 {
   "stripe_checkout_url": "https://...",
@@ -1436,11 +1557,13 @@ function requireAdminRole(roles: AdminRole[]) { ... }
 Esempi principali:
 
 #### `GET /api/v1/admin/users`
+
 Lista tutti gli utenti (paginated).
 
 **Auth**: admin / moderator
 
 **Query params**:
+
 - `filter[status]` ('active' | 'banned' | 'suspended')
 - `filter[country]`
 - `q` (search by username/email/address)
@@ -1449,11 +1572,13 @@ Lista tutti gli utenti (paginated).
 **Response 200**: lista users con dati admin (KYC status, balance, last activity).
 
 #### `POST /api/v1/admin/users/:id/ban`
+
 Banna utente.
 
 **Auth**: admin / moderator
 
 **Request body**:
+
 ```json
 {
   "reason": "Bot activity detected",
@@ -1464,41 +1589,49 @@ Banna utente.
 **Response 200**: user updated.
 
 #### `POST /api/v1/admin/users/:id/unban`
+
 Rimuove ban.
 
 **Auth**: admin / super_admin
 
 #### `POST /api/v1/admin/users/:id/refund`
+
 Refund manuale.
 
 **Auth**: admin / super_admin
 
 #### `GET /api/v1/admin/markets`
+
 Lista mercati con info admin.
 
 **Auth**: admin
 
 #### `POST /api/v1/admin/markets/:id/feature`
+
 Promuove a featured.
 
 **Auth**: admin
 
 #### `POST /api/v1/admin/markets/:id/hide`
+
 Nasconde dalla home.
 
 **Auth**: admin
 
 #### `GET /api/v1/admin/fees`
+
 Configurazione fee corrente.
 
 **Auth**: admin
 
 #### `POST /api/v1/admin/fees`
+
 Aggiorna fee runtime.
 
 **Auth**: super_admin
 
 **Request body**:
+
 ```json
 {
   "builder_fee_pct": 0.7,
@@ -1511,26 +1644,31 @@ Aggiorna fee runtime.
 ```
 
 #### `GET /api/v1/admin/creators/applications`
+
 Queue applications da review.
 
 **Auth**: admin
 
 #### `POST /api/v1/admin/creators/:id/approve`
+
 Approva applicazione.
 
 **Auth**: admin
 
 #### `POST /api/v1/admin/creators/:id/reject`
+
 Reject applicazione.
 
 **Auth**: admin
 
 #### `POST /api/v1/admin/notifications/broadcast`
+
 Invio annuncio a tutti.
 
 **Auth**: admin
 
 **Request body**:
+
 ```json
 {
   "audience": "all",
@@ -1544,11 +1682,13 @@ Invio annuncio a tutti.
 ```
 
 #### `GET /api/v1/admin/analytics/dashboard`
+
 KPI dashboard.
 
 **Auth**: admin
 
 **Response 200**:
+
 ```json
 {
   "period": "24h",
@@ -1562,19 +1702,18 @@ KPI dashboard.
     "kyc_pending": 3,
     "refunds_pending": 1
   },
-  "alerts": [
-    "Builder fee revenue +35% spike vs 7d avg",
-    "3 KYC pending da >48h"
-  ]
+  "alerts": ["Builder fee revenue +35% spike vs 7d avg", "3 KYC pending da >48h"]
 }
 ```
 
 #### `GET /api/v1/admin/audit-log`
+
 Audit log dettagliato.
 
 **Auth**: admin
 
 **Query params**:
+
 - `filter[actor_id]`
 - `filter[action_type]`
 - `filter[target_type]`
@@ -1582,16 +1721,19 @@ Audit log dettagliato.
 - `cursor`, `limit`
 
 #### `GET /api/v1/admin/feature-flags`
+
 Lista feature flags.
 
 **Auth**: admin
 
 #### `PATCH /api/v1/admin/feature-flags/:key`
+
 Aggiorna feature flag.
 
 **Auth**: admin
 
 **Request body**:
+
 ```json
 {
   "enabled": true,
@@ -1600,16 +1742,19 @@ Aggiorna feature flag.
 ```
 
 #### `GET /api/v1/admin/settings/leaderboard-mode`
+
 Toggle 1-tab vs 2-tab.
 
 **Auth**: super_admin
 
 #### `POST /api/v1/admin/settings/leaderboard-mode`
+
 Cambia modalità leaderboard.
 
 **Auth**: super_admin
 
 **Request body**:
+
 ```json
 {
   "mode": "two_tab"
@@ -1629,11 +1774,13 @@ Riusiamo il pattern V1: 1 WebSocket connection per source, condivisa via React C
 **URL**: `wss://ws-subscriptions-clob.polymarket.com/ws/`
 
 **Topics**:
+
 - `book` — orderbook updates per market
 - `price_change` — cambi prezzo midpoint
 - `last_trade_price` — ultimo trade eseguito
 
 **Subscribe message**:
+
 ```json
 {
   "type": "MARKET",
@@ -1642,6 +1789,7 @@ Riusiamo il pattern V1: 1 WebSocket connection per source, condivisa via React C
 ```
 
 **Message format**:
+
 ```json
 {
   "event_type": "book",
@@ -1657,12 +1805,14 @@ Riusiamo il pattern V1: 1 WebSocket connection per source, condivisa via React C
 **URL**: `wss://ws-live-data.polymarket.com/`
 
 **Topics**:
+
 - `activity` — feed live trade
 - `crypto_prices` — prezzi crypto Binance source
 - `crypto_prices_chainlink` — prezzi crypto Chainlink source
 - `comments` — commenti real-time
 
 **Subscribe message**:
+
 ```json
 {
   "subscriptions": [
@@ -1676,19 +1826,25 @@ Riusiamo il pattern V1: 1 WebSocket connection per source, condivisa via React C
 **URL**: `wss://[project-ref].supabase.co/realtime/v1/websocket`
 
 **Channels Predimark**:
+
 - `notifications:user_id` — notifiche per utente specifico
 - `positions:user_id` — updates posizioni utente
 - `comments:market_id` — commenti Predimark per market
 - `leaderboard` — updates classifica (broadcasted ogni 60s)
 
 **Subscribe pattern (client-side)**:
+
 ```typescript
 const channel = supabase
   .channel(`notifications:${userId}`)
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, payload => {
-    // Handle new notification
-  })
-  .subscribe();
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'notifications' },
+    (payload) => {
+      // Handle new notification
+    }
+  )
+  .subscribe()
 ```
 
 ### 3.4 — Singleton manager pattern
@@ -1696,23 +1852,23 @@ const channel = supabase
 ```typescript
 // lib/ws/SingletonWS.ts
 class SingletonWS {
-  private static instances = new Map<string, WebSocket>();
-  
+  private static instances = new Map<string, WebSocket>()
+
   static getInstance(url: string): WebSocket {
     if (!this.instances.has(url)) {
-      const ws = new WebSocket(url);
-      ws.onopen = () => console.log(`WS ${url} connected`);
-      ws.onclose = () => this.handleReconnect(url);
-      this.instances.set(url, ws);
+      const ws = new WebSocket(url)
+      ws.onopen = () => console.log(`WS ${url} connected`)
+      ws.onclose = () => this.handleReconnect(url)
+      this.instances.set(url, ws)
     }
-    return this.instances.get(url)!;
+    return this.instances.get(url)!
   }
-  
+
   private static handleReconnect(url: string) {
     setTimeout(() => {
-      this.instances.delete(url);
-      this.getInstance(url); // Reconnect
-    }, 1000);
+      this.instances.delete(url)
+      this.getInstance(url) // Reconnect
+    }, 1000)
   }
 }
 ```
@@ -1722,25 +1878,25 @@ class SingletonWS {
 ```typescript
 // useLiveMidpoint hook
 export function useLiveMidpoint(marketId: string) {
-  const [midpoint, setMidpoint] = useState<number | null>(null);
-  
+  const [midpoint, setMidpoint] = useState<number | null>(null)
+
   useEffect(() => {
-    const ws = SingletonWS.getInstance(POLYMARKET_CLOB_WS_URL);
-    
-    ws.send(JSON.stringify({ type: 'MARKET', markets: [marketId] }));
-    
+    const ws = SingletonWS.getInstance(POLYMARKET_CLOB_WS_URL)
+
+    ws.send(JSON.stringify({ type: 'MARKET', markets: [marketId] }))
+
     const handler = (event: MessageEvent) => {
-      const msg = JSON.parse(event.data);
+      const msg = JSON.parse(event.data)
       if (msg.market === marketId && msg.event_type === 'price_change') {
-        setMidpoint(msg.midpoint);
+        setMidpoint(msg.midpoint)
       }
-    };
-    
-    ws.addEventListener('message', handler);
-    return () => ws.removeEventListener('message', handler);
-  }, [marketId]);
-  
-  return midpoint;
+    }
+
+    ws.addEventListener('message', handler)
+    return () => ws.removeEventListener('message', handler)
+  }, [marketId])
+
+  return midpoint
 }
 ```
 
@@ -1751,11 +1907,13 @@ export function useLiveMidpoint(marketId: string) {
 Le Edge Functions girano su Deno runtime e sono usate per logica server critica.
 
 ### 4.1 — `submit-trade`
+
 Esegue trade Polymarket lato server (per copy auto + sicurezza).
 
 **Trigger**: API call da `/api/v1/trades/submit` (per trade copy auto).
 
 **Logic**:
+
 1. Verifica saldo utente (real o demo)
 2. Se demo: aggiorna `positions` + `trades` con flag `is_demo=true`
 3. Se real:
@@ -1768,11 +1926,13 @@ Esegue trade Polymarket lato server (per copy auto + sicurezza).
 4. Crea notification per utente
 
 ### 4.2 — `process-deposit-webhook`
+
 Riceve webhook MoonPay e accredita USDC.
 
 **Trigger**: webhook MoonPay HTTP POST.
 
 **Logic**:
+
 1. Verifica firma webhook (signature header)
 2. Trova utente da customer_id
 3. Marca deposit come completato
@@ -1780,11 +1940,13 @@ Riceve webhook MoonPay e accredita USDC.
 5. Crea notification "Deposit completed"
 
 ### 4.3 — `calculate-creator-payout`
+
 Job nightly per calcolo payout settimanale Verified Creators.
 
 **Trigger**: Supabase cron (ogni domenica 23:59 UTC).
 
 **Logic**:
+
 1. Per ogni Verified Creator attivo:
 2. SELECT trades WHERE copied_from_creator_id = X AND executed_at IN [last week]
 3. SUM(builder_fee) × 30% = payout amount
@@ -1793,33 +1955,39 @@ Job nightly per calcolo payout settimanale Verified Creators.
 6. Update status='completed' + tx_hash
 
 ### 4.4 — `import-polymarket-leaderboard`
+
 Job nightly per importare top trader Polymarket.
 
 **Trigger**: Supabase cron (ogni 6 ore).
 
 **Logic**:
+
 1. Fetch Polymarket Data API `/leaderboard?limit=2000`
 2. UPSERT into `external_traders` (basato su wallet_address)
 3. Calcola ranking, win_rate, specialization
 4. Update `last_synced_at`
 
 ### 4.5 — `calculate-user-stats`
+
 Job ogni 5 min per stats utente.
 
 **Trigger**: Supabase cron.
 
 **Logic**:
+
 1. Per ogni utente attivo (last activity <30 giorni):
 2. Calcola P&L cumulato, win rate, ROI, sharpe, calibration
 3. INSERT snapshot in `equity_curve` (hypertable)
 4. UPDATE balances con stats cached
 
 ### 4.6 — `signal-generator`
+
 Job ogni minuto per generare segnali.
 
 **Trigger**: Supabase cron.
 
 **Logic**:
+
 1. Per ogni mercato attivo nelle categorie supportate:
 2. Esegui algoritmi (final_period_momentum, RSI, mean reversion, etc.)
 3. Se edge > threshold: INSERT in `signals`
@@ -1827,11 +1995,13 @@ Job ogni minuto per generare segnali.
 5. Pubblica su Telegram (free tier 5 min delay, paid real-time)
 
 ### 4.7 — `kyc-fraud-check`
+
 Pre-screening AI dei documenti KYC.
 
 **Trigger**: trigger Postgres ON INSERT su `kyc_submissions`.
 
 **Logic**:
+
 1. Per ogni nuovo KYC submission:
 2. Chiama Claude API con immagini documenti
 3. Verifica: ID type valid, foto matches selfie, no manipulation
@@ -1846,6 +2016,7 @@ Pre-screening AI dei documenti KYC.
 ### 5.1 — Polymarket
 
 **Base URLs**:
+
 - Gamma API: `https://gamma-api.polymarket.com`
 - CLOB: `https://clob.polymarket.com`
 - Data API: `https://data-api.polymarket.com`
@@ -1873,6 +2044,7 @@ Pre-screening AI dei documenti KYC.
 **SDK Server**: `@privy-io/server-auth`
 
 **Endpoints usati**:
+
 - Verify JWT
 - Get user details
 - Create session keys
@@ -1887,6 +2059,7 @@ Pre-screening AI dei documenti KYC.
 **Webhook**: `https://predimark.com/api/v1/webhooks/telegram`
 
 **Endpoints usati**:
+
 - `sendMessage` — invio notifiche
 - `editMessageText` — update messaggio (es. signal expired)
 - `setMyCommands` — registra comandi `/start`, `/watchlist`, `/signals`
@@ -1900,6 +2073,7 @@ Per Stripe Connect Express + payout creator.
 **Base URL**: `https://api.anthropic.com/v1`
 
 **Endpoints usati**:
+
 - `/messages` — KYC document review, classificazione mercati
 - Model: `claude-opus-4-7` per casi critici, `claude-haiku-4-5` per batch
 
@@ -1911,46 +2085,46 @@ Per Stripe Connect Express + payout creator.
 
 ```typescript
 // app/api/v1/users/me/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyPrivyToken } from '@/lib/privy/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyPrivyToken } from '@/lib/privy/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export async function GET(req: NextRequest) {
   // Extract JWT from Authorization header
-  const authHeader = req.headers.get('Authorization');
+  const authHeader = req.headers.get('Authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json(
       { error: { code: 'AUTH_MISSING', message: 'Missing authorization header' } },
       { status: 401 }
-    );
+    )
   }
-  
-  const token = authHeader.slice(7);
-  
+
+  const token = authHeader.slice(7)
+
   try {
     // Verify with Privy server SDK
-    const privyUser = await verifyPrivyToken(token);
-    
+    const privyUser = await verifyPrivyToken(token)
+
     // Get or create Supabase user
     const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('*')
       .eq('auth_id', privyUser.userId)
-      .single();
-    
+      .single()
+
     if (error || !user) {
       return NextResponse.json(
         { error: { code: 'USER_NOT_FOUND', message: 'User not found' } },
         { status: 404 }
-      );
+      )
     }
-    
-    return NextResponse.json(user);
+
+    return NextResponse.json(user)
   } catch (err) {
     return NextResponse.json(
       { error: { code: 'AUTH_INVALID', message: 'Invalid token' } },
       { status: 401 }
-    );
+    )
   }
 }
 ```
@@ -1959,57 +2133,54 @@ export async function GET(req: NextRequest) {
 
 ```typescript
 // supabase/functions/submit-trade/index.ts
-import { serve } from 'https://deno.land/std/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from 'https://deno.land/std/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 serve(async (req) => {
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  );
-  
-  const { market_id, side, amount_usdc, is_demo } = await req.json();
-  
+  )
+
+  const { market_id, side, amount_usdc, is_demo } = await req.json()
+
   // Validate
   if (!market_id || !side || !amount_usdc) {
-    return new Response(
-      JSON.stringify({ error: { code: 'VALIDATION_FAILED' } }),
-      { status: 400 }
-    );
+    return new Response(JSON.stringify({ error: { code: 'VALIDATION_FAILED' } }), { status: 400 })
   }
-  
+
   // Insert position + trade in transaction
   const { data, error } = await supabase.rpc('submit_trade', {
     p_market_id: market_id,
     p_side: side,
     p_amount: amount_usdc,
-    p_is_demo: is_demo
-  });
-  
+    p_is_demo: is_demo,
+  })
+
   if (error) {
     return new Response(
       JSON.stringify({ error: { code: 'TRADE_FAILED', details: error.message } }),
       { status: 500 }
-    );
+    )
   }
-  
-  return new Response(JSON.stringify(data), { status: 201 });
-});
+
+  return new Response(JSON.stringify(data), { status: 201 })
+})
 ```
 
 ### 6.3 — React Query hook per fetch
 
 ```typescript
 // hooks/useUserStats.ts
-import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api/client';
+import { useQuery } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api/client'
 
 export function useUserStats(period: '7d' | '30d' | '1y' = '30d') {
   return useQuery({
     queryKey: ['user-stats', period],
     queryFn: () => apiClient.get(`/users/me/stats?period=${period}`),
     staleTime: 5 * 60 * 1000, // 5 min
-  });
+  })
 }
 ```
 
@@ -2017,21 +2188,20 @@ export function useUserStats(period: '7d' | '30d' | '1y' = '30d') {
 
 ```typescript
 // hooks/useSubmitTrade.ts
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export function useSubmitTrade() {
-  const queryClient = useQueryClient();
-  
+  const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: (params: SubmitTradeParams) =>
-      apiClient.post('/trades/submit', params),
+    mutationFn: (params: SubmitTradeParams) => apiClient.post('/trades/submit', params),
     onSuccess: () => {
       // Invalidate positions, balances, history
-      queryClient.invalidateQueries({ queryKey: ['positions'] });
-      queryClient.invalidateQueries({ queryKey: ['balances'] });
-      queryClient.invalidateQueries({ queryKey: ['trades'] });
+      queryClient.invalidateQueries({ queryKey: ['positions'] })
+      queryClient.invalidateQueries({ queryKey: ['balances'] })
+      queryClient.invalidateQueries({ queryKey: ['trades'] })
     },
-  });
+  })
 }
 ```
 
@@ -2039,36 +2209,33 @@ export function useSubmitTrade() {
 
 ```typescript
 // middleware.ts (Next.js)
-import { NextResponse } from 'next/server';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
+import { NextResponse } from 'next/server'
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(100, '1 m'),
-});
+})
 
 export async function middleware(req: NextRequest) {
-  const ip = req.ip ?? '127.0.0.1';
-  const { success, limit, remaining, reset } = await ratelimit.limit(ip);
-  
+  const ip = req.ip ?? '127.0.0.1'
+  const { success, limit, remaining, reset } = await ratelimit.limit(ip)
+
   const response = success
     ? NextResponse.next()
-    : new NextResponse(
-        JSON.stringify({ error: { code: 'RATE_LIMIT_EXCEEDED' } }),
-        { status: 429 }
-      );
-  
-  response.headers.set('X-RateLimit-Limit', limit.toString());
-  response.headers.set('X-RateLimit-Remaining', remaining.toString());
-  response.headers.set('X-RateLimit-Reset', reset.toString());
-  
-  return response;
+    : new NextResponse(JSON.stringify({ error: { code: 'RATE_LIMIT_EXCEEDED' } }), { status: 429 })
+
+  response.headers.set('X-RateLimit-Limit', limit.toString())
+  response.headers.set('X-RateLimit-Remaining', remaining.toString())
+  response.headers.set('X-RateLimit-Reset', reset.toString())
+
+  return response
 }
 
 export const config = {
   matcher: '/api/v1/:path*',
-};
+}
 ```
 
 ---
@@ -2080,7 +2247,7 @@ export const config = {
 Usa **Zod** per validare tutti i payload:
 
 ```typescript
-import { z } from 'zod';
+import { z } from 'zod'
 
 const SubmitTradeSchema = z.object({
   market_id: z.string().uuid(),
@@ -2089,14 +2256,14 @@ const SubmitTradeSchema = z.object({
   is_demo: z.boolean(),
   order_type: z.enum(['market', 'limit']),
   limit_price: z.number().min(0.01).max(0.99).optional(),
-});
+})
 
-const parsed = SubmitTradeSchema.safeParse(body);
+const parsed = SubmitTradeSchema.safeParse(body)
 if (!parsed.success) {
   return NextResponse.json(
     { error: { code: 'VALIDATION_FAILED', details: parsed.error.flatten() } },
     { status: 422 }
-  );
+  )
 }
 ```
 
@@ -2110,7 +2277,7 @@ const ALLOWED_ORIGINS = [
   'https://predimark.com',
   'https://staging.predimark.com',
   'http://localhost:3000', // dev only
-];
+]
 ```
 
 ### CSRF
@@ -2152,5 +2319,5 @@ Per Cowork:
 
 ---
 
-*Fine Documento 7 — API Design*
-*Continua con Documento 8 (Design System) nella sessione successiva*
+_Fine Documento 7 — API Design_
+_Continua con Documento 8 (Design System) nella sessione successiva_

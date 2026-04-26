@@ -49,6 +49,7 @@ La pagina `/me` ha **un layout overview** + **N sub-pagine dedicate** per deep d
 ```
 
 **Switch globale REAL/DEMO nell'header**:
+
 - Click su REAL → redirect a `/me`
 - Click su DEMO → redirect a `/me/demo`
 - Persiste tra sessioni (Zustand localStorage)
@@ -58,22 +59,27 @@ La pagina `/me` ha **un layout overview** + **N sub-pagine dedicate** per deep d
 ## DECISIONI DI STILE PER /me
 
 ### Tema visivo
+
 Stesso tema dark+light + palette Predimark senza giallo, ereditato da Pagina 1.
 
 ### Colori semantici specifici per /me
+
 - **Verde** `#10b981` (dark) / `#059669` (light): P&L positivo, saldo, win
 - **Rosso** `#ef4444` (dark) / `#dc2626` (light): P&L negativo, loss, debito
 - **Blu** `#3b82f6`: CTA primario (Deposit, Trade)
 - **Grigio**: dati neutri (volume tradato, trade count, ecc.)
 
 ### Banner Demo (quando in modalità Demo)
+
 Banner persistente in cima a tutte le pagine `/me/demo/*`:
+
 ```
 ┌──────────────────────────────────────────────────────────┐
 │ ⓘ Modalità Demo · Saldo paper money · I tuoi trade non   │
 │   sono reali · [Switch to Real Mode]                      │
 └──────────────────────────────────────────────────────────┘
 ```
+
 Background blu chiaro `#3b82f615`, testo blu primario, bottone CTA.
 
 ---
@@ -231,6 +237,7 @@ Background blu chiaro `#3b82f615`, testo blu primario, bottone CTA.
 ```
 
 **Caratteristiche del grafico equity**:
+
 - Linea **verde** se valore corrente > valore inizio periodo
 - Linea **rossa** se valore corrente < valore inizio periodo
 - Colore di sfondo gradient morbido (verde tenue / rosso tenue) sotto la linea
@@ -239,6 +246,7 @@ Background blu chiaro `#3b82f615`, testo blu primario, bottone CTA.
 - **Loading state**: skeleton placeholder finché non carica
 
 **Quick actions**:
+
 - **Deposit** (CTA blu primario): apre modal/page MoonPay onramp
 - **Withdraw**: apre modal/page off-ramp
 - **Trade**: redirect a Home con scroll alle hero card
@@ -247,6 +255,7 @@ Background blu chiaro `#3b82f615`, testo blu primario, bottone CTA.
 ### Card posizioni aperte (preview)
 
 Ogni card mostra:
+
 - **Foto evento** + nome mercato + side (YES/NO/UP/DOWN/Team)
 - **Quantità** shares possedute
 - **Prezzo medio acquisto** (Avg)
@@ -259,6 +268,7 @@ Ogni card mostra:
 ### Card stats oggi
 
 Riepilogo rapido performance del giorno:
+
 - **Trade oggi**: numero di trade chiusi nelle ultime 24h
 - **Win rate**: percentuale di trade vincenti oggi
 - **Volume tradato**: somma USDC di tutti i trade oggi
@@ -267,6 +277,7 @@ Riepilogo rapido performance del giorno:
 ### Card watchlist preview
 
 Top 5 mercati seguiti con price change:
+
 - Foto + nome mercato compatto
 - Probabilità corrente + delta (verde/rosso)
 - Click → naviga alla pagina evento
@@ -274,6 +285,7 @@ Top 5 mercati seguiti con price change:
 ### Card achievements recenti
 
 Top 3 badge sbloccati di recente:
+
 - Icona trofeo + nome badge
 - "Sbloccato Xg fa"
 - Click → naviga a `/me/achievements` per dettagli
@@ -281,6 +293,7 @@ Top 3 badge sbloccati di recente:
 ### Card following
 
 Top 3 creator seguiti con loro performance del giorno:
+
 - Avatar + nome creator
 - "+$X oggi (+Y%)" o "−$X oggi (−Y%)"
 - Click → naviga a `/creator/[username]`
@@ -521,40 +534,53 @@ Questo è dato pratico per migliorare le decisioni di trading. Polymarket non of
 ## SUB-PAGINE MINORI (descrizione sintetica)
 
 ### `/me/following`
+
 Lista creator seguiti con loro performance recente. Click su uno → naviga al profilo creator. Bottone "Unfollow" inline.
 
 ### `/me/sessions`
+
 Lista session keys copy trading attive:
+
 - Per ogni session: creator + livello (Manuale/24h/7g/30g/Indefinito) + stato (attiva/scaduta)
 - Bottone "Revoca" istantaneo (chiude la session immediatamente)
 - Storico session passate
 
 ### `/me/referrals`
+
 Programma referral:
+
 - Link referral personale (con bottone copy)
 - Lista referrati con loro volume e payout dovuto
 - Storico payout ricevuti
 - Spiegazione "Come funziona" (20% revenue share per 6 mesi)
 
 ### `/me/achievements`
+
 Griglia badge sbloccati + locked:
+
 - Sbloccati: colorati con descrizione
 - Locked: silhouette grigia con "Sblocca facendo X"
 - Categorie: Trading / Social / Streaks / Volumes / Special
 
 ### `/me/transactions`
+
 Storico depositi e prelievi:
+
 - Ogni transazione: tipo (deposit/withdraw), importo, data, status (pending/completed/failed), tx hash on-chain
 - Filtri per tipo e periodo
 
 ### `/me/notifications`
+
 Storico notifiche ricevute (email + push + in-app):
+
 - Lista cronologica
 - Marca come letto
 - Filtri per tipo
 
 ### `/me/settings/*`
+
 7 sub-pagine settings (descritte nel Documento 3 — Sitemap):
+
 - profile / security / notifications / telegram / premium / language / data
 
 ---
@@ -562,16 +588,20 @@ Storico notifiche ricevute (email + push + in-app):
 ## STATI DELLE PAGINE /me
 
 ### Default (utente loggato con saldo e attività)
+
 Layout completo con dati real-time.
 
 ### Loading (primo caricamento)
+
 - Skeleton placeholder per hero, posizioni, stats, watchlist
 - Caricamento progressivo sezione per sezione
 
 ### Empty state (utente nuovo, niente attività)
+
 Per ogni sezione vuota mostra **empty state custom**:
 
 **Posizioni vuote**:
+
 ```
 [Icona]
 "Nessuna posizione aperta"
@@ -580,12 +610,14 @@ Inizia a tradare per vedere le tue posizioni qui.
 ```
 
 **History vuoto**:
+
 ```
 "Nessun trade chiuso"
 Quando i tuoi trade si risolvono, appariranno qui.
 ```
 
 **Watchlist vuota**:
+
 ```
 "Nessun mercato seguito"
 Aggiungi mercati alla watchlist con il bookmark per tenerli d'occhio.
@@ -593,6 +625,7 @@ Aggiungi mercati alla watchlist con il bookmark per tenerli d'occhio.
 ```
 
 **Stats vuote**:
+
 ```
 "Statistiche non disponibili"
 Servono almeno 5 trade chiusi per generare statistiche significative.
@@ -600,9 +633,11 @@ Servono almeno 5 trade chiusi per generare statistiche significative.
 ```
 
 ### Error (problema rete/API)
+
 Banner non bloccante "Connessione interrotta" + dati cached.
 
 ### Modalità Demo (attiva)
+
 - L'utente è su `/me/demo/*` invece di `/me/*`
 - Banner blu persistente in cima
 - Dati paper money
@@ -616,6 +651,7 @@ Banner non bloccante "Connessione interrotta" + dati cached.
 ### Real-time updates
 
 Aggiornamenti via WebSocket per:
+
 - **Prezzi correnti posizioni**: WS CLOB `price_change`
 - **P&L**: ricalcolato live in base a prezzi
 - **Saldo**: aggiornato dopo ogni trade (via WS o polling)
@@ -625,6 +661,7 @@ Aggiornamenti via WebSocket per:
 ### Switch REAL/DEMO
 
 Quando l'utente clicca lo switch nell'header globale:
+
 - Se è su `/me/*` → redirect a `/me/demo/*` (stessa sub-page)
 - Se è su `/me/demo/*` → redirect a `/me/*`
 - Se è su altra pagina (es. Home) → redirect alla home con switch attivato
@@ -634,6 +671,7 @@ Esempio: utente su `/me/positions` clicca DEMO → finisce su `/me/demo/position
 ### Notifiche push opzionali per watchlist
 
 Per ogni mercato in watchlist, l'utente può abilitare notifiche push per:
+
 - Movimento prezzo > X% in 1h/24h
 - Nuovo segnale Predimark sul mercato
 - Mercato chiude tra 24h
@@ -688,6 +726,7 @@ Configurabile da `/me/settings/notifications`.
 ### Database considerations
 
 Per Cowork: il DB Supabase deve avere tabelle separate per real e demo data. Esempio:
+
 - `positions_real` / `positions_demo`
 - `trades_real` / `trades_demo`
 - `transactions_real` (demo non ha transazioni)
@@ -719,5 +758,5 @@ Documenti che verranno costruiti nelle prossime sessioni:
 
 ---
 
-*Fine Documento 4 — Wireframes — Pagina 3 (Profilo /me)*
-*Continua con Pagina 4 (Profilo creator) nella sessione successiva*
+_Fine Documento 4 — Wireframes — Pagina 3 (Profilo /me)_
+_Continua con Pagina 4 (Profilo creator) nella sessione successiva_

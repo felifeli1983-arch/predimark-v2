@@ -14,6 +14,7 @@
 Questo documento definisce lo **schema completo del database** Predimark V2 in Supabase (Postgres + TimescaleDB).
 
 Per ogni tabella fornisce:
+
 - **CREATE TABLE** SQL pronto per migration
 - **Indici** per performance
 - **RLS policies** per security
@@ -26,17 +27,17 @@ Cowork può usare questo doc per generare migrations Supabase con minime modific
 
 ## DECISIONI ARCHITETTURALI
 
-| Decisione | Scelta |
-|---|---|
-| REAL vs DEMO data | **Una tabella con flag `is_demo BOOL`** (helper functions per filtri) |
-| Trader esterni Polymarket | **Tabella separata `external_traders`** |
-| Time-series storage | **Equity curve + price history mercati** in TimescaleDB hypertables |
-| Audit log | **Tabella unica + partitioning by month** |
-| ID strategy | **UUID v4** per tutti i primary key (no autoincrement) |
-| Timestamps | **TIMESTAMPTZ** sempre (UTC + timezone) |
-| Soft delete | **`deleted_at TIMESTAMPTZ NULL`** per record con storia (users, creators, markets) |
-| JSON storage | **JSONB** per dati semi-strutturati (preferences, feature flag config) |
-| Encryption | **pgcrypto** per dati sensibili (KYC documents metadata) |
+| Decisione                 | Scelta                                                                             |
+| ------------------------- | ---------------------------------------------------------------------------------- |
+| REAL vs DEMO data         | **Una tabella con flag `is_demo BOOL`** (helper functions per filtri)              |
+| Trader esterni Polymarket | **Tabella separata `external_traders`**                                            |
+| Time-series storage       | **Equity curve + price history mercati** in TimescaleDB hypertables                |
+| Audit log                 | **Tabella unica + partitioning by month**                                          |
+| ID strategy               | **UUID v4** per tutti i primary key (no autoincrement)                             |
+| Timestamps                | **TIMESTAMPTZ** sempre (UTC + timezone)                                            |
+| Soft delete               | **`deleted_at TIMESTAMPTZ NULL`** per record con storia (users, creators, markets) |
+| JSON storage              | **JSONB** per dati semi-strutturati (preferences, feature flag config)             |
+| Encryption                | **pgcrypto** per dati sensibili (KYC documents metadata)                           |
 
 ---
 
@@ -135,41 +136,41 @@ CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   auth_id UUID UNIQUE NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   wallet_address TEXT UNIQUE NOT NULL,        -- Polygon address (0x...)
-  
+
   -- Profile
   username TEXT UNIQUE,                        -- @username scelto dall'utente, opzionale
   display_name TEXT,                           -- Nome reale opzionale
   avatar_url TEXT,                             -- URL avatar (Supabase Storage)
   bio TEXT,                                    -- Bio max 140 char
-  
+
   -- Contact
   email TEXT,                                  -- Email da Privy (può essere null per wallet-only)
   email_verified BOOLEAN DEFAULT false,
   phone TEXT,                                  -- Optional, per Telegram bot
   phone_verified BOOLEAN DEFAULT false,
-  
+
   -- Geo
   country_code CHAR(2),                        -- IT, US, ES (ISO 3166)
   geo_block_status TEXT DEFAULT 'allowed',     -- 'allowed' | 'demo_only' | 'blocked'
-  
+
   -- Preferences
   language CHAR(2) DEFAULT 'en',               -- en, es, pt, it, fr
   theme TEXT DEFAULT 'dark',                   -- 'dark' | 'light'
-  
+
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   last_login_at TIMESTAMPTZ,
   deleted_at TIMESTAMPTZ,                      -- Soft delete
-  
+
   -- Status
   is_suspended BOOLEAN DEFAULT false,
   suspended_at TIMESTAMPTZ,
   suspended_reason TEXT,
-  
+
   -- Onboarding
   onboarding_completed BOOLEAN DEFAULT false,
-  
+
   CONSTRAINT username_format CHECK (username IS NULL OR username ~ '^[a-z0-9_]{3,20}$'),
   CONSTRAINT email_format CHECK (email IS NULL OR email ~ '^[^@]+@[^@]+\.[^@]+$')
 );
@@ -182,6 +183,7 @@ CREATE INDEX idx_users_active ON users(deleted_at) WHERE deleted_at IS NULL;
 ```
 
 **RLS policies**:
+
 ```sql
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
@@ -216,32 +218,32 @@ Top trader Polymarket esterni (non hanno account Predimark, ma sono in leaderboa
 CREATE TABLE external_traders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   wallet_address TEXT UNIQUE NOT NULL,         -- Polygon address
-  
+
   -- Polymarket info (importati via Data API)
   polymarket_nickname TEXT,                    -- "WhaleAI" se settato dal trader
   polymarket_pnl_total NUMERIC(20, 2),         -- P&L cumulato totale (USDC)
   polymarket_volume_total NUMERIC(20, 2),      -- Volume tradato cumulato
-  
+
   -- Cached metrics (refresh nightly job)
   win_rate NUMERIC(5, 2),                      -- Percentuale 0-100
   trades_count INTEGER DEFAULT 0,
   specialization TEXT[],                       -- ['crypto', 'sport'] derivato da volumi
-  
+
   -- Discoverability
   rank_today INTEGER,                          -- Posizione classifica oggi
   rank_7d INTEGER,
   rank_30d INTEGER,
   rank_all_time INTEGER,
-  
+
   -- Status
   is_active BOOLEAN DEFAULT true,              -- false se inactive da >30g
   is_blocked BOOLEAN DEFAULT false,            -- Admin può bloccare (es. trader scammer)
-  
+
   -- Timestamps
   first_seen_at TIMESTAMPTZ DEFAULT NOW(),     -- Quando l'abbiamo importato la prima volta
   last_synced_at TIMESTAMPTZ DEFAULT NOW(),    -- Ultima sync con Polymarket Data API
   last_trade_at TIMESTAMPTZ,                   -- Ultimo trade visto on-chain
-  
+
   CONSTRAINT wallet_format CHECK (wallet_address ~ '^0x[a-fA-F0-9]{40}$')
 );
 
@@ -253,6 +255,7 @@ CREATE INDEX idx_external_rank_today ON external_traders(rank_today) WHERE rank_
 ```
 
 **RLS policies**:
+
 ```sql
 ALTER TABLE external_traders ENABLE ROW LEVEL SECURITY;
 
@@ -276,41 +279,41 @@ Cache locale dei mercati Polymarket (per query veloci, evitiamo di sempre hit Po
 ```sql
 CREATE TABLE markets (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
+
   -- Polymarket identifiers
   polymarket_market_id TEXT UNIQUE NOT NULL,   -- ID Polymarket
   polymarket_event_id TEXT NOT NULL,           -- ID evento padre
   slug TEXT UNIQUE NOT NULL,                   -- "trump-2028"
-  
+
   -- Content
   title TEXT NOT NULL,
   description TEXT,
   image_url TEXT,
-  
+
   -- Classification
   card_kind TEXT NOT NULL,                     -- 'binary' | 'multi_outcome' | 'multi_strike' | 'h2h_sport' | 'crypto_up_down'
   category TEXT NOT NULL,                      -- 'crypto' | 'sport' | 'politics' | 'culture' | 'news' | 'geopolitics' | 'economy' | 'tech'
   tags TEXT[],                                 -- ['election', 'usa', '2028']
-  
+
   -- Trading data (refreshed every 30s via cache)
   current_yes_price NUMERIC(5, 4),             -- 0.0001 - 0.9999
   current_no_price NUMERIC(5, 4),
   volume_24h NUMERIC(20, 2),
   volume_total NUMERIC(20, 2),
   liquidity NUMERIC(20, 2),
-  
+
   -- Status
   is_active BOOLEAN DEFAULT true,
   is_featured BOOLEAN DEFAULT false,           -- Curated by admin
   is_hot BOOLEAN DEFAULT false,                -- Hot Now tag
   is_hidden BOOLEAN DEFAULT false,             -- Admin può nascondere
-  
+
   -- Resolution
   resolution_source TEXT,                      -- "Chainlink BTC/USD", "ESPN", etc.
   resolves_at TIMESTAMPTZ,                     -- Quando il mercato chiude
   resolved_at TIMESTAMPTZ,                     -- Quando si è risolto effettivamente
   resolved_outcome TEXT,                       -- 'yes' | 'no' | outcome_id per multi
-  
+
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -330,6 +333,7 @@ CREATE INDEX idx_markets_tags ON markets USING GIN (tags);
 ```
 
 **RLS policies**:
+
 ```sql
 ALTER TABLE markets ENABLE ROW LEVEL SECURITY;
 
@@ -355,28 +359,28 @@ CREATE TABLE positions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   market_id UUID NOT NULL REFERENCES markets(id),
-  
+
   -- Position data
   side TEXT NOT NULL,                          -- 'yes' | 'no' | 'up' | 'down' | outcome_id per multi
   shares NUMERIC(20, 6) NOT NULL,              -- Numero share possedute
   avg_price NUMERIC(5, 4) NOT NULL,            -- Prezzo medio acquisto (0.0001-0.9999)
   total_cost NUMERIC(20, 2) NOT NULL,          -- USDC totale speso
-  
+
   -- Real-time computed (aggiornati via trigger o background job)
   current_price NUMERIC(5, 4),                 -- Prezzo corrente del side
   current_value NUMERIC(20, 2),                -- shares × current_price
   unrealized_pnl NUMERIC(20, 2),               -- current_value - total_cost
   unrealized_pnl_pct NUMERIC(10, 4),           -- (current_value - total_cost) / total_cost × 100
-  
+
   -- Status
   is_open BOOLEAN DEFAULT true,
   is_demo BOOLEAN NOT NULL DEFAULT false,      -- ⚠ Flag CRITICO: real vs demo
-  
+
   -- Timestamps
   opened_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   closed_at TIMESTAMPTZ,
-  
+
   CONSTRAINT shares_positive CHECK (shares > 0),
   CONSTRAINT price_range CHECK (avg_price > 0 AND avg_price < 1)
 );
@@ -393,6 +397,7 @@ CREATE INDEX idx_positions_delayed_view ON positions(user_id, opened_at)
 ```
 
 **RLS policies**:
+
 ```sql
 ALTER TABLE positions ENABLE ROW LEVEL SECURITY;
 
@@ -436,38 +441,38 @@ CREATE TABLE trades (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   market_id UUID NOT NULL REFERENCES markets(id),
   position_id UUID REFERENCES positions(id),    -- Riferimento posizione di partenza
-  
+
   -- Trade data
   trade_type TEXT NOT NULL,                     -- 'buy' | 'sell' | 'resolution'
   side TEXT NOT NULL,                           -- 'yes' | 'no' | etc.
   shares NUMERIC(20, 6) NOT NULL,
   price NUMERIC(5, 4) NOT NULL,                 -- Prezzo del singolo share
   total_amount NUMERIC(20, 2) NOT NULL,         -- shares × price (USDC)
-  
+
   -- Fees
   builder_fee NUMERIC(20, 4),                   -- Builder fee Polymarket pagata
   service_fee NUMERIC(20, 4),                   -- Service fee 1% se copy External
-  
+
   -- Result (solo per sell o resolution)
   pnl NUMERIC(20, 2),                           -- Profit/Loss realizzato
   pnl_pct NUMERIC(10, 4),                       -- ROI %
   is_win BOOLEAN,                               -- true se pnl > 0
-  
+
   -- Source
   source TEXT NOT NULL DEFAULT 'manual',        -- 'manual' | 'copy_creator' | 'copy_external' | 'signal'
   copied_from_creator_id UUID REFERENCES creators(id),
   copied_from_external_id UUID REFERENCES external_traders(id),
-  
+
   -- Polymarket reference
   polymarket_tx_hash TEXT,                      -- TX hash on-chain
   polymarket_order_id TEXT,                     -- Order ID CLOB
-  
+
   -- Status
   is_demo BOOLEAN NOT NULL DEFAULT false,
-  
+
   -- Timestamps
   executed_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   CONSTRAINT shares_positive CHECK (shares > 0),
   CONSTRAINT price_range CHECK (price >= 0 AND price <= 1)
 );
@@ -493,23 +498,23 @@ Saldo USDC reale e demo per ogni utente.
 ```sql
 CREATE TABLE balances (
   user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-  
+
   -- Real balance (USDC on-chain Polygon)
   usdc_balance NUMERIC(20, 6) DEFAULT 0,        -- Cached, source of truth è on-chain
   usdc_locked NUMERIC(20, 6) DEFAULT 0,         -- USDC in ordini limit aperti
   usdc_last_synced_at TIMESTAMPTZ,
-  
+
   -- Demo balance (paper money)
   demo_balance NUMERIC(20, 2) DEFAULT 10000,    -- Default $10k al signup
   demo_locked NUMERIC(20, 2) DEFAULT 0,
   demo_last_reset_at TIMESTAMPTZ,
-  
+
   -- Aggregated stats (cached, refresh ogni 5 min)
   real_total_pnl NUMERIC(20, 2) DEFAULT 0,
   real_volume_total NUMERIC(20, 2) DEFAULT 0,
   demo_total_pnl NUMERIC(20, 2) DEFAULT 0,
   demo_volume_total NUMERIC(20, 2) DEFAULT 0,
-  
+
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -530,48 +535,48 @@ Verified Creators del programma Predimark.
 CREATE TABLE creators (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  
+
   -- Application
   applied_at TIMESTAMPTZ DEFAULT NOW(),
   reviewed_at TIMESTAMPTZ,
   reviewed_by UUID REFERENCES users(id),
   application_status TEXT DEFAULT 'pending',    -- 'pending' | 'approved' | 'rejected' | 'requested_more_info'
   rejection_reason TEXT,
-  
+
   -- Verified status
   is_verified BOOLEAN DEFAULT false,
   verified_at TIMESTAMPTZ,
   is_public BOOLEAN DEFAULT true,               -- Profilo visibile pubblicamente
-  
+
   -- Profile pubblico
   bio_creator TEXT,                             -- Bio specifica per profilo creator
   website_url TEXT,
   twitter_handle TEXT,
   discord_handle TEXT,
   specialization TEXT[],                        -- ['crypto', 'sport']
-  
+
   -- Privacy settings
   show_positions BOOLEAN DEFAULT true,          -- Posizioni visibili (con delay 30min)
   show_history BOOLEAN DEFAULT true,
   anonymize_amounts BOOLEAN DEFAULT false,      -- Mostra solo % invece di $
-  
+
   -- Score Predimark (calcolato job nightly)
   score INTEGER,                                -- 0-100
   tier TEXT,                                    -- 'gold' | 'silver' | 'bronze' | 'rising' | 'standard'
-  
+
   -- Stats cached
   followers_count INTEGER DEFAULT 0,
   copiers_active INTEGER DEFAULT 0,
   total_earnings NUMERIC(20, 2) DEFAULT 0,      -- Builder fee revenue share guadagnata
-  
+
   -- Status
   is_suspended BOOLEAN DEFAULT false,
   suspended_at TIMESTAMPTZ,
   suspended_reason TEXT,
-  
+
   -- Timestamps
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   CONSTRAINT score_range CHECK (score IS NULL OR (score >= 0 AND score <= 100))
 );
 
@@ -592,23 +597,23 @@ Storico payout settimanali ai Verified Creators.
 CREATE TABLE creator_payouts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES creators(id),
-  
+
   -- Period
   period_start TIMESTAMPTZ NOT NULL,
   period_end TIMESTAMPTZ NOT NULL,
-  
+
   -- Calculation
   total_volume_copied NUMERIC(20, 2) NOT NULL,  -- Volume tradato dai copier
   total_builder_fee NUMERIC(20, 4) NOT NULL,    -- Builder fee generata
   revenue_share_pct NUMERIC(5, 2) DEFAULT 30,   -- 30%
   payout_amount NUMERIC(20, 4) NOT NULL,        -- 30% di builder_fee
-  
+
   -- Status
   status TEXT DEFAULT 'pending',                -- 'pending' | 'processing' | 'completed' | 'failed'
   paid_at TIMESTAMPTZ,
   payment_method TEXT,                          -- 'usdc_polygon' | 'stripe_bank' (futuro)
   payment_tx_hash TEXT,                         -- Per pagamenti USDC on-chain
-  
+
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -628,19 +633,19 @@ Chi segue chi (utente segue creator o external trader).
 CREATE TABLE follows (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   follower_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  
+
   -- Followed entity (XOR: o creator o external)
   followed_creator_id UUID REFERENCES creators(id) ON DELETE CASCADE,
   followed_external_id UUID REFERENCES external_traders(id) ON DELETE CASCADE,
-  
+
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   -- Notification preferences
   notify_new_position BOOLEAN DEFAULT true,
   notify_position_closed BOOLEAN DEFAULT true,
   notify_via_push BOOLEAN DEFAULT true,
   notify_via_telegram BOOLEAN DEFAULT false,
-  
+
   CONSTRAINT exactly_one_followed CHECK (
     (followed_creator_id IS NOT NULL AND followed_external_id IS NULL) OR
     (followed_creator_id IS NULL AND followed_external_id IS NOT NULL)
@@ -663,15 +668,15 @@ Session keys Privy per copy trading automatico.
 CREATE TABLE copy_trading_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  
+
   -- Target (XOR creator/external)
   target_creator_id UUID REFERENCES creators(id),
   target_external_id UUID REFERENCES external_traders(id),
-  
+
   -- Session config
   session_key_pubkey TEXT NOT NULL,             -- Public key Privy session
   session_key_id TEXT UNIQUE NOT NULL,          -- ID interno Privy
-  
+
   -- Limits
   budget_max_usdc NUMERIC(20, 2) NOT NULL,      -- Budget totale autorizzato
   budget_spent_usdc NUMERIC(20, 2) DEFAULT 0,   -- Quanto già speso
@@ -679,26 +684,26 @@ CREATE TABLE copy_trading_sessions (
   max_trades_per_day INTEGER DEFAULT 10,
   trades_today_count INTEGER DEFAULT 0,
   trades_today_reset_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   -- Whitelist mercati (opzionale)
   allowed_categories TEXT[],                    -- Se NULL = tutti
-  
+
   -- Duration
   duration_type TEXT NOT NULL,                  -- 'manual' | '24h' | '7d' | '30d' | 'indefinite'
   expires_at TIMESTAMPTZ,                       -- NULL se indefinite o manual
-  
+
   -- Status
   status TEXT DEFAULT 'active',                 -- 'active' | 'expired' | 'revoked' | 'budget_exhausted'
   revoked_at TIMESTAMPTZ,
   revoke_reason TEXT,
-  
+
   -- Stats
   trades_executed_count INTEGER DEFAULT 0,
   total_pnl NUMERIC(20, 2) DEFAULT 0,
-  
+
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   CONSTRAINT exactly_one_target CHECK (
     (target_creator_id IS NOT NULL AND target_external_id IS NULL) OR
     (target_creator_id IS NULL AND target_external_id IS NOT NULL)
@@ -726,32 +731,32 @@ Segnali algoritmici Predimark generati dal motore.
 CREATE TABLE signals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   market_id UUID NOT NULL REFERENCES markets(id),
-  
+
   -- Signal details
   algorithm_name TEXT NOT NULL,                 -- 'final_period_momentum' | 'rsi_oversold' | 'mean_reversion'
   direction TEXT NOT NULL,                      -- 'buy_yes' | 'buy_no' | 'buy_up' | 'buy_down'
   edge_pct NUMERIC(5, 2) NOT NULL,              -- Edge previsto in % (es. +14.5)
   confidence_pct NUMERIC(5, 2) NOT NULL,        -- Confidence 0-100
-  
+
   -- Predicted outcome
   predicted_probability NUMERIC(5, 4),          -- Probabilità prevista
   current_market_price NUMERIC(5, 4),           -- Prezzo mercato al momento
-  
+
   -- Validity
   valid_from TIMESTAMPTZ DEFAULT NOW(),
   valid_until TIMESTAMPTZ,
-  
+
   -- Status
   status TEXT DEFAULT 'active',                 -- 'active' | 'expired' | 'resolved' | 'invalidated'
-  
+
   -- Resolution (post-event)
   resolved_at TIMESTAMPTZ,
   was_correct BOOLEAN,                          -- true se outcome corrispose
   realized_edge_pct NUMERIC(5, 2),              -- Edge effettivamente realizzato
-  
+
   -- Metadata
   metadata JSONB,                               -- Dati extra dell'algoritmo
-  
+
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -773,33 +778,33 @@ Notifiche per utenti (in-app, push, email, telegram).
 CREATE TABLE notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  
+
   -- Content
   title TEXT NOT NULL,
   body TEXT NOT NULL,
   cta_label TEXT,
   cta_url TEXT,
-  
+
   -- Type & priority
   type TEXT NOT NULL,                           -- 'signal' | 'copy_trade' | 'position_update' | 'system' | 'admin_broadcast'
   priority TEXT DEFAULT 'normal',               -- 'low' | 'normal' | 'high' | 'urgent'
-  
+
   -- Channels delivered
   delivered_in_app BOOLEAN DEFAULT false,
   delivered_push BOOLEAN DEFAULT false,
   delivered_email BOOLEAN DEFAULT false,
   delivered_telegram BOOLEAN DEFAULT false,
-  
+
   -- Read status
   is_read BOOLEAN DEFAULT false,
   read_at TIMESTAMPTZ,
-  
+
   -- Related entities
   related_market_id UUID REFERENCES markets(id),
   related_signal_id UUID REFERENCES signals(id),
   related_creator_id UUID REFERENCES creators(id),
   related_trade_id UUID REFERENCES trades(id),
-  
+
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -821,14 +826,14 @@ CREATE TABLE watchlist (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   market_id UUID NOT NULL REFERENCES markets(id),
-  
+
   -- Notification preferences
   notify_price_change_pct NUMERIC(5, 2),        -- es. 5.0 = notifica se prezzo cambia >5%
   notify_signal BOOLEAN DEFAULT true,
   notify_resolution BOOLEAN DEFAULT true,
-  
+
   added_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   UNIQUE (user_id, market_id)
 );
 
@@ -845,37 +850,37 @@ Preferenze granulari dell'utente.
 ```sql
 CREATE TABLE user_preferences (
   user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-  
+
   -- Interests (per personalizzare home)
   interests TEXT[] DEFAULT '{}',                -- ['crypto', 'sport', 'politics']
-  
+
   -- Notification preferences globali
   notify_email BOOLEAN DEFAULT true,
   notify_push BOOLEAN DEFAULT true,
   notify_telegram BOOLEAN DEFAULT false,
-  
+
   -- Telegram
   telegram_chat_id TEXT,
   telegram_premium BOOLEAN DEFAULT false,       -- $5/mese subscription
   telegram_premium_until TIMESTAMPTZ,
-  
+
   -- Display preferences
   default_period_filter TEXT DEFAULT '7d',      -- 'today' | '7d' | '30d' | 'all'
   default_sort_leaderboard TEXT DEFAULT 'volume',
   default_chart_timeframe TEXT DEFAULT '1d',
-  
+
   -- Onboarding state
   onboarding_step_completed INTEGER DEFAULT 0,  -- 0-4
   onboarding_skipped BOOLEAN DEFAULT false,
   show_demo_banner BOOLEAN DEFAULT true,
   show_welcome_banner BOOLEAN DEFAULT true,
-  
+
   -- Privacy
   profile_visible BOOLEAN DEFAULT true,         -- Profilo visibile in leaderboard
-  
+
   -- Settings JSON (extensible)
   settings JSONB DEFAULT '{}',
-  
+
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -895,28 +900,28 @@ Sottomissioni KYC per withdraw real money.
 CREATE TABLE kyc_submissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  
+
   -- Documents (URLs encrypted in Supabase Storage)
   id_front_url TEXT NOT NULL,
   id_back_url TEXT,
   selfie_url TEXT NOT NULL,
   address_proof_url TEXT,
-  
+
   -- AI fraud check
   ai_check_passed BOOLEAN,
   ai_check_confidence NUMERIC(5, 2),
   ai_check_metadata JSONB,
-  
+
   -- Manual review
   status TEXT DEFAULT 'pending',                -- 'pending' | 'approved' | 'rejected' | 'requested_more_info'
   reviewed_at TIMESTAMPTZ,
   reviewed_by UUID REFERENCES users(id),
   reviewer_notes TEXT,
   rejection_reason TEXT,
-  
+
   -- Timestamps
   submitted_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   CONSTRAINT only_one_pending UNIQUE (user_id) DEFERRABLE INITIALLY DEFERRED
 );
 
@@ -935,13 +940,13 @@ Configurazione paesi bloccati (admin-managed).
 CREATE TABLE geo_blocks (
   country_code CHAR(2) PRIMARY KEY,
   country_name TEXT NOT NULL,
-  
+
   block_type TEXT NOT NULL,                     -- 'full_block' | 'demo_only' | 'kyc_required'
   reason TEXT,
-  
+
   effective_from TIMESTAMPTZ DEFAULT NOW(),
   effective_until TIMESTAMPTZ,                  -- NULL = indefinite
-  
+
   -- Audit
   created_by UUID REFERENCES users(id),
   updated_by UUID REFERENCES users(id),
@@ -963,18 +968,18 @@ CREATE TABLE referrals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   referrer_user_id UUID NOT NULL REFERENCES users(id),
   referred_user_id UUID UNIQUE NOT NULL REFERENCES users(id),
-  
+
   referral_code TEXT NOT NULL,                  -- Codice usato dal referrato
-  
+
   -- Tracking
   signed_up_at TIMESTAMPTZ DEFAULT NOW(),
   first_trade_at TIMESTAMPTZ,
-  
+
   -- Revenue tracking
   total_volume_generated NUMERIC(20, 2) DEFAULT 0,
   total_fees_generated NUMERIC(20, 4) DEFAULT 0,
   total_payout_to_referrer NUMERIC(20, 4) DEFAULT 0,
-  
+
   -- Validity (6 mesi)
   payout_until TIMESTAMPTZ,                     -- 6 mesi da first_trade_at
   is_active BOOLEAN DEFAULT true
@@ -999,17 +1004,17 @@ CREATE TABLE achievements (
   description TEXT NOT NULL,
   icon TEXT,                                    -- Lucide icon name
   category TEXT,                                -- 'trading' | 'social' | 'streak' | 'volume' | 'special'
-  
+
   -- Trigger condition (JSONB per flessibilità)
   trigger_condition JSONB NOT NULL,
   -- Es: {"type": "trade_count", "threshold": 1}
   -- Es: {"type": "win_streak", "threshold": 5}
   -- Es: {"type": "volume_total", "threshold": 10000}
-  
+
   -- Rarity
   rarity TEXT DEFAULT 'common',                 -- 'common' | 'rare' | 'epic' | 'legendary'
   points INTEGER DEFAULT 10,                    -- Punti per leaderboard achievement
-  
+
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -1024,9 +1029,9 @@ CREATE TABLE user_achievements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   achievement_id UUID NOT NULL REFERENCES achievements(id),
-  
+
   unlocked_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   UNIQUE (user_id, achievement_id)
 );
 
@@ -1045,23 +1050,23 @@ Ruoli admin (super-admin / admin / moderator).
 ```sql
 CREATE TABLE admin_users (
   user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-  
+
   role TEXT NOT NULL,                           -- 'super_admin' | 'admin' | 'moderator'
-  
+
   -- Permessi granulari (per future estensioni)
   permissions JSONB DEFAULT '{}',
-  
+
   -- MFA
   mfa_enabled BOOLEAN DEFAULT false,
   mfa_secret TEXT,                              -- Encrypted
-  
+
   -- Audit
   last_login_at TIMESTAMPTZ,
   ip_allowlist TEXT[],                          -- Optional IP restrictions
-  
+
   added_by UUID REFERENCES users(id),
   added_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   CONSTRAINT role_valid CHECK (role IN ('super_admin', 'admin', 'moderator'))
 );
 
@@ -1077,25 +1082,25 @@ Audit log dettagliato di tutte le azioni admin. **Partitioned by month**.
 ```sql
 CREATE TABLE audit_log (
   id UUID DEFAULT gen_random_uuid(),
-  
+
   -- Actor
   actor_user_id UUID NOT NULL REFERENCES users(id),
   actor_role TEXT NOT NULL,                     -- Snapshot ruolo al momento dell'azione
   actor_ip TEXT,
-  
+
   -- Action
   action_type TEXT NOT NULL,                    -- 'BAN_USER' | 'UPDATE_FEE' | 'APPROVE_CREATOR' | etc.
   target_type TEXT NOT NULL,                    -- 'user' | 'market' | 'creator' | 'fee' | 'feature_flag'
   target_id UUID,
-  
+
   -- Change details
   before_value JSONB,
   after_value JSONB,
   reason_note TEXT,
-  
+
   -- Timestamps
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  
+
   PRIMARY KEY (id, created_at)
 ) PARTITION BY RANGE (created_at);
 
@@ -1115,6 +1120,7 @@ CREATE INDEX idx_audit_target ON audit_log(target_type, target_id);
 **Job mensile**: cron job crea automaticamente la partition del mese successivo.
 
 **RLS**:
+
 ```sql
 ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
 
@@ -1138,20 +1144,20 @@ Feature flags runtime per rollout graduale.
 CREATE TABLE feature_flags (
   key TEXT PRIMARY KEY,                         -- 'new_chart_engine' | 'copy_trading_external'
   description TEXT,
-  
+
   enabled BOOLEAN DEFAULT false,
   rollout_percentage INTEGER DEFAULT 0,         -- 0-100 (per gradual rollout)
-  
+
   -- Targeting (opzionale)
   target_audience JSONB DEFAULT '{}',
   -- Es: {"countries": ["US", "UK"], "user_segments": ["beta_testers"]}
-  
+
   -- Audit
   created_by UUID REFERENCES users(id),
   updated_by UUID REFERENCES users(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   CONSTRAINT rollout_pct_range CHECK (rollout_percentage >= 0 AND rollout_percentage <= 100)
 );
 ```
@@ -1167,23 +1173,23 @@ CREATE TABLE ab_tests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT UNIQUE NOT NULL,                    -- 'home_hero_carousel_size'
   description TEXT,
-  
+
   -- Variants (JSONB)
   variants JSONB NOT NULL,
   -- Es: [{"id": "control", "weight": 50, "config": {"size": 3}}, {"id": "variant_b", "weight": 50, "config": {"size": 5}}]
-  
+
   -- Tracking
   metric_tracked TEXT NOT NULL,                 -- 'click_through_rate' | 'signup_conversion' | etc.
-  
+
   -- Status
   status TEXT DEFAULT 'draft',                  -- 'draft' | 'running' | 'paused' | 'ended'
   started_at TIMESTAMPTZ,
   ended_at TIMESTAMPTZ,
-  
+
   -- Result
   winner_variant TEXT,
   statistical_significance NUMERIC(5, 2),
-  
+
   created_by UUID REFERENCES users(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -1200,9 +1206,9 @@ CREATE TABLE ab_test_assignments (
   test_id UUID NOT NULL REFERENCES ab_tests(id),
   user_id UUID NOT NULL REFERENCES users(id),
   variant_id TEXT NOT NULL,
-  
+
   assigned_at TIMESTAMPTZ DEFAULT NOW(),
-  
+
   UNIQUE (test_id, user_id)
 );
 
@@ -1221,15 +1227,15 @@ Snapshot orario del valore portfolio per ogni utente.
 CREATE TABLE equity_curve (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   recorded_at TIMESTAMPTZ NOT NULL,
-  
+
   -- Snapshot values
   total_value_usdc NUMERIC(20, 2) NOT NULL,     -- Saldo + valore posizioni aperte
   realized_pnl_total NUMERIC(20, 2) DEFAULT 0,
   unrealized_pnl_total NUMERIC(20, 2) DEFAULT 0,
-  
+
   -- Demo separation
   is_demo BOOLEAN NOT NULL DEFAULT false,
-  
+
   PRIMARY KEY (user_id, recorded_at, is_demo)
 );
 
@@ -1258,11 +1264,11 @@ Storia prezzi mercati cached per chart.
 CREATE TABLE price_history (
   market_id UUID NOT NULL REFERENCES markets(id),
   recorded_at TIMESTAMPTZ NOT NULL,
-  
+
   yes_price NUMERIC(5, 4),
   no_price NUMERIC(5, 4),
   volume_period NUMERIC(20, 2),                 -- Volume in questo intervallo
-  
+
   PRIMARY KEY (market_id, recorded_at)
 );
 
@@ -1295,20 +1301,20 @@ CREATE TABLE market_comments_internal (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   market_id UUID NOT NULL REFERENCES markets(id),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  
+
   -- Content
   body TEXT NOT NULL,
   parent_comment_id UUID REFERENCES market_comments_internal(id),
-  
+
   -- Engagement
   likes_count INTEGER DEFAULT 0,
   replies_count INTEGER DEFAULT 0,
-  
+
   -- Moderation
   is_hidden BOOLEAN DEFAULT false,
   hidden_by UUID REFERENCES users(id),
   hidden_reason TEXT,
-  
+
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   deleted_at TIMESTAMPTZ
@@ -1449,7 +1455,7 @@ ORDER BY p.opened_at DESC;
 
 ```sql
 WITH verified AS (
-  SELECT 
+  SELECT
     u.id, u.username, u.avatar_url,
     'verified' as type,
     c.score, c.tier,
@@ -1461,7 +1467,7 @@ WITH verified AS (
   WHERE c.is_verified = true AND c.is_public = true
 ),
 external AS (
-  SELECT 
+  SELECT
     e.id, e.wallet_address as username, NULL as avatar_url,
     'external' as type,
     NULL as score, NULL as tier,
@@ -1480,7 +1486,7 @@ LIMIT 50;
 ### Storico trade utente con calcolo win rate
 
 ```sql
-SELECT 
+SELECT
   COUNT(*) FILTER (WHERE is_win = true) as wins,
   COUNT(*) as total_trades,
   ROUND(100.0 * COUNT(*) FILTER (WHERE is_win = true) / COUNT(*), 2) as win_rate,
@@ -1495,7 +1501,7 @@ WHERE user_id = $1
 ### Calcolo creator payout settimanale
 
 ```sql
-SELECT 
+SELECT
   c.id as creator_id,
   SUM(t.total_amount) as volume_copied,
   SUM(t.builder_fee) as builder_fee_total,
@@ -1539,18 +1545,18 @@ supabase/migrations/
 
 ### Stima dimensioni tabelle (1 anno, 5k utenti attivi)
 
-| Tabella | Righe stimate | Dimensione stimata |
-|---|---|---|
-| users | 5,000 | 5 MB |
-| external_traders | 5,000 | 5 MB |
-| markets | 50,000 | 50 MB |
-| positions | 500,000 | 200 MB |
-| trades | 5,000,000 | 2 GB |
-| price_history | 50,000,000 | 5 GB (compressed: 1 GB) |
-| equity_curve | 10,000,000 | 1 GB (compressed: 200 MB) |
-| audit_log | 100,000/mese | 50 MB/mese |
-| notifications | 10,000,000 | 5 GB |
-| **TOTALE** | | **~15 GB** |
+| Tabella          | Righe stimate | Dimensione stimata        |
+| ---------------- | ------------- | ------------------------- |
+| users            | 5,000         | 5 MB                      |
+| external_traders | 5,000         | 5 MB                      |
+| markets          | 50,000        | 50 MB                     |
+| positions        | 500,000       | 200 MB                    |
+| trades           | 5,000,000     | 2 GB                      |
+| price_history    | 50,000,000    | 5 GB (compressed: 1 GB)   |
+| equity_curve     | 10,000,000    | 1 GB (compressed: 200 MB) |
+| audit_log        | 100,000/mese  | 50 MB/mese                |
+| notifications    | 10,000,000    | 5 GB                      |
+| **TOTALE**       |               | **~15 GB**                |
 
 **Supabase Pro plan**: 8 GB DB included, $0.125/GB extra. Costo stimato: ~$1/mese in extra storage al primo anno.
 
@@ -1571,5 +1577,5 @@ supabase/migrations/
 
 ---
 
-*Fine Documento 6 — Database Schema*
-*Continua con Documento 7 (API Design) nella sessione successiva*
+_Fine Documento 6 — Database Schema_
+_Continua con Documento 7 (API Design) nella sessione successiva_

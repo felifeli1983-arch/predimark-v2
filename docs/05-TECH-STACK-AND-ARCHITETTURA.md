@@ -23,34 +23,35 @@ Tutte le decisioni qui sono **confermate da Feliciano** o sono **default di V1**
 
 ### Framework principale
 
-| Tecnologia | Versione | Motivazione |
-|---|---|---|
-| **Next.js** | 16.x | App Router + Server Components + Turbopack. Stesso stack di V1, mature e ottimizzato per Vercel deploy. |
-| **React** | 19.x | Latest stable. Concurrent features, server components, useOptimistic per UX fluida nei trade. |
-| **TypeScript** | 5.x strict | `"strict": true` in tsconfig. No `any` permessi. Tipo-safety end-to-end. |
-| **Turbopack** | built-in | Bundler ufficiale Next 16. ~10x faster di Webpack per dev mode. |
+| Tecnologia     | Versione   | Motivazione                                                                                             |
+| -------------- | ---------- | ------------------------------------------------------------------------------------------------------- |
+| **Next.js**    | 16.x       | App Router + Server Components + Turbopack. Stesso stack di V1, mature e ottimizzato per Vercel deploy. |
+| **React**      | 19.x       | Latest stable. Concurrent features, server components, useOptimistic per UX fluida nei trade.           |
+| **TypeScript** | 5.x strict | `"strict": true` in tsconfig. No `any` permessi. Tipo-safety end-to-end.                                |
+| **Turbopack**  | built-in   | Bundler ufficiale Next 16. ~10x faster di Webpack per dev mode.                                         |
 
 ### Styling
 
-| Tecnologia | Versione | Motivazione |
-|---|---|---|
-| **Tailwind CSS** | 4.x | Latest con `@theme` directive in `globals.css` (no `tailwind.config.ts` file). Più semplice, meno boilerplate. |
-| **shadcn/ui** | latest | Componenti React copy-paste (no dipendenza npm). Personalizzabili, accessibili, dark mode nativo. |
-| **lucide-react** | latest | Icone SVG. **Zero emoji** in UI per regola Predimark. |
-| **Framer Motion** | 11.x | Animazioni fluide (modal, drawer, tabs, equity curve). Performance-friendly. |
+| Tecnologia        | Versione | Motivazione                                                                                                    |
+| ----------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
+| **Tailwind CSS**  | 4.x      | Latest con `@theme` directive in `globals.css` (no `tailwind.config.ts` file). Più semplice, meno boilerplate. |
+| **shadcn/ui**     | latest   | Componenti React copy-paste (no dipendenza npm). Personalizzabili, accessibili, dark mode nativo.              |
+| **lucide-react**  | latest   | Icone SVG. **Zero emoji** in UI per regola Predimark.                                                          |
+| **Framer Motion** | 11.x     | Animazioni fluide (modal, drawer, tabs, equity curve). Performance-friendly.                                   |
 
 **Regole strict di styling**:
+
 - Tema dark e light supportati nativamente via Tailwind dark:
 - Palette dichiarata in `globals.css` con `@theme`:
   ```css
   @theme {
-    --color-bg-primary: #0a0e1a;     /* dark bg */
-    --color-bg-secondary: #141a2a;   /* dark card */
-    --color-success: #10b981;        /* verde Yes/Up/Buy */
-    --color-danger: #ef4444;         /* rosso No/Down/Sell */
-    --color-cta: #3b82f6;            /* blu CTA */
-    --color-live: #dc2626;           /* live indicator pulsante */
-    --color-hot: #f97316;            /* hot indicator */
+    --color-bg-primary: #0a0e1a; /* dark bg */
+    --color-bg-secondary: #141a2a; /* dark card */
+    --color-success: #10b981; /* verde Yes/Up/Buy */
+    --color-danger: #ef4444; /* rosso No/Down/Sell */
+    --color-cta: #3b82f6; /* blu CTA */
+    --color-live: #dc2626; /* live indicator pulsante */
+    --color-hot: #f97316; /* hot indicator */
     /* ... */
   }
   ```
@@ -59,14 +60,15 @@ Tutte le decisioni qui sono **confermate da Feliciano** o sono **default di V1**
 
 ### State management
 
-| Tecnologia | Uso | Note |
-|---|---|---|
-| **Zustand** + **persist middleware** | State client globale | Persiste in localStorage. Leggero (1.5kb gzipped). |
-| **React Query** (`@tanstack/react-query`) | Server state + cache | Per fetch, mutations, polling, optimistic updates. |
-| **React Context** | State UI ephemeral | Per dropdown, modal, toast — niente persistenza. |
-| **URL query params** | Filtri pagina | Per leaderboard, search, filters condivisibili via link. |
+| Tecnologia                                | Uso                  | Note                                                     |
+| ----------------------------------------- | -------------------- | -------------------------------------------------------- |
+| **Zustand** + **persist middleware**      | State client globale | Persiste in localStorage. Leggero (1.5kb gzipped).       |
+| **React Query** (`@tanstack/react-query`) | Server state + cache | Per fetch, mutations, polling, optimistic updates.       |
+| **React Context**                         | State UI ephemeral   | Per dropdown, modal, toast — niente persistenza.         |
+| **URL query params**                      | Filtri pagina        | Per leaderboard, search, filters condivisibili via link. |
 
 **Stores Zustand previsti** (aggiornati per V2):
+
 1. `useAppMode` — REAL vs DEMO toggle, lingua, tema dark/light
 2. `usePrediction` — draft trade in corso (importo, side, prezzo limit)
 3. `useBetSlip` — bet slip multi-mercato (V2 feature)
@@ -75,24 +77,25 @@ Tutte le decisioni qui sono **confermate da Feliciano** o sono **default di V1**
 
 ### Web3 / Wallet
 
-| Tecnologia | Uso |
-|---|---|
-| **Privy** (`@privy-io/react-auth`) | Auth primary + embedded wallet creation |
-| **wagmi** 2.x | React hooks per Ethereum (account, signMessage, sendTransaction) |
-| **viem** | Low-level Ethereum library (replacement per ethers.js) |
-| **WalletConnect** v2 | Per external wallet (MetaMask Mobile, Rainbow, Trust) |
-| **@tanstack/react-query** | Cache delle query Web3 (balances, allowances) |
+| Tecnologia                         | Uso                                                              |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| **Privy** (`@privy-io/react-auth`) | Auth primary + embedded wallet creation                          |
+| **wagmi** 2.x                      | React hooks per Ethereum (account, signMessage, sendTransaction) |
+| **viem**                           | Low-level Ethereum library (replacement per ethers.js)           |
+| **WalletConnect** v2               | Per external wallet (MetaMask Mobile, Rainbow, Trust)            |
+| **@tanstack/react-query**          | Cache delle query Web3 (balances, allowances)                    |
 
 **Configurazione chain**: Polygon 137 (mainnet) + Polygon Amoy 80002 (testnet per staging).
 
 ### Polymarket integration
 
-| Tecnologia | Uso |
-|---|---|
-| **@polymarket/clob-client** | SDK ufficiale per CLOB API (book, midpoint, prices-history, POST /order) |
-| **Custom client** in `lib/polymarket/` | Wrapper su Gamma API REST + Data API REST + WebSocket RTDS |
+| Tecnologia                             | Uso                                                                      |
+| -------------------------------------- | ------------------------------------------------------------------------ |
+| **@polymarket/clob-client**            | SDK ufficiale per CLOB API (book, midpoint, prices-history, POST /order) |
+| **Custom client** in `lib/polymarket/` | Wrapper su Gamma API REST + Data API REST + WebSocket RTDS               |
 
 Endpoint utilizzati (da V1, validati):
+
 - **Gamma API** REST: events, markets, comments, tags, series, search
 - **CLOB** REST + WebSocket: book/midpoint/prices-history + topic book/price_change/last_trade_price
 - **Data API** REST: leaderboard, trades, holders, positions
@@ -100,28 +103,28 @@ Endpoint utilizzati (da V1, validati):
 
 ### Charting
 
-| Tecnologia | Uso |
-|---|---|
+| Tecnologia                                        | Uso                                                                               |
+| ------------------------------------------------- | --------------------------------------------------------------------------------- |
 | **Custom SVG components** in `components/charts/` | Equity curve, line chart prob, candle chart crypto. Già scritti in V1, riusabili. |
-| **Recharts** | Per chart "standard" (bar, pie nel dashboard admin) |
+| **Recharts**                                      | Per chart "standard" (bar, pie nel dashboard admin)                               |
 
 **No TradingView**: troppo pesante, troppe feature non necessarie, costo licenza per uso commerciale. I nostri SVG custom bastano.
 
 ### Internazionalizzazione
 
-| Tecnologia | Uso |
-|---|---|
-| **next-intl** | i18n per Next.js App Router. Translation files in `messages/[locale].json` |
-| **Browser language detection** | Riconosce automaticamente, fallback a EN |
-| **5 lingue al lancio**: EN / ES / PT / IT / FR | Switch manuale nel footer + settings |
+| Tecnologia                                     | Uso                                                                        |
+| ---------------------------------------------- | -------------------------------------------------------------------------- |
+| **next-intl**                                  | i18n per Next.js App Router. Translation files in `messages/[locale].json` |
+| **Browser language detection**                 | Riconosce automaticamente, fallback a EN                                   |
+| **5 lingue al lancio**: EN / ES / PT / IT / FR | Switch manuale nel footer + settings                                       |
 
 ### PWA (Progressive Web App)
 
-| Tecnologia | Uso |
-|---|---|
-| **next-pwa** | Service worker, offline support basic, install prompt |
-| **Web Push API** | Notifiche push native browser/mobile |
-| **manifest.json** | Icone, theme color, shortcuts |
+| Tecnologia        | Uso                                                   |
+| ----------------- | ----------------------------------------------------- |
+| **next-pwa**      | Service worker, offline support basic, install prompt |
+| **Web Push API**  | Notifiche push native browser/mobile                  |
+| **manifest.json** | Icone, theme color, shortcuts                         |
 
 **Niente app nativa V1** — PWA copre 90% dei casi d'uso mobile. Native app valutata per V2 se PWA limita.
 
@@ -131,37 +134,38 @@ Endpoint utilizzati (da V1, validati):
 
 ### Backend principale: **Supabase**
 
-| Servizio | Uso |
-|---|---|
-| **Postgres 15+** | Database relazionale principale. Tabelle utenti, mercati, trades, positions, audit log, ecc. |
-| **TimescaleDB extension** | Time-series per analytics (volume per ora, equity curve storage, signal performance) |
-| **Supabase Auth** | Auth via Privy JWT (verifica server-side) |
-| **Supabase Realtime** | WebSocket per notifiche real-time interne (es. updates posizioni utente, comments live) |
-| **Supabase Storage** | Avatar upload, KYC documents (encrypted at rest) |
-| **Edge Functions** (Deno) | Logica server-side critica (vedi sezione dedicata) |
-| **Row Level Security (RLS)** | Policy granulari per privacy dati utente |
+| Servizio                     | Uso                                                                                          |
+| ---------------------------- | -------------------------------------------------------------------------------------------- |
+| **Postgres 15+**             | Database relazionale principale. Tabelle utenti, mercati, trades, positions, audit log, ecc. |
+| **TimescaleDB extension**    | Time-series per analytics (volume per ora, equity curve storage, signal performance)         |
+| **Supabase Auth**            | Auth via Privy JWT (verifica server-side)                                                    |
+| **Supabase Realtime**        | WebSocket per notifiche real-time interne (es. updates posizioni utente, comments live)      |
+| **Supabase Storage**         | Avatar upload, KYC documents (encrypted at rest)                                             |
+| **Edge Functions** (Deno)    | Logica server-side critica (vedi sezione dedicata)                                           |
+| **Row Level Security (RLS)** | Policy granulari per privacy dati utente                                                     |
 
 **Plan stimato**: Supabase Free al lancio (50k MAU + 500MB DB + 1GB storage), upgrade a Pro ($25/mese) quando si supera. Successivamente Team plan se serve più scale.
 
 ### Edge Functions (Supabase) — logica server critica
 
 Edge Functions (Deno runtime) per logica che richiede:
+
 - Esecuzione server-side (no client)
 - Bassa latenza (deploy globale edge)
 - Accesso a secret env vars
 
 **Edge Functions previste**:
 
-| Function | Scopo |
-|---|---|
-| `submit-trade` | Validazione + signing trade Polymarket lato server (per copy trading auto) |
-| `process-deposit-webhook` | Ricezione webhook MoonPay e accredito USDC |
-| `calculate-creator-payout` | Calcolo settimanale payout Verified Creators |
-| `process-referral-payout` | Calcolo mensile payout referrer |
-| `import-polymarket-leaderboard` | Job nightly per importare top trader Polymarket via Data API |
-| `calculate-user-stats` | Job ogni 5 min per stats utente (P&L, ROI, calibration) |
-| `signal-generator` | Job ogni minuto per generare segnali algoritmici |
-| `kyc-fraud-check` | Chiama AI service per pre-screening documenti KYC |
+| Function                        | Scopo                                                                      |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| `submit-trade`                  | Validazione + signing trade Polymarket lato server (per copy trading auto) |
+| `process-deposit-webhook`       | Ricezione webhook MoonPay e accredito USDC                                 |
+| `calculate-creator-payout`      | Calcolo settimanale payout Verified Creators                               |
+| `process-referral-payout`       | Calcolo mensile payout referrer                                            |
+| `import-polymarket-leaderboard` | Job nightly per importare top trader Polymarket via Data API               |
+| `calculate-user-stats`          | Job ogni 5 min per stats utente (P&L, ROI, calibration)                    |
+| `signal-generator`              | Job ogni minuto per generare segnali algoritmici                           |
+| `kyc-fraud-check`               | Chiama AI service per pre-screening documenti KYC                          |
 
 ### Next.js API Routes — BFF (Backend For Frontend)
 
@@ -202,13 +206,14 @@ Le API routes Next.js servono come **layer BFF** tra frontend e Supabase/externa
 
 3 cache layer combinati:
 
-| Layer | Tecnologia | Uso |
-|---|---|---|
-| **Vercel ISR + Next fetch cache** | Built-in | Pagine statiche (landing, FAQ, mercati con cache 60s) |
-| **Redis (Upstash)** | $0 free tier 10k commands/giorno | Cache Polymarket API hot (leaderboard, top markets), session data, rate limiting |
-| **Vercel KV (Edge Config)** | Built-in | Feature flags runtime, A/B test config, leaderboard mode (1-tab vs 2-tab) |
+| Layer                             | Tecnologia                       | Uso                                                                              |
+| --------------------------------- | -------------------------------- | -------------------------------------------------------------------------------- |
+| **Vercel ISR + Next fetch cache** | Built-in                         | Pagine statiche (landing, FAQ, mercati con cache 60s)                            |
+| **Redis (Upstash)**               | $0 free tier 10k commands/giorno | Cache Polymarket API hot (leaderboard, top markets), session data, rate limiting |
+| **Vercel KV (Edge Config)**       | Built-in                         | Feature flags runtime, A/B test config, leaderboard mode (1-tab vs 2-tab)        |
 
 **Esempio strategy**:
+
 - Mercato singolo: ISR 30 secondi (Vercel)
 - Leaderboard top 50: Redis cache 60 secondi
 - Feature flags: Edge Config (sub-100ms read globale)
@@ -220,37 +225,37 @@ Le API routes Next.js servono come **layer BFF** tra frontend e Supabase/externa
 
 ### Polymarket (data layer principale)
 
-| Componente | Uso | Cache |
-|---|---|---|
-| **Gamma API** REST | Mercati, eventi, comments | 30-60s |
-| **CLOB** REST | Book, prices-history | 5-10s book, 60s history |
-| **CLOB** WebSocket | Real-time prices/trades | No cache, direct WS |
-| **Data API** REST | Leaderboard, holders, trades on-chain | 60-300s |
-| **RTDS WebSocket** | Activity, crypto_prices, comments | No cache, direct WS |
-| **Builder code** | `0xc520...92475` | Hardcoded in env var |
+| Componente         | Uso                                   | Cache                   |
+| ------------------ | ------------------------------------- | ----------------------- |
+| **Gamma API** REST | Mercati, eventi, comments             | 30-60s                  |
+| **CLOB** REST      | Book, prices-history                  | 5-10s book, 60s history |
+| **CLOB** WebSocket | Real-time prices/trades               | No cache, direct WS     |
+| **Data API** REST  | Leaderboard, holders, trades on-chain | 60-300s                 |
+| **RTDS WebSocket** | Activity, crypto_prices, comments     | No cache, direct WS     |
+| **Builder code**   | `0xc520...92475`                      | Hardcoded in env var    |
 
 **Rate limit**: Polymarket non documenta limiti hard, ma ho osservato in V1 throttling oltre ~10 req/sec per IP. Cache aggressiva risolve.
 
 ### Privy (auth + wallet)
 
-| Componente | Uso |
-|---|---|
-| **Privy SDK React** | Login UI, embedded wallet creation |
+| Componente           | Uso                                         |
+| -------------------- | ------------------------------------------- |
+| **Privy SDK React**  | Login UI, embedded wallet creation          |
 | **Privy Server SDK** | Verifica JWT, query user data, session keys |
-| **Embedded wallets** | Auto-creati per utenti Email/OAuth |
-| **Session Keys** | Per copy trading auto (budget + scadenza) |
-| **MFA** | Per super-admin |
+| **Embedded wallets** | Auto-creati per utenti Email/OAuth          |
+| **Session Keys**     | Per copy trading auto (budget + scadenza)   |
+| **MFA**              | Per super-admin                             |
 
 **Piano Privy**: Starter (gratis fino a 1000 MAU). Upgrade a Growth ($99/mese) quando superiamo.
 
 ### MoonPay (onramp fiat)
 
-| Componente | Uso |
-|---|---|
-| **MoonPay Widget** | Embedded UI per buy USDC con carta |
-| **MoonPay Webhook** | Conferma deposito → accredito user wallet |
-| **Currency**: USDC su Polygon | Pre-configurato nel widget |
-| **Min/Max**: $25 - $1000 per transazione | Configurabile in admin |
+| Componente                               | Uso                                       |
+| ---------------------------------------- | ----------------------------------------- |
+| **MoonPay Widget**                       | Embedded UI per buy USDC con carta        |
+| **MoonPay Webhook**                      | Conferma deposito → accredito user wallet |
+| **Currency**: USDC su Polygon            | Pre-configurato nel widget                |
+| **Min/Max**: $25 - $1000 per transazione | Configurabile in admin                    |
 
 **Fee MoonPay**: ~3.5% (paga utente). Predimark non prende cut su deposit.
 
@@ -258,11 +263,11 @@ Le API routes Next.js servono come **layer BFF** tra frontend e Supabase/externa
 
 ### Telegram bot
 
-| Componente | Uso |
-|---|---|
-| **Telegram Bot API** | Send messages, receive commands |
-| **node-telegram-bot-api** | SDK Node.js |
-| **Hosted on Railway** | $5/mese, sempre online |
+| Componente                    | Uso                                           |
+| ----------------------------- | --------------------------------------------- |
+| **Telegram Bot API**          | Send messages, receive commands               |
+| **node-telegram-bot-api**     | SDK Node.js                                   |
+| **Hosted on Railway**         | $5/mese, sempre online                        |
 | **Webhook mode** (no polling) | Webhook URL su Vercel `/api/telegram/webhook` |
 
 **Tier free**: 5 minuti delay sui segnali.
@@ -272,21 +277,21 @@ Le API routes Next.js servono come **layer BFF** tra frontend e Supabase/externa
 
 Per payout creator e referrer (al di fuori di crypto):
 
-| Componente | Uso |
-|---|---|
+| Componente                 | Uso                                         |
+| -------------------------- | ------------------------------------------- |
 | **Stripe Connect Express** | Onboarding creator come "connected account" |
-| **Stripe Payouts** | Bonifico bancario settimanale o mensile |
-| **Stripe Tax** | Calcolo automatico tasse per giurisdizione |
+| **Stripe Payouts**         | Bonifico bancario settimanale o mensile     |
+| **Stripe Tax**             | Calcolo automatico tasse per giurisdizione  |
 
 **Note V1**: payout creator inizialmente in **USDC su Polygon** direttamente al wallet del creator (no fee Stripe). Stripe Connect aggiunto V1.5 quando volume payout > $10k/mese.
 
 ### AI services (per KYC fraud check + segnali)
 
-| Servizio | Uso |
-|---|---|
-| **Claude API** (Anthropic) | KYC document review automation, classificazione mercati per categoria |
-| **OpenAI GPT-4** (fallback) | Backup se Claude API down |
-| **Custom algos in TypeScript** | Segnali Predimark (RSI, MACD, calibration, final period momentum) |
+| Servizio                       | Uso                                                                   |
+| ------------------------------ | --------------------------------------------------------------------- |
+| **Claude API** (Anthropic)     | KYC document review automation, classificazione mercati per categoria |
+| **OpenAI GPT-4** (fallback)    | Backup se Claude API down                                             |
+| **Custom algos in TypeScript** | Segnali Predimark (RSI, MACD, calibration, final period momentum)     |
 
 ---
 
@@ -327,6 +332,7 @@ Per payout creator e referrer (al di fuori di crypto):
 ```
 
 **Pattern**:
+
 - 1 WebSocket connection per data source (no duplicate)
 - Singleton manager esposto via React Context
 - Componenti subscribe via hook (es. `useLiveMidpoint(marketId)`)
@@ -410,15 +416,16 @@ FOR SELECT USING (is_verified = true AND is_public = true);
 
 ### Secrets management
 
-| Tipo | Storage | Note |
-|---|---|---|
-| **API keys** (Privy, MoonPay, Polymarket builder) | Vercel env vars (encrypted) | Mai in client code |
-| **JWT secrets** | Vercel env vars | Rotated quarterly |
-| **Database connection string** | Vercel env vars | Service role key SOLO server |
-| **Telegram bot token** | Railway env vars | Bot hosted there |
-| **Stripe keys** (V1.5) | Vercel env vars | Test/live separati |
+| Tipo                                              | Storage                     | Note                         |
+| ------------------------------------------------- | --------------------------- | ---------------------------- |
+| **API keys** (Privy, MoonPay, Polymarket builder) | Vercel env vars (encrypted) | Mai in client code           |
+| **JWT secrets**                                   | Vercel env vars             | Rotated quarterly            |
+| **Database connection string**                    | Vercel env vars             | Service role key SOLO server |
+| **Telegram bot token**                            | Railway env vars            | Bot hosted there             |
+| **Stripe keys** (V1.5)                            | Vercel env vars             | Test/live separati           |
 
 **Mai**:
+
 - Hardcoded secrets in repo
 - Service role keys in client bundle
 - Logging di JWT in clear
@@ -433,6 +440,7 @@ FOR SELECT USING (is_verified = true AND is_public = true);
 ### Audit log
 
 Tutto ciò che fa un admin viene loggato:
+
 - chi (admin user_id)
 - cosa (action type es. "BAN_USER", "UPDATE_FEE")
 - quando (timestamp)
@@ -455,27 +463,28 @@ Audit log è **append-only**, no DELETE permesso, indici per ricerca rapida.
 
 ### Rendering strategy
 
-| Tipo pagina | Strategy | TTFB target |
-|---|---|---|
-| **Landing /** | SSG (static) | <200ms |
-| **Home / (loggato)** | SSR + streaming | <500ms |
-| **Pagina evento** | SSR + ISR 30s | <600ms |
-| **Profilo /me** | CSR (client-side) | (after auth) |
-| **Profilo creator** | SSG + ISR 5min | <300ms |
-| **Leaderboard** | SSR + Redis cache | <500ms |
-| **Admin /admin/\*** | SSR (sempre fresh) | <800ms |
-| **Signup / onboarding** | SSG + minimal JS | <200ms |
+| Tipo pagina             | Strategy           | TTFB target  |
+| ----------------------- | ------------------ | ------------ |
+| **Landing /**           | SSG (static)       | <200ms       |
+| **Home / (loggato)**    | SSR + streaming    | <500ms       |
+| **Pagina evento**       | SSR + ISR 30s      | <600ms       |
+| **Profilo /me**         | CSR (client-side)  | (after auth) |
+| **Profilo creator**     | SSG + ISR 5min     | <300ms       |
+| **Leaderboard**         | SSR + Redis cache  | <500ms       |
+| **Admin /admin/\***     | SSR (sempre fresh) | <800ms       |
+| **Signup / onboarding** | SSG + minimal JS   | <200ms       |
 
 ### Bundle size budget
 
-| Bundle | Target gzipped |
-|---|---|
-| Initial JS (client) | < 200kb |
-| Per-route JS | < 50kb |
-| Critical CSS inlined | < 10kb |
-| Total page weight (initial) | < 500kb |
+| Bundle                      | Target gzipped |
+| --------------------------- | -------------- |
+| Initial JS (client)         | < 200kb        |
+| Per-route JS                | < 50kb         |
+| Critical CSS inlined        | < 10kb         |
+| Total page weight (initial) | < 500kb        |
 
 **Tecniche**:
+
 - **Code splitting** per route (Next.js automatic)
 - **Dynamic imports** per componenti pesanti (es. CalibrationCurveChart)
 - **Lazy load** immagini (`next/image`)
@@ -503,32 +512,35 @@ Audit log è **append-only**, no DELETE permesso, indici per ricerca rapida.
 
 Approfittiamo dei **free tier generosi** dei servizi pro per avere observability di qualità a $0:
 
-| Servizio | Free tier | Quando paghiamo |
-|---|---|---|
-| **Vercel Analytics** | Built-in, 100k events/mese | Mai per V1 |
-| **Vercel Speed Insights** | Built-in | Mai per V1 |
-| **Sentry** (error tracking) | 5k errors/mese gratis | Quando errori > 5k/mese (probabilmente mai V1) |
-| **PostHog Cloud** | 1M events/mese gratis | Quando MAU > 10k (mesi futuri) |
-| **Supabase logs** | 7 giorni retention | Mai per V1 |
-| **Cloudflare Analytics** | Built-in | Mai per V1 |
+| Servizio                    | Free tier                  | Quando paghiamo                                |
+| --------------------------- | -------------------------- | ---------------------------------------------- |
+| **Vercel Analytics**        | Built-in, 100k events/mese | Mai per V1                                     |
+| **Vercel Speed Insights**   | Built-in                   | Mai per V1                                     |
+| **Sentry** (error tracking) | 5k errors/mese gratis      | Quando errori > 5k/mese (probabilmente mai V1) |
+| **PostHog Cloud**           | 1M events/mese gratis      | Quando MAU > 10k (mesi futuri)                 |
+| **Supabase logs**           | 7 giorni retention         | Mai per V1                                     |
+| **Cloudflare Analytics**    | Built-in                   | Mai per V1                                     |
 
 **Stima**: $0/mese per monitoring nei primi 6-12 mesi di vita prodotto. Quando supereremo i free tier, passaggio a paid sarà giustificato dal volume utenti.
 
 ### Cosa tracciamo
 
 **Performance & Errors** (Sentry):
+
 - JS errors browser
 - API errors backend
 - Slow transactions (>3s)
 - User context (anonymized)
 
 **Product Analytics** (PostHog):
+
 - Funnel signup → first trade → retention
 - Feature usage (quale CardKind più usato, quale tab leaderboard)
 - Session replay (per debug UX issues)
 - A/B test results
 
 **Infrastructure** (Vercel):
+
 - Web Vitals (LCP, FID, CLS)
 - API response times
 - Function execution duration
@@ -550,32 +562,32 @@ Configurati in Sentry/Vercel:
 
 ### Costi mensili previsti (V1 lancio, 0-1k utenti)
 
-| Servizio | Free tier | Mese 1-3 | Mese 6 (target 1k MAU) |
-|---|---|---|---|
-| **Vercel** | Hobby gratis | $0 | $20 (Pro per dominio + analytics) |
-| **Supabase** | 50k MAU + 500MB | $0 | $25 (Pro per più storage) |
-| **Privy** | 1000 MAU | $0 | $99 (Growth se >1k MAU) |
-| **Upstash Redis** | 10k cmd/giorno | $0 | $0-10 |
-| **Cloudflare** | Free tier | $0 | $0 |
-| **Sentry** | 5k errors/mese | $0 | $0 |
-| **PostHog Cloud** | 1M events/mese | $0 | $0 |
-| **MoonPay** | Pay per use | $0 | $0 (utente paga fee) |
-| **Railway** (Telegram bot) | - | $5 | $5 |
-| **Polygon RPC** (Alchemy free) | - | $0 | $0 |
-| **Domain + email** | - | $15 | $15 |
-| **MaxMind GeoIP2 Lite** | Free | $0 | $0 |
-| **Anthropic Claude API** | Pay per use | $20 | $50 (KYC + signal gen) |
-| **TOTALE** | | **$40/mese** | **$224/mese** |
+| Servizio                       | Free tier       | Mese 1-3     | Mese 6 (target 1k MAU)            |
+| ------------------------------ | --------------- | ------------ | --------------------------------- |
+| **Vercel**                     | Hobby gratis    | $0           | $20 (Pro per dominio + analytics) |
+| **Supabase**                   | 50k MAU + 500MB | $0           | $25 (Pro per più storage)         |
+| **Privy**                      | 1000 MAU        | $0           | $99 (Growth se >1k MAU)           |
+| **Upstash Redis**              | 10k cmd/giorno  | $0           | $0-10                             |
+| **Cloudflare**                 | Free tier       | $0           | $0                                |
+| **Sentry**                     | 5k errors/mese  | $0           | $0                                |
+| **PostHog Cloud**              | 1M events/mese  | $0           | $0                                |
+| **MoonPay**                    | Pay per use     | $0           | $0 (utente paga fee)              |
+| **Railway** (Telegram bot)     | -               | $5           | $5                                |
+| **Polygon RPC** (Alchemy free) | -               | $0           | $0                                |
+| **Domain + email**             | -               | $15          | $15                               |
+| **MaxMind GeoIP2 Lite**        | Free            | $0           | $0                                |
+| **Anthropic Claude API**       | Pay per use     | $20          | $50 (KYC + signal gen)            |
+| **TOTALE**                     |                 | **$40/mese** | **$224/mese**                     |
 
 ### Crescita costi (proiezione)
 
-| Tempo | MAU | Costi mensili stimati |
-|---|---|---|
-| Lancio (mese 1) | 100 | $40 |
-| Mese 3 | 500 | $80 |
-| Mese 6 | 1.000 | $224 |
-| Mese 12 | 5.000 | $500-700 |
-| Mese 18 | 10.000 | $1.000-1.500 |
+| Tempo           | MAU    | Costi mensili stimati |
+| --------------- | ------ | --------------------- |
+| Lancio (mese 1) | 100    | $40                   |
+| Mese 3          | 500    | $80                   |
+| Mese 6          | 1.000  | $224                  |
+| Mese 12         | 5.000  | $500-700              |
+| Mese 18         | 10.000 | $1.000-1.500          |
 
 **Break-even infrastrutturale** previsto a ~500 utenti attivi/settimana (vedi Doc 1 Modello economico).
 
@@ -618,11 +630,11 @@ V1 (Predimark attuale) ha già componenti utili. Cosa riusare, cosa riscrivere:
 
 ### 3 environments
 
-| Env | URL | Branch | Purpose |
-|---|---|---|---|
-| **Development** | localhost:3000 | feature branches | Sviluppo locale Cowork |
-| **Staging** | staging.predimark.com | `staging` | Test integrazione prima del prod |
-| **Production** | predimark.com | `main` | Live users |
+| Env             | URL                   | Branch           | Purpose                          |
+| --------------- | --------------------- | ---------------- | -------------------------------- |
+| **Development** | localhost:3000        | feature branches | Sviluppo locale Cowork           |
+| **Staging**     | staging.predimark.com | `staging`        | Test integrazione prima del prod |
+| **Production**  | predimark.com         | `main`           | Live users                       |
 
 ### CI/CD pipeline
 
@@ -760,5 +772,5 @@ Pattern raccomandato per Cowork:
 
 ---
 
-*Fine Documento 5 — Tech Stack & Architettura*
-*Continua con Documento 6 (Database schema) nella sessione successiva*
+_Fine Documento 5 — Tech Stack & Architettura_
+_Continua con Documento 6 (Database schema) nella sessione successiva_

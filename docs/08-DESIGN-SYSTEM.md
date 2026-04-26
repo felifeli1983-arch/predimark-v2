@@ -14,6 +14,7 @@
 Questo documento è il **vocabolario visivo e interattivo** di Predimark V2.
 
 Definisce:
+
 - **Design tokens** (colori, tipografia, spacing, radius, shadows) con codice CSS pronto
 - **Iconografia** (Lucide React conventions)
 - **Componenti base** (button, input, card, badge, chip)
@@ -30,15 +31,15 @@ Cowork userà questo documento come **riferimento unico** per garantire coerenza
 
 ## DECISIONI ARCHITETTURALI
 
-| Decisione | Scelta |
-|---|---|
-| Font family | **Inter** (variabile, copre tutte 5 lingue) |
-| Border radius scale | **Mix moderato**: 4px / 8px / 12px / full (chip) |
-| Density / Spacing | **Dynamic**: compact in data-heavy (table, orderbook, leaderboard), spacious in landing/profile/onboarding |
-| Animation | **Moderate**: 200ms transitions standard, Framer Motion per modal/drawer/bottom sheet |
-| Theming | **Tailwind 4 con `@theme` directive** in `globals.css` (no `tailwind.config.ts`) |
-| Component library | **shadcn/ui** copy-paste (no npm dep) |
-| Icons | **Lucide React** — zero emoji nelle UI |
+| Decisione           | Scelta                                                                                                     |
+| ------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Font family         | **Inter** (variabile, copre tutte 5 lingue)                                                                |
+| Border radius scale | **Mix moderato**: 4px / 8px / 12px / full (chip)                                                           |
+| Density / Spacing   | **Dynamic**: compact in data-heavy (table, orderbook, leaderboard), spacious in landing/profile/onboarding |
+| Animation           | **Moderate**: 200ms transitions standard, Framer Motion per modal/drawer/bottom sheet                      |
+| Theming             | **Tailwind 4 con `@theme` directive** in `globals.css` (no `tailwind.config.ts`)                           |
+| Component library   | **shadcn/ui** copy-paste (no npm dep)                                                                      |
+| Icons               | **Lucide React** — zero emoji nelle UI                                                                     |
 
 ---
 
@@ -51,50 +52,50 @@ Cowork userà questo documento come **riferimento unico** per garantire coerenza
 ```css
 @theme {
   /* Backgrounds */
-  --color-bg-primary: #0a0e1a;        /* Body background */
-  --color-bg-secondary: #141a2a;      /* Card / panel background */
-  --color-bg-tertiary: #1c2333;       /* Hover / active state */
-  --color-bg-elevated: #232b3d;       /* Modal / dropdown background */
-  
+  --color-bg-primary: #0a0e1a; /* Body background */
+  --color-bg-secondary: #141a2a; /* Card / panel background */
+  --color-bg-tertiary: #1c2333; /* Hover / active state */
+  --color-bg-elevated: #232b3d; /* Modal / dropdown background */
+
   /* Text */
-  --color-text-primary: #ffffff;      /* Headings, important text */
-  --color-text-secondary: #b8c2d4;    /* Body text */
-  --color-text-tertiary: #7a849a;     /* Helper, placeholder */
-  --color-text-muted: #4a5169;        /* Disabled */
-  
+  --color-text-primary: #ffffff; /* Headings, important text */
+  --color-text-secondary: #b8c2d4; /* Body text */
+  --color-text-tertiary: #7a849a; /* Helper, placeholder */
+  --color-text-muted: #4a5169; /* Disabled */
+
   /* Borders */
   --color-border-default: #2a3142;
   --color-border-strong: #3a4258;
   --color-border-subtle: #1f2535;
-  
+
   /* Semantic colors (regole strict Predimark) */
-  --color-success: #10b981;           /* Verde: Yes / Up / Buy / Profit / Win */
-  --color-success-bg: #10b98115;      /* Background tinted verde */
+  --color-success: #10b981; /* Verde: Yes / Up / Buy / Profit / Win */
+  --color-success-bg: #10b98115; /* Background tinted verde */
   --color-success-border: #10b981;
-  
-  --color-danger: #ef4444;            /* Rosso: No / Down / Sell / Loss */
+
+  --color-danger: #ef4444; /* Rosso: No / Down / Sell / Loss */
   --color-danger-bg: #ef444415;
   --color-danger-border: #ef4444;
-  
-  --color-cta: #3b82f6;               /* Blu: CTA primario, link, action */
+
+  --color-cta: #3b82f6; /* Blu: CTA primario, link, action */
   --color-cta-hover: #2563eb;
   --color-cta-bg: #3b82f615;
-  
-  --color-live: #dc2626;              /* Rosso pulsante: indicator LIVE */
-  --color-hot: #f97316;               /* Arancione: hot indicator */
-  --color-info: #06b6d4;              /* Ciano: info, neutral status */
-  --color-warning: #fbbf24;           /* Beige soft: warning (NO giallo brillante) */
+
+  --color-live: #dc2626; /* Rosso pulsante: indicator LIVE */
+  --color-hot: #f97316; /* Arancione: hot indicator */
+  --color-info: #06b6d4; /* Ciano: info, neutral status */
+  --color-warning: #fbbf24; /* Beige soft: warning (NO giallo brillante) */
   --color-warning-bg: #fbbf2415;
-  
+
   /* Category colors (color blocking direzione Dribbble) */
-  --color-cat-sport: #3b82f6;         /* Blu */
-  --color-cat-politics: #ef4444;      /* Rosso */
-  --color-cat-crypto: #f97316;        /* Arancione */
-  --color-cat-culture: #a855f7;       /* Viola */
-  --color-cat-news: #06b6d4;          /* Verde-acqua */
-  --color-cat-geopolitics: #1e40af;   /* Blu scuro */
-  --color-cat-economy: #047857;       /* Verde scuro */
-  --color-cat-tech: #6d28d9;          /* Viola scuro */
+  --color-cat-sport: #3b82f6; /* Blu */
+  --color-cat-politics: #ef4444; /* Rosso */
+  --color-cat-crypto: #f97316; /* Arancione */
+  --color-cat-culture: #a855f7; /* Viola */
+  --color-cat-news: #06b6d4; /* Verde-acqua */
+  --color-cat-geopolitics: #1e40af; /* Blu scuro */
+  --color-cat-economy: #047857; /* Verde scuro */
+  --color-cat-tech: #6d28d9; /* Viola scuro */
 }
 ```
 
@@ -108,24 +109,24 @@ Cowork userà questo documento come **riferimento unico** per garantire coerenza
     --color-bg-secondary: #f9fafb;
     --color-bg-tertiary: #f3f4f6;
     --color-bg-elevated: #ffffff;
-    
+
     /* Text */
     --color-text-primary: #0a0e1a;
     --color-text-secondary: #4a5169;
     --color-text-tertiary: #6b7280;
     --color-text-muted: #9ca3af;
-    
+
     /* Borders */
     --color-border-default: #e5e7eb;
     --color-border-strong: #d1d5db;
     --color-border-subtle: #f3f4f6;
-    
+
     /* Semantic (slightly darker variants per leggibilità su white) */
     --color-success: #059669;
     --color-success-bg: #05966915;
     --color-danger: #dc2626;
     --color-danger-bg: #dc262615;
-    --color-cta: #3b82f6;             /* Stesso blu (funziona bene) */
+    --color-cta: #3b82f6; /* Stesso blu (funziona bene) */
     --color-cta-hover: #2563eb;
     --color-cta-bg: #3b82f615;
     --color-live: #dc2626;
@@ -133,7 +134,7 @@ Cowork userà questo documento come **riferimento unico** per garantire coerenza
     --color-info: #0891b2;
     --color-warning: #d97706;
     --color-warning-bg: #d9770615;
-    
+
     /* Category colors (light variants leggermente più scuri per contrasto) */
     --color-cat-sport: #2563eb;
     --color-cat-politics: #dc2626;
@@ -161,6 +162,7 @@ Queste regole sono **sacre** in tutta la UI:
 - ❌ **MAI rosa, viola brillante, fluo** (look distintivo: serio + moderno)
 
 Per validation:
+
 - Errori di form → rosso (`--color-danger`)
 - Successi/conferme → verde (`--color-success`)
 - Info neutral → ciano (`--color-info`)
@@ -172,35 +174,35 @@ Per validation:
 @theme {
   /* Font families */
   --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, monospace;  /* Per address, numeri, codice */
-  
+  --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, monospace; /* Per address, numeri, codice */
+
   /* Font sizes (mobile-first) */
-  --text-xs: 11px;       /* Helper, tooltip */
-  --text-sm: 13px;       /* Body small, badge, chip */
-  --text-base: 15px;     /* Body default */
-  --text-lg: 17px;       /* Subheading */
-  --text-xl: 20px;       /* H4 */
-  --text-2xl: 24px;      /* H3 */
-  --text-3xl: 30px;      /* H2 */
-  --text-4xl: 36px;      /* H1 */
-  --text-5xl: 48px;      /* Hero title (desktop) */
-  --text-6xl: 60px;      /* Equity curve number, KPI big */
-  
+  --text-xs: 11px; /* Helper, tooltip */
+  --text-sm: 13px; /* Body small, badge, chip */
+  --text-base: 15px; /* Body default */
+  --text-lg: 17px; /* Subheading */
+  --text-xl: 20px; /* H4 */
+  --text-2xl: 24px; /* H3 */
+  --text-3xl: 30px; /* H2 */
+  --text-4xl: 36px; /* H1 */
+  --text-5xl: 48px; /* Hero title (desktop) */
+  --text-6xl: 60px; /* Equity curve number, KPI big */
+
   /* Font weights */
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
-  
+
   /* Line heights */
-  --leading-tight: 1.2;       /* Headings */
-  --leading-normal: 1.5;      /* Body */
-  --leading-relaxed: 1.7;     /* Long paragraphs */
-  
+  --leading-tight: 1.2; /* Headings */
+  --leading-normal: 1.5; /* Body */
+  --leading-relaxed: 1.7; /* Long paragraphs */
+
   /* Letter spacing */
-  --tracking-tight: -0.02em;  /* Big numbers (KPI, equity curve) */
+  --tracking-tight: -0.02em; /* Big numbers (KPI, equity curve) */
   --tracking-normal: 0;
-  --tracking-wide: 0.05em;    /* Small caps, labels */
+  --tracking-wide: 0.05em; /* Small caps, labels */
 }
 ```
 
@@ -267,17 +269,18 @@ DEFAULT (most pages):
 ```css
 @theme {
   --radius-none: 0;
-  --radius-xs: 2px;        /* Bordo sottile elementi piccoli */
-  --radius-sm: 4px;        /* Badge, micro-elements */
-  --radius: 8px;           /* Default: button, input, card small */
-  --radius-md: 12px;       /* Card large, modal, hero */
-  --radius-lg: 16px;       /* Modal grandi, dialog */
-  --radius-xl: 24px;       /* Hero card grandi */
-  --radius-full: 9999px;   /* Chip, avatar, indicator */
+  --radius-xs: 2px; /* Bordo sottile elementi piccoli */
+  --radius-sm: 4px; /* Badge, micro-elements */
+  --radius: 8px; /* Default: button, input, card small */
+  --radius-md: 12px; /* Card large, modal, hero */
+  --radius-lg: 16px; /* Modal grandi, dialog */
+  --radius-xl: 24px; /* Hero card grandi */
+  --radius-full: 9999px; /* Chip, avatar, indicator */
 }
 ```
 
 **Uso**:
+
 - **Button**: `--radius` (8px)
 - **Card EventCard**: `--radius-md` (12px)
 - **Hero card grande**: `--radius-xl` (24px)
@@ -298,7 +301,7 @@ DEFAULT (most pages):
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
   --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.7);
-  
+
   /* Glow effects (per highlighted state) */
   --glow-cta: 0 0 0 3px rgba(59, 130, 246, 0.4);
   --glow-success: 0 0 0 3px rgba(16, 185, 129, 0.4);
@@ -317,6 +320,7 @@ DEFAULT (most pages):
 ```
 
 **Uso**:
+
 - **Card hover**: `--shadow-md`
 - **Modal**: `--shadow-xl`
 - **Dropdown**: `--shadow-lg`
@@ -328,13 +332,13 @@ DEFAULT (most pages):
 ```css
 @theme {
   --z-base: 1;
-  --z-sticky: 10;       /* Sticky header */
+  --z-sticky: 10; /* Sticky header */
   --z-dropdown: 20;
   --z-tooltip: 30;
   --z-modal-backdrop: 40;
   --z-modal: 50;
   --z-toast: 60;
-  --z-skip-link: 100;   /* Accessibility skip link sempre visibile */
+  --z-skip-link: 100; /* Accessibility skip link sempre visibile */
 }
 ```
 
@@ -347,6 +351,7 @@ DEFAULT (most pages):
 Usiamo **Lucide React** ovunque. Mai emoji nelle UI Predimark.
 
 **Sizes standard**:
+
 - 14px — inline con testo small
 - 16px — default in pulsanti, link
 - 20px — header nav, CTA
@@ -356,44 +361,45 @@ Usiamo **Lucide React** ovunque. Mai emoji nelle UI Predimark.
 
 ### 2.2 — Icone più usate (riferimento)
 
-| Use case | Icon name |
-|---|---|
-| Navigation home | `Home` |
-| Search | `Search` |
-| Filter | `SlidersHorizontal` |
-| Sort | `ArrowUpDown` |
-| User profile | `User` / `UserCircle` |
-| Settings | `Settings` |
-| Notifications | `Bell` |
-| Wallet | `Wallet` |
-| Bookmark / watchlist | `Bookmark` |
-| Share | `Share2` |
-| External link | `ExternalLink` |
-| More menu | `MoreHorizontal` / `MoreVertical` |
-| Close | `X` |
-| Chevron up/down | `ChevronUp` / `ChevronDown` |
-| Chevron left/right | `ChevronLeft` / `ChevronRight` |
-| Trending up/down | `TrendingUp` / `TrendingDown` |
-| Check / success | `Check` / `CheckCircle2` |
-| X / error | `XCircle` |
-| Warning | `AlertTriangle` |
-| Info | `Info` |
-| Live indicator | `Radio` (pulsante) o custom dot |
-| Hot indicator | `Flame` |
-| Trophy / achievement | `Trophy` |
-| Star / favorite | `Star` |
-| Lock | `Lock` |
-| Sign out | `LogOut` |
-| Camera / upload | `Camera` / `Upload` |
-| Telegram | `Send` (custom Telegram SVG) |
-| Calendar | `Calendar` |
-| Clock / timer | `Clock` |
-| Globe / language | `Globe` |
-| Sun/Moon (theme toggle) | `Sun` / `Moon` |
+| Use case                | Icon name                         |
+| ----------------------- | --------------------------------- |
+| Navigation home         | `Home`                            |
+| Search                  | `Search`                          |
+| Filter                  | `SlidersHorizontal`               |
+| Sort                    | `ArrowUpDown`                     |
+| User profile            | `User` / `UserCircle`             |
+| Settings                | `Settings`                        |
+| Notifications           | `Bell`                            |
+| Wallet                  | `Wallet`                          |
+| Bookmark / watchlist    | `Bookmark`                        |
+| Share                   | `Share2`                          |
+| External link           | `ExternalLink`                    |
+| More menu               | `MoreHorizontal` / `MoreVertical` |
+| Close                   | `X`                               |
+| Chevron up/down         | `ChevronUp` / `ChevronDown`       |
+| Chevron left/right      | `ChevronLeft` / `ChevronRight`    |
+| Trending up/down        | `TrendingUp` / `TrendingDown`     |
+| Check / success         | `Check` / `CheckCircle2`          |
+| X / error               | `XCircle`                         |
+| Warning                 | `AlertTriangle`                   |
+| Info                    | `Info`                            |
+| Live indicator          | `Radio` (pulsante) o custom dot   |
+| Hot indicator           | `Flame`                           |
+| Trophy / achievement    | `Trophy`                          |
+| Star / favorite         | `Star`                            |
+| Lock                    | `Lock`                            |
+| Sign out                | `LogOut`                          |
+| Camera / upload         | `Camera` / `Upload`               |
+| Telegram                | `Send` (custom Telegram SVG)      |
+| Calendar                | `Calendar`                        |
+| Clock / timer           | `Clock`                           |
+| Globe / language        | `Globe`                           |
+| Sun/Moon (theme toggle) | `Sun` / `Moon`                    |
 
 ### 2.3 — Custom SVG icons (per branding)
 
 Alcune icone le facciamo custom (Predimark logo, brand icons):
+
 - **Logo Predimark** — SVG in `public/logo.svg`
 - **Verified badge** — SVG custom con check blu
 - **External trader badge** — SVG custom con warning soft
@@ -410,7 +416,7 @@ const CategoryIcons = {
   geopolitics: Globe,
   economy: TrendingUp,
   tech: Cpu,
-};
+}
 ```
 
 ### 2.5 — Animazioni icone
@@ -430,8 +436,8 @@ const CategoryIcons = {
 #### Varianti
 
 ```typescript
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success';
-type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success'
+type ButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 ```
 
 #### Spec visivo
@@ -442,29 +448,29 @@ PRIMARY (CTA):
   text: white
   hover: --color-cta-hover (#2563eb)
   active: scale 0.98
-  
+
 SECONDARY:
   bg: --color-bg-tertiary
   text: --color-text-primary
   border: --color-border-default
   hover: bg --color-bg-elevated
-  
+
 OUTLINE:
   bg: transparent
   text: --color-text-primary
   border: --color-border-strong
   hover: bg --color-bg-tertiary
-  
+
 GHOST:
   bg: transparent
   text: --color-text-primary
   hover: bg --color-bg-tertiary
-  
+
 DANGER:
   bg: --color-danger
   text: white
   hover: --color-danger filter brightness(1.1)
-  
+
 SUCCESS:
   bg: --color-success
   text: white
@@ -479,19 +485,19 @@ SM:
   padding: 6px 12px
   font: 13px
   icon: 14px
-  
+
 MD (default):
   height: 40px
   padding: 8px 16px
   font: 15px
   icon: 16px
-  
+
 LG:
   height: 48px
   padding: 12px 24px
   font: 17px
   icon: 20px
-  
+
 XL:
   height: 56px
   padding: 16px 32px
@@ -518,7 +524,7 @@ Buy Yes / Up:
   text: --color-success
   border: --color-success
   height: 56px (large)
-  
+
 Buy No / Down:
   bg: --color-danger-bg (rosso tinted 15%)
   text: --color-danger
@@ -541,16 +547,16 @@ Default:
   bg: --color-bg-secondary
   text: --color-text-primary
   font: 15px
-  
+
 Focus:
   border: --color-cta
   glow: --glow-cta (3px ring)
-  
+
 Error:
   border: --color-danger
   glow: --glow-danger (3px ring)
   + helper text rosso sotto
-  
+
 Disabled:
   bg: --color-bg-tertiary
   text: --color-text-muted
@@ -566,16 +572,16 @@ Default Card:
   border-radius: 12px
   padding: 16px (default) o 24px (spacious)
   shadow: none di default
-  
+
 Hoverable:
   hover: border --color-border-default, shadow --shadow-md
   cursor: pointer
   transition: all 200ms
-  
+
 Selected / Active:
   border: --color-cta
   glow: --glow-cta
-  
+
 Highlight (Hot, Featured):
   border: --color-hot (arancione)
 ```
@@ -591,6 +597,7 @@ Highlight (Hot, Featured):
 5. **Crypto Up/Down**: countdown + bottoni Up/Down
 
 Pattern comune:
+
 - Border-radius 12px
 - Padding 16px desktop, 12px mobile
 - Header con icon + title + tags
@@ -605,7 +612,7 @@ Default Badge:
   padding: 2px 8px
   border-radius: 4px o full (pill style)
   font: 11px / weight 500
-  
+
 Variants:
   - Default: bg --color-bg-tertiary, text --color-text-secondary
   - Success: bg --color-success-bg, text --color-success
@@ -619,7 +626,7 @@ LIVE badge (special):
   text: white
   border-radius: full
   + dot pulsante a sinistra (animazione)
-  
+
 HOT badge (special):
   bg: --color-hot (arancione)
   text: white
@@ -638,12 +645,12 @@ Default Chip:
   bg: transparent
   font: 13px
   cursor: pointer
-  
+
 Selected:
   bg: --color-cta
   text: white
   border: --color-cta
-  
+
 Hover (non-selected):
   border: --color-cta
   bg: --color-cta-bg
@@ -668,7 +675,7 @@ Border: 2px solid --color-bg-secondary (per stand out su backgrounds)
 Fallback (no avatar URL):
   Verified Creator: gradient da hash username
   External Trader: gradient da hash address (più neutral)
-  
+
 Status indicator (optional):
   small dot top-right (8px diametro, border bg)
   online: --color-success
@@ -701,7 +708,7 @@ Container:
 Animation:
   Enter: fade + scale 0.95 → 1, 250ms ease-out
   Exit: fade + scale 1 → 0.95, 200ms ease-in
-  
+
 Sections:
   Header: padding 24px, border-bottom subtle, contains title + close button
   Body: padding 24px, scrollable se overflow
@@ -722,7 +729,7 @@ Width:
 Animation:
   Slide-in 300ms ease-out
   Slide-out 250ms ease-in
-  
+
 Backdrop: come modal
 
 Z-index: --z-modal
@@ -768,7 +775,7 @@ Items:
   padding: 8px 12px
   hover: bg --color-bg-tertiary
   selected: bg --color-cta-bg, text --color-cta
-  
+
 Separators: border-top --color-border-subtle
 
 Animation:
@@ -786,13 +793,13 @@ TABS UNDERLINE (default per page sub-nav):
   Active: border-bottom 2px --color-cta, text --color-cta
   Inactive: text --color-text-secondary
   Hover: text --color-text-primary
-  
+
 TABS PILL (per filter sections):
   Container: bg --color-bg-tertiary, border-radius full, padding 4px
   Tab item: padding 6px 16px, border-radius full
   Active: bg --color-bg-elevated, shadow-sm, text primary
   Inactive: transparent, text secondary
-  
+
 TABS BUTTON (per leaderboard 2-tab mode):
   Like outline buttons but grouped, no gap
   Active: bg --color-cta, text white
@@ -873,7 +880,7 @@ Spinner:
   size: 14px (inline), 20px (button), 32px (page), 48px (overlay)
   stroke: --color-cta
   rotate: 360° linear infinite, 800ms
-  
+
 Progress Bar:
   height: 4px (default), 8px (large)
   bg-track: --color-border-default
@@ -1091,7 +1098,10 @@ Stack di durata standard:
 }
 
 .transition-colors {
-  transition: color 200ms, background-color 200ms, border-color 200ms;
+  transition:
+    color 200ms,
+    background-color 200ms,
+    border-color 200ms;
 }
 
 .transition-transform {
@@ -1102,6 +1112,7 @@ Stack di durata standard:
 ### 6.3 — Framer Motion usage
 
 Riservato per:
+
 - **Modal / Dialog** (`AnimatePresence` + variants)
 - **Drawer / Bottom Sheet** (`drag` con elastic constraints)
 - **Page transitions** rare casi (es. onboarding wizard step)
@@ -1130,8 +1141,15 @@ Riservato per:
 
 ```css
 @keyframes pulse-live {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.3); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3);
+  }
 }
 
 .live-dot {
@@ -1145,13 +1163,25 @@ Quando un prezzo cambia, animazione flash:
 
 ```css
 @keyframes flash-up {
-  0% { background: --color-success; color: white; }
-  100% { background: transparent; color: var(--current); }
+  0% {
+    background: --color-success;
+    color: white;
+  }
+  100% {
+    background: transparent;
+    color: var(--current);
+  }
 }
 
 @keyframes flash-down {
-  0% { background: --color-danger; color: white; }
-  100% { background: transparent; color: var(--current); }
+  0% {
+    background: --color-danger;
+    color: white;
+  }
+  100% {
+    background: transparent;
+    color: var(--current);
+  }
 }
 ```
 
@@ -1161,14 +1191,19 @@ Durata 200ms, applicato on price change via React effect.
 
 ```css
 @keyframes shimmer {
-  from { background-position: -200% 0; }
-  to { background-position: 200% 0; }
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
 }
 
 .skeleton {
-  background: linear-gradient(90deg, 
-    var(--color-bg-secondary) 0%, 
-    var(--color-bg-tertiary) 50%, 
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-secondary) 0%,
+    var(--color-bg-tertiary) 50%,
     var(--color-bg-secondary) 100%
   );
   background-size: 200% 100%;
@@ -1182,7 +1217,9 @@ Rispettare `prefers-reduced-motion`:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -1207,23 +1244,25 @@ Anche un toggle in `/me/settings/profile`: "Reduce animations" (per accessibilit
 Tailwind 4 con `class` strategy:
 
 ```html
-<html class="dark"> <!-- o "light" -->
+<html class="dark">
+  <!-- o "light" -->
+</html>
 ```
 
 JavaScript switcher:
 
 ```typescript
 function setTheme(theme: 'light' | 'dark') {
-  const html = document.documentElement;
-  html.classList.remove('light', 'dark');
-  html.classList.add(theme);
-  localStorage.setItem('predimark-theme', theme);
+  const html = document.documentElement
+  html.classList.remove('light', 'dark')
+  html.classList.add(theme)
+  localStorage.setItem('predimark-theme', theme)
 }
 
 // On mount
-const saved = localStorage.getItem('predimark-theme');
-const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-setTheme(saved ?? preferred);
+const saved = localStorage.getItem('predimark-theme')
+const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+setTheme(saved ?? preferred)
 ```
 
 ### 7.3 — Differenze visive principali
@@ -1235,7 +1274,7 @@ DARK MODE:
   text: white #ffffff
   accents: vibrant (verde brillante, rosso brillante)
   shadows: pronunced
-  
+
 LIGHT MODE:
   bg: pure white #ffffff
   cards: subtle gray #f9fafb
@@ -1255,6 +1294,7 @@ LIGHT MODE:
 ### 8.1 — Keyboard navigation
 
 Tutto navigabile da tastiera:
+
 - **Tab** / **Shift+Tab**: tra elementi interattivi
 - **Enter** / **Space**: attiva button/link/checkbox
 - **Esc**: chiude modal/dropdown
@@ -1298,6 +1338,7 @@ Mai rimuovere `outline` senza alternative. Sempre **focus ring** custom:
 ### 8.4 — Color contrast (WCAG AA / AAA)
 
 Tutti i testi devono passare WCAG AA:
+
 - **Body text** (15px+): ratio ≥ 4.5:1
 - **Headings** (18px+): ratio ≥ 3:1
 - **UI components** (buttons, icons): ratio ≥ 3:1
@@ -1309,6 +1350,7 @@ Verificato con tool **WebAIM Contrast Checker**.
 ### 8.5 — Touch target size
 
 Mobile minimum 44x44px (Apple HIG standard):
+
 - Buttons: min height 44px su mobile
 - Icon-only buttons: 44x44 hit area (anche se icon è 20px)
 - Link inline: padding extra per dare hit area
@@ -1343,11 +1385,11 @@ Tailwind default + custom Predimark:
 ```css
 @theme {
   --breakpoint-xs: 480px;
-  --breakpoint-sm: 640px;     /* Mobile large */
-  --breakpoint-md: 768px;     /* Tablet */
-  --breakpoint-lg: 1024px;    /* Desktop */
-  --breakpoint-xl: 1280px;    /* Large desktop */
-  --breakpoint-2xl: 1536px;   /* Wide */
+  --breakpoint-sm: 640px; /* Mobile large */
+  --breakpoint-md: 768px; /* Tablet */
+  --breakpoint-lg: 1024px; /* Desktop */
+  --breakpoint-xl: 1280px; /* Large desktop */
+  --breakpoint-2xl: 1536px; /* Wide */
 }
 ```
 
@@ -1358,9 +1400,9 @@ Tutti gli stili **partono da mobile**, poi vengono espansi via `md:`, `lg:`, ecc
 ```html
 <!-- ✅ CORRETTO -->
 <div class="px-4 lg:px-8 text-sm lg:text-base">
-
-<!-- ❌ SBAGLIATO -->
-<div class="px-8 sm:px-4 text-base sm:text-sm">
+  <!-- ❌ SBAGLIATO -->
+  <div class="px-8 sm:px-4 text-base sm:text-sm"></div>
+</div>
 ```
 
 ### 9.3 — Layout patterns
@@ -1380,7 +1422,7 @@ Tutti gli stili **partono da mobile**, poi vengono espansi via `md:`, `lg:`, ecc
 
 ```html
 <!-- Mobile: hamburger drawer -->
-<button class="lg:hidden"><Menu /></button>
+<button class="lg:hidden"><menu /></button>
 <!-- Desktop: inline -->
 <nav class="hidden lg:flex">...</nav>
 ```
@@ -1388,6 +1430,7 @@ Tutti gli stili **partono da mobile**, poi vengono espansi via `md:`, `lg:`, ecc
 #### Bottom sheet → Sidebar
 
 Trade widget (Doc 4 Pagina 2):
+
 - Mobile: bottom sheet on click
 - Desktop: sidebar fissa destra
 
@@ -1411,6 +1454,7 @@ Trade widget (Doc 4 Pagina 2):
 ### 9.5 — Bottom navigation mobile
 
 5 voci principali (vedi Doc 4 Pagina 1):
+
 ```
 [Home] [Search] [Signals] [Bet Slip] [Altro]
 ```
@@ -1461,13 +1505,13 @@ Trade widget (Doc 4 Pagina 2):
   --color-bg-primary: #0a0e1a;
   --color-bg-secondary: #141a2a;
   /* ... tutti i token ... */
-  
+
   /* Typography */
   --font-sans: 'Inter Variable', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --text-base: 15px;
   /* ... */
-  
+
   /* Spacing, radius, shadows... */
 }
 
@@ -1479,16 +1523,18 @@ Trade widget (Doc 4 Pagina 2):
     font-size: var(--text-base);
     line-height: var(--leading-normal);
   }
-  
+
   /* Focus visible */
   *:focus-visible {
     outline: none;
     box-shadow: var(--glow-cta);
   }
-  
+
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
@@ -1571,5 +1617,5 @@ Per Cowork:
 
 ---
 
-*Fine Documento 8 — Design System*
-*Continua con Documento 9 (Roadmap V1→V2) nella sessione successiva*
+_Fine Documento 8 — Design System_
+_Continua con Documento 9 (Roadmap V1→V2) nella sessione successiva_

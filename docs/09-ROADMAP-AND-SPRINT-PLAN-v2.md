@@ -51,6 +51,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 1.1 — Repo + Next.js init
 
 #### SPRINT 1.1.1 — Setup credenziali GitHub e Supabase per Claude in VS Code
+
 - **Stima**: 1-2 ore
 - **Dipendenze**: nessuna (primo sprint)
 - **Cosa produce**:
@@ -67,6 +68,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: questo è il setup PRIMO assoluto. Senza, niente sprint successivi. Il prompt deve includere: come creare PAT GitHub (link a docs), come trovare service role key Supabase. Feliciano deve fornire credenziali account.
 
 #### SPRINT 1.1.2 — Init Next.js 16 project con stack base
+
 - **Stima**: 2-3 ore
 - **Dipendenze**: 1.1.1
 - **Cosa produce**:
@@ -86,6 +88,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: package.json deve usare versions latest stable (Next 16.x, React 19.x). Verifica con `npm view next version` prima di scrivere prompt.
 
 #### SPRINT 1.1.3 — Setup design tokens globals.css
+
 - **Stima**: 2 ore
 - **Dipendenze**: 1.1.2
 - **Cosa produce**:
@@ -104,6 +107,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 1.2 — Supabase project setup
 
 #### SPRINT 1.2.1 — Crea Supabase projects (staging + production)
+
 - **Stima**: 1 ora
 - **Dipendenze**: 1.1.1
 - **Cosa produce**:
@@ -120,6 +124,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: TimescaleDB extension richiede plan Pro Supabase oppure setup manuale. Verifica disponibilità su free tier prima.
 
 #### SPRINT 1.2.2 — Setup Supabase client e helpers
+
 - **Stima**: 2 ore
 - **Dipendenze**: 1.2.1
 - **Cosa produce**:
@@ -137,6 +142,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 1.3 — Privy app setup
 
 #### SPRINT 1.3.1 — Crea Privy app + configurazione
+
 - **Stima**: 1-2 ore
 - **Dipendenze**: 1.1.1
 - **Cosa produce**:
@@ -151,6 +157,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: account Privy va creato da Feliciano (decisione Feliciano: usare email aziendale per il dominio).
 
 #### SPRINT 1.3.2 — Integrazione Privy SDK in Next.js
+
 - **Stima**: 3 ore
 - **Dipendenze**: 1.3.1, 1.1.3
 - **Cosa produce**:
@@ -170,6 +177,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 1.4 — Vercel + CI/CD
 
 #### SPRINT 1.4.1 — Setup Vercel project + environments
+
 - **Stima**: 1 ora
 - **Dipendenze**: 1.1.2
 - **Cosa produce**:
@@ -185,6 +193,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: Feliciano deve fornire credenziali Vercel + accesso pannello DNS registrar per impostare CNAME. Cowork dà istruzioni step-by-step DNS.
 
 #### SPRINT 1.4.2 — GitHub Actions CI pipeline
+
 - **Stima**: 2-3 ore
 - **Dipendenze**: 1.4.1
 - **Cosa produce**:
@@ -201,6 +210,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 1.5 — Dev environment & tooling
 
 #### SPRINT 1.5.1 — Setup ESLint, Prettier, Husky pre-commit
+
 - **Stima**: 1-2 ore
 - **Dipendenze**: 1.1.2
 - **Cosa produce**:
@@ -214,6 +224,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: lint rules non eccessivamente strict, evitiamo over-tooling.
 
 #### SPRINT 1.5.2 — Setup Vitest + React Testing Library
+
 - **Stima**: 2 ore
 - **Dipendenze**: 1.1.2
 - **Cosa produce**:
@@ -227,6 +238,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: niente setup Playwright qui (sarà sprint MA8). Solo unit/integration.
 
 #### SPRINT 1.5.3 — Inserimento doc 1-8 in cartella progetto
+
 - **Stima**: 30 min
 - **Dipendenze**: nessuna
 - **Cosa produce**:
@@ -250,6 +262,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 2.1 — Core tables migrations
 
 #### SPRINT 2.1.1 — Migration users + external_traders
+
 - **Stima**: 2-3 ore
 - **Dipendenze**: 1.2.2, 1.5.3
 - **Cosa produce**:
@@ -265,6 +278,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: copia il SQL ESATTAMENTE da Doc 6. Verifica con grep che ogni colonna del Doc 6 è in migration. Se Doc 6 ha typos, segnala a Feliciano.
 
 #### SPRINT 2.1.2 — Migration markets
+
 - **Stima**: 2 ore
 - **Dipendenze**: 2.1.1
 - **Cosa produce**: tabella `markets` con tutti gli indici e RLS
@@ -272,6 +286,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 6 sezione 1 (markets)
 
 #### SPRINT 2.1.3 — Migration positions + trades + balances
+
 - **Stima**: 3 ore
 - **Dipendenze**: 2.1.2
 - **Cosa produce**: tabelle `positions`, `trades`, `balances` con flag `is_demo`
@@ -286,6 +301,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 2.2 — Creator + signal tables
 
 #### SPRINT 2.2.1 — Migration creators + creator_payouts + follows + copy_trading_sessions
+
 - **Stima**: 3 ore
 - **Dipendenze**: 2.1.3
 - **Cosa produce**: 4 tabelle programma creator
@@ -296,6 +312,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 6 sezione 2
 
 #### SPRINT 2.2.2 — Migration signals + notifications
+
 - **Stima**: 2 ore
 - **Dipendenze**: 2.2.1
 - **Cosa produce**: tabelle `signals` + `notifications`
@@ -303,6 +320,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 6 sezione 3
 
 #### SPRINT 2.2.3 — Migration watchlist + user_preferences + kyc + referrals + achievements
+
 - **Stima**: 3 ore
 - **Dipendenze**: 2.2.2
 - **Cosa produce**: 6 tabelle minor (watchlist, user_preferences, kyc_submissions, geo_blocks, referrals, achievements + user_achievements)
@@ -312,6 +330,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 2.3 — Admin tables + audit log
 
 #### SPRINT 2.3.1 — Migration admin_users + audit_log partitioned
+
 - **Stima**: 3 ore
 - **Dipendenze**: 2.2.3
 - **Cosa produce**:
@@ -327,6 +346,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: partitioning è un po' tricky. Includi nel prompt esempi PG ufficiali partitioning.
 
 #### SPRINT 2.3.2 — Migration feature_flags + ab_tests
+
 - **Stima**: 2 ore
 - **Dipendenze**: 2.3.1
 - **Cosa produce**: tabelle feature flags + A/B tests + ab_test_assignments
@@ -336,6 +356,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 2.4 — TimescaleDB hypertables
 
 #### SPRINT 2.4.1 — Migration equity_curve + price_history hypertables
+
 - **Stima**: 2 ore
 - **Dipendenze**: 2.3.2
 - **Cosa produce**:
@@ -350,6 +371,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 2.5 — Helper functions + seed data
 
 #### SPRINT 2.5.1 — Helper functions + triggers update_updated_at
+
 - **Stima**: 2 ore
 - **Dipendenze**: 2.4.1
 - **Cosa produce**:
@@ -359,6 +381,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 6 sezione 10
 
 #### SPRINT 2.5.2 — Seed data iniziale
+
 - **Stima**: 1-2 ore
 - **Dipendenze**: 2.5.1
 - **Cosa produce**:
@@ -372,6 +395,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 2.6 — Auth flow integration
 
 #### SPRINT 2.6.1 — API endpoint /api/v1/auth/session
+
 - **Stima**: 4 ore
 - **Dipendenze**: 1.3.2, 2.5.2
 - **Cosa produce**:
@@ -390,6 +414,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: usa MaxMind GeoIP2 Lite database (free download). Inizialmente fallback a header `cf-ipcountry` (Cloudflare).
 
 #### SPRINT 2.6.2 — End-to-end signup test
+
 - **Stima**: 2 ore
 - **Dipendenze**: 2.6.1
 - **Cosa produce**: flusso E2E signup → user record in DB
@@ -411,6 +436,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 3.1 — Layout globale
 
 #### SPRINT 3.1.1 — Root layout + Header globale
+
 - **Stima**: 3 ore
 - **Dipendenze**: 2.6.2, 1.1.3
 - **Cosa produce**:
@@ -427,6 +453,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: la REAL/DEMO switch è nascosta se utente non loggato.
 
 #### SPRINT 3.1.2 — Bottom navigation mobile
+
 - **Stima**: 2 ore
 - **Dipendenze**: 3.1.1
 - **Cosa produce**:
@@ -440,6 +467,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 1 (sezione mobile), Doc 8 sezione 9.5
 
 #### SPRINT 3.1.3 — Footer minimal
+
 - **Stima**: 1 ora
 - **Dipendenze**: 3.1.1
 - **Cosa produce**: footer con link essential (Privacy, Terms, Support, lingua switch)
@@ -449,6 +477,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 3.2 — Polymarket integration
 
 #### SPRINT 3.2.1 — Polymarket Gamma API client
+
 - **Stima**: 4 ore
 - **Dipendenze**: 1.5.2
 - **Cosa produce**:
@@ -464,6 +493,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: V1 codice Predimark esistente ha già queste cose, possiamo riusarne logica/types. Cowork copia adapter da V1 con permission Feliciano.
 
 #### SPRINT 3.2.2 — classifyEvent → 5 CardKind
+
 - **Stima**: 3 ore
 - **Dipendenze**: 3.2.1
 - **Cosa produce**:
@@ -476,6 +506,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: V1 ha già questa logica, riusabile.
 
 #### SPRINT 3.2.3 — WebSocket Polymarket CLOB singleton
+
 - **Stima**: 4 ore
 - **Dipendenze**: 3.2.1
 - **Cosa produce**:
@@ -490,6 +521,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: V1 ha pattern simile, riusabile.
 
 #### SPRINT 3.2.4 — WebSocket RTDS singleton
+
 - **Stima**: 3 ore
 - **Dipendenze**: 3.2.3
 - **Cosa produce**:
@@ -504,6 +536,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 3.3 — EventCard varianti
 
 #### SPRINT 3.3.1 — EventCard Binary variant
+
 - **Stima**: 3 ore
 - **Dipendenze**: 3.2.2
 - **Cosa produce**:
@@ -518,6 +551,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 1, Doc 8 sezione 3.3
 
 #### SPRINT 3.3.2 — EventCard Multi-outcome + Multi-strike
+
 - **Stima**: 4 ore
 - **Dipendenze**: 3.3.1
 - **Cosa produce**: 2 variant cards
@@ -525,6 +559,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 1
 
 #### SPRINT 3.3.3 — EventCard H2H Sport
+
 - **Stima**: 3 ore
 - **Dipendenze**: 3.3.1
 - **Cosa produce**: variant H2H sport con 2 team + score live
@@ -532,6 +567,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 1
 
 #### SPRINT 3.3.4 — EventCard Crypto Up/Down
+
 - **Stima**: 4 ore
 - **Dipendenze**: 3.3.1, 3.2.4
 - **Cosa produce**: variant crypto round con countdown + bottoni Up/Down + prezzo live
@@ -545,6 +581,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 3.4 — Pagina Home
 
 #### SPRINT 3.4.1 — Pagina Home layout
+
 - **Stima**: 4 ore
 - **Dipendenze**: 3.3.1-4, 3.1.1
 - **Cosa produce**:
@@ -564,6 +601,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 3.5 — Pagina evento (5 layout)
 
 #### SPRINT 3.5.1 — Pagina evento Binary layout
+
 - **Stima**: 5 ore
 - **Dipendenze**: 3.4.1, 3.3.1
 - **Cosa produce**:
@@ -578,18 +616,21 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: V1 ha già CandleChart custom, riusabile.
 
 #### SPRINT 3.5.2 — Pagina evento Multi-outcome + Multi-strike
+
 - **Stima**: 4 ore
 - **Dipendenze**: 3.5.1
 - **Cosa produce**: 2 layout dedicati per multi-outcome (lista candidates) e multi-strike (ladder soglie)
 - **Riferimenti**: Doc 4 Pagina 2
 
 #### SPRINT 3.5.3 — Pagina evento H2H Sport con Hub Sport
+
 - **Stima**: 5 ore
 - **Dipendenze**: 3.5.1
 - **Cosa produce**: layout sport + hub sport navigation (Live/NBA/UCL/NHL/UFC/Altro sub-nav)
 - **Riferimenti**: Doc 4 Pagina 2
 
 #### SPRINT 3.5.4 — Pagina evento Crypto Up/Down con CryptoRoundView
+
 - **Stima**: 5 ore
 - **Dipendenze**: 3.5.1, 3.3.4
 - **Cosa produce**: layout crypto round + auto-redirect al round successivo se scaduto + navigation pallini orari
@@ -597,6 +638,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 2
 
 #### SPRINT 3.5.5 — Espansione inline orderbook
+
 - **Stima**: 3 ore
 - **Dipendenze**: 3.5.1
 - **Cosa produce**: accordion orderbook completo (asks + bids + spread + depth)
@@ -606,6 +648,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 3.6 — Signup flow
 
 #### SPRINT 3.6.1 — Pagina /signup con 5 metodi auth
+
 - **Stima**: 3 ore
 - **Dipendenze**: 1.3.2, 3.1.1
 - **Cosa produce**:
@@ -616,6 +659,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 7
 
 #### SPRINT 3.6.2 — Onboarding soft modal
+
 - **Stima**: 4 ore
 - **Dipendenze**: 3.6.1
 - **Cosa produce**:
@@ -626,6 +670,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 7
 
 #### SPRINT 3.6.3 — Geo-block banner soft + redirect concreto
+
 - **Stima**: 2 ore
 - **Dipendenze**: 3.6.2, 2.6.1
 - **Cosa produce**: banner per paesi demo-only + redirect quando prova trade real
@@ -642,6 +687,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 4.1 — Trade widget UI
 
 #### SPRINT 4.1.1 — Trade widget sidebar desktop
+
 - **Stima**: 5 ore
 - **Dipendenze**: 3.5.1
 - **Cosa produce**:
@@ -654,6 +700,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 2 sezione Trade Widget
 
 #### SPRINT 4.1.2 — Trade widget bottom sheet mobile
+
 - **Stima**: 4 ore
 - **Dipendenze**: 4.1.1
 - **Cosa produce**: bottom sheet mobile con drag-to-close (Framer Motion)
@@ -663,6 +710,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 4.2 — Modalità Mercato
 
 #### SPRINT 4.2.1 — API endpoint /api/v1/trades/submit (DEMO mode)
+
 - **Stima**: 3 ore
 - **Dipendenze**: 2.6.1, 4.1.1
 - **Cosa produce**:
@@ -675,6 +723,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 7 sezione 2.4
 
 #### SPRINT 4.2.2 — Submit trade DEMO frontend integration
+
 - **Stima**: 3 ore
 - **Dipendenze**: 4.2.1
 - **Cosa produce**: hook `useSubmitTrade()` + UI feedback success/error
@@ -684,6 +733,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 4.3 — Modalità Limit
 
 #### SPRINT 4.3.1 — Limit order UI con scadenza preset
+
 - **Stima**: 3 ore
 - **Dipendenze**: 4.2.2
 - **Cosa produce**:
@@ -696,6 +746,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 4.4 — REAL mode CLOB integration
 
 #### SPRINT 4.4.1 — EIP-712 typed data builder
+
 - **Stima**: 4 ore
 - **Dipendenze**: 4.2.2
 - **Cosa produce**:
@@ -706,6 +757,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: V1 ha già scaffold `lib/polymarket/trading/`, riusabile. Verifica builder code env var.
 
 #### SPRINT 4.4.2 — CLOB submit trade REAL
+
 - **Stima**: 5 ore
 - **Dipendenze**: 4.4.1
 - **Cosa produce**:
@@ -722,6 +774,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 4.5 — Position management
 
 #### SPRINT 4.5.1 — Sell position (close)
+
 - **Stima**: 3 ore
 - **Dipendenze**: 4.4.2
 - **Cosa produce**: API endpoint `/api/v1/trades/sell` + UI sell button su position card
@@ -729,6 +782,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 7 sezione 2.4
 
 #### SPRINT 4.5.2 — Auto-update positions on resolution
+
 - **Stima**: 3 ore
 - **Dipendenze**: 4.5.1
 - **Cosa produce**:
@@ -741,6 +795,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 4.6 — Real-time + signals
 
 #### SPRINT 4.6.1 — Banner Segnale Predimark integration
+
 - **Stima**: 3 ore
 - **Dipendenze**: 4.4.2
 - **Cosa produce**:
@@ -760,6 +815,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 5.1 — Layout /me
 
 #### SPRINT 5.1.1 — Layout /me + sub-nav
+
 - **Stima**: 3 ore
 - **Dipendenze**: 4.6.1
 - **Cosa produce**: `app/me/layout.tsx` con sub-nav (Overview / Positions / History / Watchlist / Stats / Settings)
@@ -768,6 +824,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 5.2 — Hero finanziario + equity curve
 
 #### SPRINT 5.2.1 — Hero finanziario Robinhood-style
+
 - **Stima**: 4 ore
 - **Dipendenze**: 5.1.1
 - **Cosa produce**:
@@ -778,6 +835,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 3, Doc 8 sezione 5.4
 
 #### SPRINT 5.2.2 — API equity curve + cron job snapshot
+
 - **Stima**: 3 ore
 - **Dipendenze**: 5.2.1, 2.4.1
 - **Cosa produce**:
@@ -789,18 +847,21 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 5.3 — Sub-pages
 
 #### SPRINT 5.3.1 — Sub-page Positions
+
 - **Stima**: 3 ore
 - **Dipendenze**: 5.1.1
 - **Cosa produce**: lista posizioni aperte con filter + sort
 - **Riferimenti**: Doc 4 Pagina 3
 
 #### SPRINT 5.3.2 — Sub-page History con export CSV
+
 - **Stima**: 3 ore
 - **Dipendenze**: 5.3.1
 - **Cosa produce**: history trade con filter + bottone export CSV
 - **Riferimenti**: Doc 4 Pagina 3
 
 #### SPRINT 5.3.3 — Sub-page Stats + Calibration curve
+
 - **Stima**: 5 ore
 - **Dipendenze**: 5.2.2
 - **Cosa produce**:
@@ -812,6 +873,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Note Cowork**: calibration formula da `prediction-market-analysis` di Becker repo (vedi memorie utente).
 
 #### SPRINT 5.3.4 — Sub-page Watchlist
+
 - **Stima**: 2 ore
 - **Dipendenze**: 5.1.1
 - **Cosa produce**: lista mercati seguiti con notify settings
@@ -819,16 +881,18 @@ NOTE PER COWORK (preparazione prompt):
 
 ### Step 5.4 — Demo mode separation
 
-#### SPRINT 5.4.1 — Routes /me/demo/* parallele
+#### SPRINT 5.4.1 — Routes /me/demo/\* parallele
+
 - **Stima**: 4 ore
 - **Dipendenze**: 5.3.4
 - **Cosa produce**:
-  - Sub-pages `/me/demo/positions`, `/me/demo/history`, ecc. parallele a /me/*
+  - Sub-pages `/me/demo/positions`, `/me/demo/history`, ecc. parallele a /me/\*
   - Tutte le query con filtro `is_demo = true`
   - Banner persistente "DEMO MODE"
 - **Riferimenti**: Doc 4 Pagina 3 sezione demo
 
 #### SPRINT 5.4.2 — Switch REAL/DEMO redirect logic
+
 - **Stima**: 2 ore
 - **Dipendenze**: 5.4.1
 - **Cosa produce**: switch in header redirect a `/me/demo/*` o `/me/*`
@@ -837,6 +901,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 5.5 — Settings sub-pages
 
 #### SPRINT 5.5.1 — Settings sub-pages (7 sezioni)
+
 - **Stima**: 5 ore
 - **Dipendenze**: 5.4.2
 - **Cosa produce**:
@@ -855,12 +920,14 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 6.1 — Creator profile page
 
 #### SPRINT 6.1.1 — Pagina /creator/[username]
+
 - **Stima**: 5 ore
 - **Dipendenze**: 5.5.1
 - **Cosa produce**: profilo Verified Creator completo (hero, stats, positions con delay 30min, achievements)
 - **Riferimenti**: Doc 4 Pagina 4
 
 #### SPRINT 6.1.2 — Pagina /trader/[address] per External
+
 - **Stima**: 4 ore
 - **Dipendenze**: 6.1.1
 - **Cosa produce**: profilo External Trader con disclaimer permanente "⚠ Non partner Predimark"
@@ -869,6 +936,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 6.2 — Application form
 
 #### SPRINT 6.2.1 — Form /creator/apply
+
 - **Stima**: 3 ore
 - **Dipendenze**: 6.1.1
 - **Cosa produce**: form application + endpoint POST `/api/v1/creators/apply`
@@ -877,6 +945,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 6.3 — Leaderboard
 
 #### SPRINT 6.3.1 — Endpoint leaderboard unified
+
 - **Stima**: 4 ore
 - **Dipendenze**: 6.1.2
 - **Cosa produce**:
@@ -886,6 +955,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 7 sezione 2.7
 
 #### SPRINT 6.3.2 — Pagina /leaderboard
+
 - **Stima**: 5 ore
 - **Dipendenze**: 6.3.1
 - **Cosa produce**:
@@ -896,6 +966,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 5
 
 #### SPRINT 6.3.3 — Toggle leaderboard mode (1-tab vs 2-tab)
+
 - **Stima**: 2 ore
 - **Dipendenze**: 6.3.2
 - **Cosa produce**: setting admin runtime + 2-tab UI quando attivata
@@ -904,6 +975,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 6.4 — Score + Tier + Import
 
 #### SPRINT 6.4.1 — Score Predimark calcolo + Tier assignment
+
 - **Stima**: 4 ore
 - **Dipendenze**: 6.3.1
 - **Cosa produce**:
@@ -913,6 +985,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Riferimenti**: Doc 4 Pagina 4
 
 #### SPRINT 6.4.2 — Edge Function import-polymarket-leaderboard
+
 - **Stima**: 4 ore
 - **Dipendenze**: 6.4.1
 - **Cosa produce**:
@@ -925,18 +998,21 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 6.5 — Follow + Copy
 
 #### SPRINT 6.5.1 — Follow system + endpoint
+
 - **Stima**: 3 ore
 - **Dipendenze**: 6.1.2
 - **Cosa produce**: bottone Follow + endpoint POST `/api/v1/creators/:username/follow`
 - **Riferimenti**: Doc 7 sezione 2.5
 
 #### SPRINT 6.5.2 — Notifiche follow (new position, position closed)
+
 - **Stima**: 3 ore
 - **Dipendenze**: 6.5.1
 - **Cosa produce**: trigger Postgres che inserisce notification quando creator apre/chiude position
 - **Riferimenti**: Doc 7 sezione 2.5
 
 #### SPRINT 6.5.3 — Copy single trade UI manual
+
 - **Stima**: 4 ore
 - **Dipendenze**: 6.5.2
 - **Cosa produce**:
@@ -957,12 +1033,14 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 7.1 — Layout admin + auth
 
 #### SPRINT 7.1.1 — Layout admin con sidebar gerarchica
+
 - **Stima**: 4 ore
 - **Dipendenze**: 6.5.3
 - **Cosa produce**: `app/admin/layout.tsx` con top bar + sidebar 12 sezioni
 - **Riferimenti**: Doc 4 Pagina 6
 
 #### SPRINT 7.1.2 — Role-based access (3 ruoli)
+
 - **Stima**: 3 ore
 - **Dipendenze**: 7.1.1, 2.3.1
 - **Cosa produce**: middleware `requireAdminRole(['admin', 'super_admin', 'moderator'])` per ogni route admin
@@ -972,6 +1050,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 7.2 — Dashboard
 
 #### SPRINT 7.2.1 — Dashboard admin con KPI
+
 - **Stima**: 4 ore
 - **Dipendenze**: 7.1.2
 - **Cosa produce**: KPI grid + alerts bar + charts + recent activity
@@ -980,12 +1059,14 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 7.3 — Users management
 
 #### SPRINT 7.3.1 — Lista users + dettaglio
+
 - **Stima**: 5 ore
 - **Dipendenze**: 7.2.1
 - **Cosa produce**: tabella users + sub-page detail con tabs (Overview / Trades / KYC / Notifications / Audit)
 - **Riferimenti**: Doc 4 Pagina 6 sezione Users
 
 #### SPRINT 7.3.2 — KYC review queue + Refunds queue
+
 - **Stima**: 4 ore
 - **Dipendenze**: 7.3.1
 - **Cosa produce**: 2 queue pages con approve/reject pattern
@@ -994,12 +1075,14 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 7.4 — Markets + Fees
 
 #### SPRINT 7.4.1 — Markets management (4 sub-pages)
+
 - **Stima**: 4 ore
 - **Dipendenze**: 7.2.1
 - **Cosa produce**: lista, featured curate (drag-drop), hidden, import manual
 - **Riferimenti**: Doc 4 Pagina 6 sezione Markets
 
 #### SPRINT 7.4.2 — Fees configuration runtime
+
 - **Stima**: 3 ore
 - **Dipendenze**: 7.2.1
 - **Cosa produce**: form per cambiare builder fee + service fee + creator share + telegram premium price con audit log
@@ -1008,12 +1091,14 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 7.5 — Creators
 
 #### SPRINT 7.5.1 — Creators applications review
+
 - **Stima**: 3 ore
 - **Dipendenze**: 7.3.2
 - **Cosa produce**: queue applications con approve/reject + reason note
 - **Riferimenti**: Doc 4 Pagina 6 sezione Creators
 
 #### SPRINT 7.5.2 — Creator payouts queue
+
 - **Stima**: 3 ore
 - **Dipendenze**: 7.5.1
 - **Cosa produce**: lista payouts pending + bottone "Process payouts batch"
@@ -1022,12 +1107,14 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 7.6 — Notifications + Analytics
 
 #### SPRINT 7.6.1 — Broadcast notifications
+
 - **Stima**: 4 ore
 - **Dipendenze**: 7.2.1
 - **Cosa produce**: form per inviare annuncio multi-canale (push, email, telegram)
 - **Riferimenti**: Doc 4 Pagina 6 sezione Notifications
 
 #### SPRINT 7.6.2 — Analytics dashboard
+
 - **Stima**: 4 ore
 - **Dipendenze**: 7.2.1
 - **Cosa produce**: dashboard con DAU/MAU, funnel, retention, top markets
@@ -1036,18 +1123,21 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 7.7 — Audit + Settings
 
 #### SPRINT 7.7.1 — Audit log viewer
+
 - **Stima**: 3 ore
 - **Dipendenze**: 7.2.1, 2.3.1
 - **Cosa produce**: tabella audit log con filtri (actor, action, target, period) + expand JSON diff
 - **Riferimenti**: Doc 4 Pagina 6 sezione Audit
 
 #### SPRINT 7.7.2 — Feature flags + A/B tests UI
+
 - **Stima**: 4 ore
 - **Dipendenze**: 7.7.1, 2.3.2
 - **Cosa produce**: gestione feature flags (enable/disable + rollout %) + A/B test config
 - **Riferimenti**: Doc 4 Pagina 6 sezione Settings
 
 #### SPRINT 7.7.3 — Settings (team, branding, integrations)
+
 - **Stima**: 3 ore
 - **Dipendenze**: 7.7.2
 - **Cosa produce**: 3 settings pages restanti (team admin management, branding, integrations)
@@ -1064,22 +1154,26 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 8.1 — Testing
 
 #### SPRINT 8.1.1 — Setup Playwright E2E
+
 - **Stima**: 3 ore
 - **Dipendenze**: 7.7.3
 - **Cosa produce**: Playwright installato + test config + CI integration
 - **Riferimenti**: Doc 5 sezione 10
 
 #### SPRINT 8.1.2 — E2E test signup flow
+
 - **Stima**: 3 ore
 - **Dipendenze**: 8.1.1
 - **Cosa produce**: test scenario signup → onboarding → first demo trade
 
 #### SPRINT 8.1.3 — E2E test trade flow REAL
+
 - **Stima**: 3 ore
 - **Dipendenze**: 8.1.2
 - **Cosa produce**: test scenario login → deposit → trade real → sell
 
 #### SPRINT 8.1.4 — E2E test creator + leaderboard
+
 - **Stima**: 3 ore
 - **Dipendenze**: 8.1.3
 - **Cosa produce**: test scenario follow creator + view leaderboard
@@ -1087,6 +1181,7 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 8.2 — Performance + Accessibility
 
 #### SPRINT 8.2.1 — Performance audit + optimization
+
 - **Stima**: 4 ore
 - **Dipendenze**: 8.1.4
 - **Cosa produce**:
@@ -1096,6 +1191,7 @@ NOTE PER COWORK (preparazione prompt):
 - **Acceptance criteria**: Lighthouse score > 90 su pagine critiche
 
 #### SPRINT 8.2.2 — Accessibility audit WCAG AA
+
 - **Stima**: 4 ore
 - **Dipendenze**: 8.2.1
 - **Cosa produce**: audit con axe-core + fix issues
@@ -1104,11 +1200,13 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 8.3 — Multilingua
 
 #### SPRINT 8.3.1 — Setup next-intl + estrazione strings
+
 - **Stima**: 3 ore
 - **Dipendenze**: 8.2.2
 - **Cosa produce**: next-intl configurato + tutti i testi UI in `messages/en.json`
 
 #### SPRINT 8.3.2 — Traduzione 5 lingue (EN + ES + PT + IT + FR)
+
 - **Stima**: 4 ore
 - **Dipendenze**: 8.3.1
 - **Cosa produce**: file `messages/[locale].json` per tutte e 5 le lingue (auto-translate via Claude API + review)
@@ -1117,12 +1215,14 @@ NOTE PER COWORK (preparazione prompt):
 ### Step 8.4 — Launch
 
 #### SPRINT 8.4.1 — Production setup + DNS + SSL
+
 - **Stima**: 2 ore
 - **Dipendenze**: 8.3.2
 - **Cosa produce**: predimark.com configurato, SSL automatico Vercel, env vars production complete
 - **Note Cowork**: Feliciano deve fare 1 click sul DNS registrar per ultimi record.
 
 #### SPRINT 8.4.2 — Soft launch + waitlist + monitoring setup
+
 - **Stima**: 3 ore
 - **Dipendenze**: 8.4.1
 - **Cosa produce**:
@@ -1165,5 +1265,5 @@ Quando arriva il momento di iniziare uno sprint:
 
 ---
 
-*Fine Documento 9 v2 — Roadmap & Sprint Plan completo*
-*Continua con Documento 10 (Memo finale per Cowork) nella sessione successiva*
+_Fine Documento 9 v2 — Roadmap & Sprint Plan completo_
+_Continua con Documento 10 (Memo finale per Cowork) nella sessione successiva_

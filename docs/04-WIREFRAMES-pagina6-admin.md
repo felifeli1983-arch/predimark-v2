@@ -18,6 +18,7 @@ L'admin è la **macchina dietro le quinte** di Predimark. Senza questa, il prodo
 **A chi è destinato**: solo utenti con ruolo `admin`, `super_admin`, o `moderator` nel JWT. Tutti gli altri vedono 404 su `/admin/*`.
 
 **Approccio del documento**: dato che ci sono 35+ sub-pages, NON descriverò ogni singola pagina in dettaglio. Userò invece:
+
 - **Layout master** comune a tutte le sub-pages
 - **Pattern UI ricorrenti** (tabelle, form, modali)
 - **8 gruppi tematici** con esempio di sub-page rappresentativa
@@ -29,11 +30,11 @@ L'admin è la **macchina dietro le quinte** di Predimark. Senza questa, il prodo
 
 ### Ruoli admin (3 livelli)
 
-| Ruolo | Permessi |
-|---|---|
-| **Super-admin** | Tutto. Inclusi: cambio ruoli altri admin, feature flags critici, kill switches globali, accesso completo a finance/payouts |
-| **Admin** | Gestione operativa: users (ban/unban/refund), markets, creators (approve/reject), fees runtime, notifiche broadcast, analytics |
-| **Moderator** | Solo support: users (ban/unban/respond ticket), comments moderation, KYC review, reports |
+| Ruolo           | Permessi                                                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Super-admin** | Tutto. Inclusi: cambio ruoli altri admin, feature flags critici, kill switches globali, accesso completo a finance/payouts     |
+| **Admin**       | Gestione operativa: users (ban/unban/refund), markets, creators (approve/reject), fees runtime, notifiche broadcast, analytics |
+| **Moderator**   | Solo support: users (ban/unban/respond ticket), comments moderation, KYC review, reports                                       |
 
 **Default**: tu (Feliciano) = super-admin. Aggiungi altri admin via `/admin/team`.
 
@@ -48,6 +49,7 @@ L'admin è la **macchina dietro le quinte** di Predimark. Senza questa, il prodo
 ### Feature flags + A/B testing
 
 Entrambi presenti in V1. Sezioni separate:
+
 - `/admin/feature-flags`: kill switch e gradual rollout di feature
 - `/admin/ab-tests`: configura test A/B su componenti UI
 
@@ -171,6 +173,7 @@ Entrambi presenti in V1. Sezioni separate:
 ### Mobile
 
 L'admin **non è ottimizzato per mobile** in V1 (decisione pragmatica — l'admin lavora da desktop). Su mobile mostriamo:
+
 - Sidebar collapsible (hamburger menu)
 - Layout single-column
 - Tabelle scrollabili orizzontalmente
@@ -216,6 +219,7 @@ SIDEBAR
 ```
 
 **Caratteristiche**:
+
 - Sezioni collapsible (click su nome categoria → espande/chiude)
 - Stato attivo della sub-page evidenziato (background colorato + bordo sinistro)
 - Badge con count su sezioni con queue (es. "KYC review (3)")
@@ -236,6 +240,7 @@ SIDEBAR
 ```
 
 **Elementi**:
+
 - **Logo "Predimark Admin"**: distintivo dal logo utente
 - **Ruolo + nome**: chiaro chi sei
 - **Last login**: per security awareness
@@ -272,6 +277,7 @@ Usato in: lista utenti, lista mercati, lista creator, lista referrals, audit log
 ```
 
 **Caratteristiche**:
+
 - Search bar con autocomplete
 - Filter dropdown multi-select (es. status: active/banned/pending)
 - Sort by colonna
@@ -304,6 +310,7 @@ Usato in: profilo utente admin, profilo creator admin, dettaglio mercato, dettag
 ```
 
 **Caratteristiche**:
+
 - Hero con info principali + actions buttons
 - Tabs per organizzare sub-info
 - Bottoni azione spesso destruttivi (Suspend, Ban) con conferma + reason note
@@ -345,6 +352,7 @@ Usato in: settings, fees, feature flags, signal config.
 ```
 
 **Caratteristiche**:
+
 - Sezioni logiche con titolo
 - Helper text per ogni campo (cosa fa, perché)
 - Audit info di chi ha modificato l'ultima volta
@@ -384,6 +392,7 @@ Usato in: KYC review, refund requests, creator applications, fraud alerts.
 ```
 
 **Caratteristiche**:
+
 - Card per ogni item in queue
 - Info contestuali (documenti, AI check, metadata)
 - 3 bottoni azione: Reject (con reason obbligatoria), Request more info (con messaggio), Approve
@@ -492,6 +501,7 @@ Bulk: Export CSV / Send notification / Bulk ban (super-admin only)
 ### `/admin/users/[id]` (profilo utente admin)
 
 Pattern 2 (detail page) con tabs:
+
 - **Overview**: info utente (KYC status, balance USDC, P&L cumulato, geo, signup date)
 - **Trades**: tutti i trade dell'utente con filter
 - **KYC**: documenti KYC + status + history review
@@ -499,6 +509,7 @@ Pattern 2 (detail page) con tabs:
 - **Audit**: audit log specifico per questo utente (modifiche admin)
 
 Bottoni azione:
+
 - **Edit profile** (super-admin only)
 - **Suspend** (con reason e durata)
 - **Ban permanently** (con reason note obbligatoria)
@@ -507,10 +518,13 @@ Bottoni azione:
 - **Reset password** (invia email reset)
 
 ### `/admin/users/banned`
+
 Lista utenti banned con: reason, banned by (admin name), banned at, ban duration. Bottone "Unban" (richiede reason).
 
 ### `/admin/users/kyc` (KYC review queue)
+
 Pattern 4 (queue review):
+
 - Card per ogni KYC pending
 - Documenti visualizzabili
 - AI fraud check result
@@ -518,7 +532,9 @@ Pattern 4 (queue review):
 - Notification automatica utente
 
 ### `/admin/users/refunds` (refund requests)
+
 Pattern 4: queue di richieste refund con:
+
 - Importo richiesto
 - Reason utente
 - Trade originale di riferimento
@@ -537,6 +553,7 @@ Actions per row: View on Polymarket / Hide / Feature / Override resolution / Add
 ### `/admin/markets/featured` (curate)
 
 Drag-and-drop interface per ordinare mercati nelle sezioni Home:
+
 - **Hero carousel** (top 3-5 mercati)
 - **Hot Now** tag (top 5-10)
 - **Top Picks** sezione
@@ -545,9 +562,11 @@ Drag-and-drop interface per ordinare mercati nelle sezioni Home:
 L'admin trascina i mercati per riordinare, click "Save" applica live a tutti gli utenti.
 
 ### `/admin/markets/hidden`
+
 Mercati nascosti dalla home (per content moderation o errori). Bottone "Restore".
 
 ### `/admin/markets/import`
+
 Form per importare manualmente un mercato Polymarket via slug o event ID:
 
 ```
@@ -608,6 +627,7 @@ Reason for change (richiesto):
 ```
 
 **Conferma prima del save**:
+
 ```
 ⚠ Confirm fee change
 
@@ -620,10 +640,13 @@ Estimated impact: +$2.1k revenue/day (based on 7d volume).
 ```
 
 ### `/admin/fees/history`
+
 Log cronologico dei cambi fee con: when, who, before → after, reason.
 
 ### `/admin/fees/revenue`
+
 Pattern 5 (dashboard real-time):
+
 - KPI: Revenue today / 7d / 30d
 - Chart: revenue cumulativa
 - Breakdown: per fee type (builder, service, telegram premium)
@@ -640,6 +663,7 @@ Pattern 1 con colonne specifiche: username, score Predimark, tier, followers, co
 ### `/admin/creators/applications` (queue review)
 
 Pattern 4. Card per applicazione con:
+
 - User profile
 - Requirements check (tutti i criteri verificati)
 - Performance metrics
@@ -651,6 +675,7 @@ Notification automatica via email + Telegram dopo decisione.
 ### `/admin/creators/[id]`
 
 Pattern 2 con tabs:
+
 - Overview: stats creator
 - Profile: edit del profilo pubblico (per casi di compliance)
 - Followers: lista chi lo segue
@@ -660,12 +685,15 @@ Pattern 2 con tabs:
 Bottoni: Edit / Suspend (con reason) / Remove from program / Send notification.
 
 ### `/admin/creators/payouts`
+
 Queue di payout dovuti ai creator:
+
 - Lista creator con earnings accumulate
 - Bottone "Process payouts" (batch settimanale)
 - Storico payout processati
 
 ### `/admin/creators/suspended`
+
 Creator sospesi temporaneamente. Bottone "Reinstate" con reason.
 
 ---
@@ -673,9 +701,11 @@ Creator sospesi temporaneamente. Bottone "Reinstate" con reason.
 ## GRUPPO 6 — REFERRALS (2 sub-pages)
 
 ### `/admin/referrals`
+
 Pattern 1: lista referrer attivi con count referrals, volume generato dai referrals, payout dovuto.
 
 ### `/admin/referrals/payouts`
+
 Queue payout referrer (calcolo automatico, batch mensile).
 
 ---
@@ -687,6 +717,7 @@ Queue payout referrer (calcolo automatico, batch mensile).
 Pattern 1 con colonne: signal ID, market, direction (Buy/Sell/Up/Down), edge %, confidence, published at, status (active/expired/resolved).
 
 Actions:
+
 - View detail
 - Override (in caso di errori, super-admin only)
 - Republish on Telegram
@@ -694,6 +725,7 @@ Actions:
 ### `/admin/signals/performance`
 
 Pattern 5 (dashboard):
+
 - Hit rate cumulativo (% segnali che hanno predetto correttamente)
 - Calibration curve (quanto siamo calibrati globalmente)
 - Edge realized vs claimed
@@ -761,9 +793,11 @@ Schedule:
 ```
 
 ### `/admin/notifications/templates`
+
 Library di template messaggi riutilizzabili (welcome, KYC approved, refund processed, ecc.).
 
 ### `/admin/notifications/history`
+
 Storico tutti gli invii broadcast e per-user.
 
 ---
@@ -773,6 +807,7 @@ Storico tutti gli invii broadcast e per-user.
 ### `/admin/analytics` (KPI dashboard principale)
 
 Pattern 5 con vista globale di tutti i KPI principali:
+
 - DAU / WAU / MAU
 - Retention curves (D1, D7, D30)
 - Funnel signup → first trade → 5 trades → become creator
@@ -783,6 +818,7 @@ Pattern 5 con vista globale di tutti i KPI principali:
 ### `/admin/analytics/users` (funnel utenti)
 
 Funnel detail con conversion rates step by step:
+
 1. Visit landing → 100%
 2. Sign up → 12%
 3. KYC complete → 8%
@@ -793,9 +829,11 @@ Funnel detail con conversion rates step by step:
 Drill-down per segmento (geo, source, device).
 
 ### `/admin/analytics/markets` (top markets)
+
 Top markets per: volume, engagement (comments), holders, growth rate.
 
 ### `/admin/analytics/revenue` (revenue dashboard)
+
 Breakdown revenue dettagliato + proiezioni.
 
 ---
@@ -805,6 +843,7 @@ Breakdown revenue dettagliato + proiezioni.
 ### `/admin/compliance/geo-block`
 
 Lista paesi bloccati (default: Italy + sanctioned countries):
+
 - Country code + name
 - Status (blocked/restricted/allowed)
 - Restriction type (full block / KYC required / paper trading only)
@@ -815,6 +854,7 @@ Bottone "Add country" / "Edit" / "Remove block" (super-admin only).
 ### `/admin/compliance/aml` (fraud alerts queue)
 
 Pattern 4: alerts AI-generated per attività sospette:
+
 - Wash trading detection
 - Multiple accounts same IP
 - Sudden volume spike
@@ -847,9 +887,11 @@ Esempio:
 Click "Expand" mostra full diff JSON before/after se applicabile.
 
 ### `/admin/system-logs`
+
 System errors, API failures, Polymarket API issues, MoonPay errors. Per debug tecnico.
 
 ### `/admin/api-usage`
+
 Rate limiting status, top API consumers, latency monitoring.
 
 ---
@@ -857,6 +899,7 @@ Rate limiting status, top API consumers, latency monitoring.
 ## GRUPPO 12 — SETTINGS (8 sub-pages)
 
 ### `/admin/settings` (overview)
+
 Hub con link alle 7 sub-pages settings.
 
 ### `/admin/settings/feature-flags`
@@ -916,6 +959,7 @@ Recommendation: Stay in Unified mode until 50+ Verified.
 ### `/admin/settings/integrations`
 
 Configurazione integrazioni esterne:
+
 - Polymarket API (key, rate limits)
 - MoonPay (API key, geo enabled)
 - Telegram bot (token, webhook URL)
@@ -925,6 +969,7 @@ Configurazione integrazioni esterne:
 ### `/admin/settings/team` (super-admin only)
 
 Lista admin team:
+
 ```
 Name        | Email             | Role          | Last login | Actions
 Feliciano   | f@predimark.com   | Super-admin   | now        | [Edit]
@@ -934,9 +979,11 @@ Moderator-A | mod@predimark.com | Moderator     | 3h ago     | [Edit] [Remove]
 Bottone "Invite team member" → email invitation con role pre-selezionato.
 
 ### `/admin/settings/payouts`
+
 Configurazione metodi payout creator (Polygon USDC native, fallback bank wire per >$10k).
 
 ### `/admin/settings/branding`
+
 Logo upload, primary color, tagline, favicon (per eventuale rebrand).
 
 ---
@@ -995,6 +1042,7 @@ Tutti protected da middleware `requireRole(['admin', 'super_admin'])`.
 ### Mobile (out of scope V1)
 
 L'admin desktop è priorità V1. Mobile è esperienza ridotta:
+
 - Sidebar collapsible
 - Tabelle con scroll orizzontale
 - Banner "Per migliore esperienza usa desktop"
@@ -1005,22 +1053,28 @@ L'admin desktop è priorità V1. Mobile è esperienza ridotta:
 ## STATI DELLE PAGINE ADMIN
 
 ### Default
+
 Layout master con sub-page content.
 
 ### Loading
+
 Skeleton placeholder per tabelle e form.
 
 ### Empty (es. nessun KYC pending)
+
 ```
 "All caught up! 🎉"
 "Nessun KYC in attesa di review."
 ```
 
 ### Error
+
 Banner rosso con dettagli errore + retry.
 
 ### Permission denied
+
 Se un moderator tenta di accedere a sezione super-admin only:
+
 ```
 "Access denied"
 "This section is for super-admins only."
@@ -1058,5 +1112,5 @@ Documenti che verranno costruiti nelle prossime sessioni:
 
 ---
 
-*Fine Documento 4 — Wireframes — Pagina 6 (Admin overview)*
-*Continua con Pagina 7 (Signup + onboarding) nella sessione successiva*
+_Fine Documento 4 — Wireframes — Pagina 6 (Admin overview)_
+_Continua con Pagina 7 (Signup + onboarding) nella sessione successiva_

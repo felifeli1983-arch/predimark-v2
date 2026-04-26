@@ -7,8 +7,8 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: 1.1.3 (da iniziare — Design tokens globals.css completi)
-- **Prossimo sprint**: 1.1.4 o 1.5.1 (ESLint/Prettier)
+- **Sprint corrente**: 1.5.1 (da iniziare — ESLint, Prettier, Husky)
+- **Prossimo sprint**: 1.5.2 (Vitest)
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
 - **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata
@@ -17,7 +17,22 @@
 
 ## Sprint completati
 
+### ✅ Sprint 1.1.3 — Setup design tokens globals.css completi
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente)
+- **Output**:
+  - `app/globals.css` con tutti i design token Doc 8 (colori dark/light, tipografia, spacing, radius, shadows, z-index, transizioni, breakpoints)
+  - Light mode via `@media (prefers-color-scheme: light)`
+  - Inter Variable via `next/font/google`
+  - Animazioni: pulse-live, shimmer, flash-up/down, hover-lift
+  - Test page `/test-design-system` con palette, tipografia, border radius, badge semantici
+  - Commit `88cac28` pushato su `main`
+- **Note**: verifica visiva light mode demandata a Feliciano (Claude in VS Code non ha browser interattivo)
+- **PR**: N/A
+
 ### ✅ Sprint 1.1.2 — Init Next.js 16 project con stack base
+
 - **Chiuso**: 2026-04-26
 - **Verificato da**: Cowork (file letti direttamente)
 - **Output**:
@@ -34,6 +49,7 @@
 - **PR**: N/A (push diretto su main — CI non ancora configurata)
 
 ### ✅ Sprint 1.1.1 — Setup credenziali GitHub
+
 - **Chiuso**: 2026-04-26
 - **Eseguito da**: Claude in VS Code
 - **Output**:
@@ -47,6 +63,7 @@
 - **PR**: N/A (sprint di setup locale)
 
 ### ✅ DB Setup completo — Cowork via Supabase MCP (fuori-sprint)
+
 - **Chiuso**: 2026-04-26
 - **Eseguito da**: Cowork direttamente via Supabase MCP (non Claude in VS Code)
 - **Output**:
@@ -106,18 +123,18 @@
 
 ## Riepilogo macro aree
 
-| MA | Nome | Sprint completati | Sprint totali | Status |
-|---|---|---|---|---|
-| MA1 | Foundation & Setup | 2 | 12 | ⏳ In corso |
-| MA2 | Database & Auth | ~10 | 11 | 🔶 DB setup anticipato da Cowork via MCP |
-| MA3 | Core Pages | 0 | 14 | ⚪ Non iniziata |
-| MA4 | Trading Core | 0 | 12 | ⚪ Non iniziata |
-| MA5 | User Profile & Demo | 0 | 9 | ⚪ Non iniziata |
-| MA6 | Creator Program & Leaderboard | 0 | 11 | ⚪ Non iniziata |
-| MA7 | Admin Panel | 0 | 13 | ⚪ Non iniziata |
-| MA8 | Polish, Testing, Launch | 0 | 10 | ⚪ Non iniziata |
+| MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
+| --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
+| MA1 | Foundation & Setup            | 3                 | 12            | ⏳ In corso                              |
+| MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
+| MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
+| MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
+| MA5 | User Profile & Demo           | 0                 | 9             | ⚪ Non iniziata                          |
+| MA6 | Creator Program & Leaderboard | 0                 | 11            | ⚪ Non iniziata                          |
+| MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
+| MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
 
-**Totale sprint**: 2 / 92
+**Totale sprint**: 3 / 92
 
 ---
 
@@ -127,6 +144,7 @@ Quando un nuovo sprint si chiude, aggiungere all'inizio della sezione "Sprint co
 
 ```markdown
 ### ✅ Sprint X.Y.Z — [Titolo]
+
 - **Chiuso**: YYYY-MM-DD HH:MM
 - **Output**: [breve descrizione di cosa è stato prodotto]
 - **Test**: [come è stato verificato]
@@ -137,4 +155,4 @@ Quando un nuovo sprint si chiude, aggiungere all'inizio della sezione "Sprint co
 
 ---
 
-*File mantenuto da Cowork. Feliciano e Claude in VS Code possono leggerlo ma di norma solo Cowork lo scrive.*
+_File mantenuto da Cowork. Feliciano e Claude in VS Code possono leggerlo ma di norma solo Cowork lo scrive._

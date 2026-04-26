@@ -22,9 +22,24 @@ export default function HomePage() {
 
       <div className="flex gap-3">
         {[
-          { label: 'Next.js ✓', bg: 'var(--color-success-bg)', color: 'var(--color-success)', border: 'var(--color-success)' },
-          { label: 'Tailwind 4 ✓', bg: 'var(--color-cta-bg)', color: 'var(--color-cta)', border: 'var(--color-cta)' },
-          { label: 'TypeScript ✓', bg: '#a855f715', color: 'var(--color-cat-culture)', border: 'var(--color-cat-culture)' },
+          {
+            label: 'Next.js ✓',
+            bg: 'var(--color-success-bg)',
+            color: 'var(--color-success)',
+            border: 'var(--color-success)',
+          },
+          {
+            label: 'Tailwind 4 ✓',
+            bg: 'var(--color-cta-bg)',
+            color: 'var(--color-cta)',
+            border: 'var(--color-cta)',
+          },
+          {
+            label: 'TypeScript ✓',
+            bg: '#a855f715',
+            color: 'var(--color-cat-culture)',
+            border: 'var(--color-cat-culture)',
+          },
         ].map(({ label, bg, color, border }) => (
           <span
             key={label}

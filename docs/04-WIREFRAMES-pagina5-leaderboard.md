@@ -13,6 +13,7 @@
 Questo documento descrive la **Pagina Leaderboard** (`/leaderboard`) di Predimark V2 — la classifica dei trader sulla piattaforma.
 
 Adottiamo un'**architettura di classifica adattiva**:
+
 - **Al lancio**: 1 classifica unificata (Verified Creators + Top Traders Polymarket mescolati con badge distintivi)
 - **Quando il programma Verified matura (50+ creator)**: l'admin può attivare le 2 tab separate
 
@@ -199,6 +200,7 @@ $2.4M Volume tradato oggi · 1,247 trader attivi
 ```
 
 **Statistiche live**:
+
 - Volume totale tradato nel periodo selezionato (default 7g)
 - Numero totale di trader attivi (con almeno 1 trade)
 - Breakdown Verified vs External (per trasparenza)
@@ -241,6 +243,7 @@ Categoria: [✓ Tutti] [Crypto] [Sport] [Politica] [Cultura] [News]
 ```
 
 Filtra per **specializzazione** del trader. Calcoliamo la specializzazione come "categoria con >40% del volume del trader":
+
 - Es. trader fa 70% trade su crypto → specializzazione = Crypto
 - Trader equilibrato (no categoria >40%) → mostrato in "Tutti"
 
@@ -297,6 +300,7 @@ Sopra la tabella, sempre visibile per l'utente loggato:
 ```
 
 **Caratteristiche**:
+
 - Background blu chiaro `#3b82f615` per evidenziare
 - Numero posizione `#487` calcolato sull'attuale filtro/sort
 - Stesse colonne della tabella (Volume / Profit / ROI / Win rate)
@@ -304,14 +308,17 @@ Sopra la tabella, sempre visibile per l'utente loggato:
 - **Sempre visibile** sopra la tabella, anche se l'utente è in posizione bassa
 
 **Quando l'utente è nelle prime 50** (in tabella):
+
 - Pin riga in cima COME PROMPT (visibile)
 - ALTRESÌ riga normale evidenziata in tabella (background giallo soft)
 
 **Quando l'utente non ha trade**:
+
 - Pin riga sostituito con CTA: "Inizia a tradare per entrare in classifica"
 - Bottoni: [Esplora mercati →] [Try Demo →]
 
 **Quando l'utente non è loggato**:
+
 - Pin riga sostituito con CTA: "Crea account per vedere la tua posizione"
 - Bottone [Sign up →]
 
@@ -321,14 +328,14 @@ Sopra la tabella, sempre visibile per l'utente loggato:
 
 ### Struttura colonne (desktop)
 
-| # | Posizione (1-50, poi continua a 51+ con load more) |
-|---|---|
-| Trader | Avatar/icona + Username/Address + Badge verifica + Score (per Verified) |
-| Volume | USDC totale tradato nel periodo |
-| Profit | P&L cumulato in USD (verde se positivo, rosso se negativo) |
-| ROI % | (P&L / Volume) × 100 |
-| WR (Win rate) | Percentuale trade vinti |
-| Action | Bottone Follow (Verified) o Copy ⚠ (External) |
+| #             | Posizione (1-50, poi continua a 51+ con load more)                      |
+| ------------- | ----------------------------------------------------------------------- |
+| Trader        | Avatar/icona + Username/Address + Badge verifica + Score (per Verified) |
+| Volume        | USDC totale tradato nel periodo                                         |
+| Profit        | P&L cumulato in USD (verde se positivo, rosso se negativo)              |
+| ROI %         | (P&L / Volume) × 100                                                    |
+| WR (Win rate) | Percentuale trade vinti                                                 |
+| Action        | Bottone Follow (Verified) o Copy ⚠ (External)                           |
 
 ### Riga Verified Creator
 
@@ -386,19 +393,23 @@ Sopra la tabella, sempre visibile per l'utente loggato:
 ## STATI DELLA PAGINA
 
 ### Default (loaded)
+
 Tabella popolata, real-time updates attivi.
 
 ### Loading (primo caricamento)
+
 - Skeleton placeholder per filtri e tabella
 - Caricamento progressivo (filtri → header tabella → righe)
 
 ### Empty (nessun risultato dai filtri)
+
 ```
 "Nessun trader corrisponde ai tuoi filtri."
 [Reset filtri]
 ```
 
 ### Empty (programma Verified vuoto + filtro "Solo Verified")
+
 ```
 "Il programma Verified Creator è ancora nuovo!"
 "Nessun creator soddisfa i tuoi filtri al momento."
@@ -408,6 +419,7 @@ Tabella popolata, real-time updates attivi.
 ```
 
 ### Error (problema rete/API)
+
 - Banner "Connessione interrotta, riprovo automaticamente..."
 - Mostra ultimi dati cached
 - Retry silenzioso
@@ -419,6 +431,7 @@ Tabella popolata, real-time updates attivi.
 ### Quando si attiva
 
 L'admin attiva la modalità 2 tab dal pannello `/admin/settings/leaderboard-mode` quando:
+
 - Verified Creators >= 50
 - Filtro auto-suggerito ma admin decide manualmente
 - Cambio applicato a tutti gli utenti senza deploy
@@ -448,6 +461,7 @@ L'admin attiva la modalità 2 tab dal pannello `/admin/settings/leaderboard-mode
 ### Cambio modalità (admin)
 
 Quando l'admin cambia modalità (1 tab ↔ 2 tab):
+
 - Tutti gli utenti ricevono la nuova UX al refresh successivo
 - Eventuali filtri salvati nei query params restano validi
 - Nessun loss di dati
@@ -459,17 +473,20 @@ Quando l'admin cambia modalità (1 tab ↔ 2 tab):
 ### Click su riga trader
 
 Click su qualsiasi riga (NON sui bottoni Follow/Copy):
+
 - Naviga al profilo: `/creator/[username]` o `/trader/[address]`
 
 ### Click su bottoni Follow / Copy
 
 Stesso flusso di Pagina 4:
+
 - **Follow**: API `/api/copy/follow`, badge cambia a "✓ Following"
 - **Copy ⚠** (External): dialog con caveat, poi setup session keys
 
 ### Cambio filtri
 
 Cambio di periodo / sort / categoria / volume min:
+
 - API call refresh tabella
 - URL aggiornato con query params (sharable)
 - Es: `/leaderboard?period=30d&sort=profit&category=crypto&min_volume=10000`
@@ -542,6 +559,7 @@ Già documentato sopra. Cambio automatico filtro "Solo Verified" + banner esplic
 ### Logica del trigger 1-tab → 2-tab
 
 Admin pannello `/admin/settings/leaderboard-mode`:
+
 - Toggle "Modalità unificata / Modalità 2 tab"
 - Suggerimento automatico quando Verified >= 50 ("Suggested: switch to 2 tab")
 - Cambio applicato runtime (no deploy)
@@ -550,6 +568,7 @@ Admin pannello `/admin/settings/leaderboard-mode`:
 ### Database considerations
 
 Per Cowork: la classifica richiede **query potenti**. Strategie:
+
 - Tabella materialized view aggiornata ogni minuto
 - Indexes su (volume, profit, roi, win_rate, sharpe) × (period_oggi, period_7d, period_30d, period_all)
 - Partitioning per categoria
@@ -578,5 +597,5 @@ Documenti che verranno costruiti nelle prossime sessioni:
 
 ---
 
-*Fine Documento 4 — Wireframes — Pagina 5 (Leaderboard)*
-*Continua con Pagina 6 (Admin) nella sessione successiva*
+_Fine Documento 4 — Wireframes — Pagina 5 (Leaderboard)_
+_Continua con Pagina 6 (Admin) nella sessione successiva_

@@ -1,4 +1,5 @@
 # PROMPT OPERATIVO — SPRINT 1.1.2
+
 ## Init Next.js 16 project con stack base
 
 > Preparato da: Cowork (Claude Desktop)
@@ -17,6 +18,7 @@ Stai iniziando lo **Sprint 1.1.2** di Predimark V2. Il repo è già inizializzat
 **Obiettivo**: scaffoldare il progetto Next.js 16 nella cartella esistente, configurare lo stack base (TypeScript strict, Tailwind 4, pacchetti core), e fare il primo push del codice su GitHub.
 
 **Stack obbligatorio:**
+
 - Next.js 16 (App Router + Turbopack)
 - React 19
 - TypeScript strict (no `any`)
@@ -59,6 +61,7 @@ npx create-next-app@latest . --typescript --app --tailwind --turbopack
 ```
 
 Quando `create-next-app` chiede:
+
 - **Would you like to use ESLint?** → Yes
 - **Would you like to use `src/` directory?** → No (usiamo `app/` nella root)
 - **Would you like to customize the import alias?** → Yes → usa `@/*`
@@ -100,7 +103,7 @@ rm -f tailwind.config.ts tailwind.config.js
 2. Sostituisci il contenuto di `app/globals.css` con questo template base (i design tokens completi arriveranno in Sprint 1.1.3):
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* ============================================
@@ -207,6 +210,7 @@ npm run dev
 ```
 
 Apri `http://localhost:3000` e verifica che:
+
 - La pagina si carica senza errori
 - I badge colorati sono visibili
 - Nessun errore nella console del browser
@@ -287,5 +291,5 @@ Pronto per Sprint 1.1.3 — Setup design tokens globals.css.
 
 ---
 
-*Prompt preparato da Cowork — Predimark V2 Sprint 1.1.2*
-*Prossimo sprint: 1.1.3 — Setup design tokens globals.css completi*
+_Prompt preparato da Cowork — Predimark V2 Sprint 1.1.2_
+_Prossimo sprint: 1.1.3 — Setup design tokens globals.css completi_

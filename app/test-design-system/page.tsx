@@ -1,16 +1,25 @@
 export default function TestDesignSystem() {
   return (
     <main className="min-h-screen p-8" style={{ background: 'var(--color-bg-primary)' }}>
-      <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-4xl)' }}>
+      <h1
+        className="text-4xl font-bold mb-2"
+        style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-4xl)' }}
+      >
         Design System
       </h1>
-      <p className="mb-12" style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
+      <p
+        className="mb-12"
+        style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}
+      >
         Predimark V2 — Sprint 1.1.3
       </p>
 
       {/* PALETTE */}
       <section className="mb-12">
-        <h2 className="mb-4 font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-2xl)' }}>
+        <h2
+          className="mb-4 font-semibold"
+          style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-2xl)' }}
+        >
           Colors
         </h2>
         <div className="flex flex-wrap gap-3">
@@ -35,7 +44,9 @@ export default function TestDesignSystem() {
                   border: border ? '1px solid var(--color-border-strong)' : undefined,
                 }}
               />
-              <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>{label}</span>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>
+                {label}
+              </span>
             </div>
           ))}
         </div>
@@ -43,28 +54,36 @@ export default function TestDesignSystem() {
 
       {/* CATEGORY COLORS */}
       <section className="mb-12">
-        <h2 className="mb-4 font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-xl)' }}>
+        <h2
+          className="mb-4 font-semibold"
+          style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-xl)' }}
+        >
           Category Colors
         </h2>
         <div className="flex flex-wrap gap-2">
-          {['sport', 'politics', 'crypto', 'culture', 'news', 'geopolitics', 'economy', 'tech'].map((cat) => (
-            <span
-              key={cat}
-              className="px-3 py-1 rounded-full text-white font-medium"
-              style={{
-                background: `var(--color-cat-${cat})`,
-                fontSize: 'var(--text-sm)',
-              }}
-            >
-              {cat}
-            </span>
-          ))}
+          {['sport', 'politics', 'crypto', 'culture', 'news', 'geopolitics', 'economy', 'tech'].map(
+            (cat) => (
+              <span
+                key={cat}
+                className="px-3 py-1 rounded-full text-white font-medium"
+                style={{
+                  background: `var(--color-cat-${cat})`,
+                  fontSize: 'var(--text-sm)',
+                }}
+              >
+                {cat}
+              </span>
+            )
+          )}
         </div>
       </section>
 
       {/* TYPOGRAPHY */}
       <section className="mb-12">
-        <h2 className="mb-4 font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-2xl)' }}>
+        <h2
+          className="mb-4 font-semibold"
+          style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-2xl)' }}
+        >
           Typography
         </h2>
         <div className="space-y-2">
@@ -80,7 +99,10 @@ export default function TestDesignSystem() {
             { label: 'text-sm / 13px', size: 'var(--text-sm)', weight: 400 },
             { label: 'text-xs / 11px', size: 'var(--text-xs)', weight: 400 },
           ].map(({ label, size, weight }) => (
-            <div key={label} style={{ fontSize: size, fontWeight: weight, color: 'var(--color-text-primary)' }}>
+            <div
+              key={label}
+              style={{ fontSize: size, fontWeight: weight, color: 'var(--color-text-primary)' }}
+            >
               {label}
             </div>
           ))}
@@ -89,7 +111,10 @@ export default function TestDesignSystem() {
 
       {/* BORDER RADIUS */}
       <section className="mb-12">
-        <h2 className="mb-4 font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-xl)' }}>
+        <h2
+          className="mb-4 font-semibold"
+          style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-xl)' }}
+        >
           Border Radius
         </h2>
         <div className="flex flex-wrap gap-4 items-end">
@@ -110,7 +135,9 @@ export default function TestDesignSystem() {
                   background: 'var(--color-cta)',
                 }}
               />
-              <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>{label}</span>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>
+                {label}
+              </span>
             </div>
           ))}
         </div>
@@ -118,7 +145,10 @@ export default function TestDesignSystem() {
 
       {/* ANIMATIONS */}
       <section className="mb-12">
-        <h2 className="mb-4 font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-xl)' }}>
+        <h2
+          className="mb-4 font-semibold"
+          style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-xl)' }}
+        >
           Animations
         </h2>
         <div className="flex gap-6 items-center">
@@ -127,28 +157,53 @@ export default function TestDesignSystem() {
               className="live-dot w-3 h-3 rounded-full"
               style={{ background: 'var(--color-live)' }}
             />
-            <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>live-dot</span>
+            <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>
+              live-dot
+            </span>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <div
-              className="skeleton w-32 h-4 rounded"
-            />
-            <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>skeleton</span>
+            <div className="skeleton w-32 h-4 rounded" />
+            <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>
+              skeleton
+            </span>
           </div>
         </div>
       </section>
 
       {/* SEMANTIC BADGES */}
       <section className="mb-12">
-        <h2 className="mb-4 font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-xl)' }}>
+        <h2
+          className="mb-4 font-semibold"
+          style={{ color: 'var(--color-text-primary)', fontSize: 'var(--text-xl)' }}
+        >
           Semantic Badges
         </h2>
         <div className="flex flex-wrap gap-3">
           {[
-            { label: 'Success', bg: 'var(--color-success-bg)', color: 'var(--color-success)', border: 'var(--color-success)' },
-            { label: 'Danger', bg: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: 'var(--color-danger)' },
-            { label: 'CTA', bg: 'var(--color-cta-bg)', color: 'var(--color-cta)', border: 'var(--color-cta)' },
-            { label: 'Warning', bg: 'var(--color-warning-bg)', color: 'var(--color-warning)', border: 'var(--color-warning)' },
+            {
+              label: 'Success',
+              bg: 'var(--color-success-bg)',
+              color: 'var(--color-success)',
+              border: 'var(--color-success)',
+            },
+            {
+              label: 'Danger',
+              bg: 'var(--color-danger-bg)',
+              color: 'var(--color-danger)',
+              border: 'var(--color-danger)',
+            },
+            {
+              label: 'CTA',
+              bg: 'var(--color-cta-bg)',
+              color: 'var(--color-cta)',
+              border: 'var(--color-cta)',
+            },
+            {
+              label: 'Warning',
+              bg: 'var(--color-warning-bg)',
+              color: 'var(--color-warning)',
+              border: 'var(--color-warning)',
+            },
           ].map(({ label, bg, color, border }) => (
             <span
               key={label}
@@ -168,7 +223,8 @@ export default function TestDesignSystem() {
       </section>
 
       <p style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>
-        Nota: per verificare light mode, usa DevTools → Rendering → Emulate CSS media → prefers-color-scheme: light
+        Nota: per verificare light mode, usa DevTools → Rendering → Emulate CSS media →
+        prefers-color-scheme: light
       </p>
     </main>
   )

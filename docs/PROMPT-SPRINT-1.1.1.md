@@ -1,4 +1,5 @@
 # PROMPT OPERATIVO — SPRINT 1.1.1
+
 ## Setup credenziali GitHub per Claude in VS Code
 
 > Preparato da: Cowork (Claude Desktop)
@@ -15,6 +16,7 @@
 Stai iniziando il progetto **Predimark V2** — una web-app di prediction markets builder sopra Polymarket. Questo è lo **Sprint 1.1.1**, il primo sprint in assoluto del progetto.
 
 **Divisione dei ruoli importante:**
+
 - **Cowork** gestisce tutto il database Supabase direttamente via MCP — tu non tocchi mai `supabase CLI`, non applichi migrations, non crei progetti. Il DB è già configurato e pronto.
 - **Tu (Claude in VS Code)** scrivi codice Next.js, fai commit, push, PR su GitHub.
 - Il file `.env.local` con tutte le chiavi Supabase è **già pronto** nella root del progetto — non devi crearlo, solo verificare che esista.
@@ -29,8 +31,8 @@ Questo sprint configura solo le credenziali GitHub per poter fare commit e push.
 
 Un solo valore ti serve:
 
-| Variabile | Dove ottenerla |
-|---|---|
+| Variabile    | Dove ottenerla                                                                                                                                  |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `GITHUB_PAT` | GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token → scope: `repo`, `workflow`, `read:org` |
 
 > ⚠️ Se il PAT manca, **fermati e chiedi a Feliciano** di generarlo prima di continuare.
@@ -220,5 +222,5 @@ Pronto per Sprint 1.1.2 — Init Next.js 16 project.
 
 ---
 
-*Prompt preparato da Cowork — Predimark V2 Sprint 1.1.1*
-*Prossimo sprint: 1.1.2 — Init Next.js 16 project con stack base*
+_Prompt preparato da Cowork — Predimark V2 Sprint 1.1.1_
+_Prossimo sprint: 1.1.2 — Init Next.js 16 project con stack base_

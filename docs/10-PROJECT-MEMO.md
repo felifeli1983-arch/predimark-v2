@@ -21,9 +21,11 @@ Se sei un **agente AI o uno sviluppatore** che sta lavorando su questo progetto,
 **Predimark V2** è una web-app di prediction markets builder sopra Polymarket. È un rebuild da zero della V1 esistente, mira a essere **prediction-only** (no lineup mode), **target globale** (no Italia per real trading), e ha **ambizioni di lancio ottobre 2026**.
 
 ### Value proposition in 1 riga
-*"Polymarket, ma con segnali algoritmici, copy trading, demo mode, e zero complessità crypto."*
+
+_"Polymarket, ma con segnali algoritmici, copy trading, demo mode, e zero complessità crypto."_
 
 ### Cosa lo distingue
+
 - **Onboarding fintech** (signup email/Google, no wallet manager, deposito carta)
 - **Segnali algoritmici** real-time per ogni mercato + log pubblico delle performance
 - **Copy trading ibrido** (Verified Creators interni + Top Trader esterni Polymarket on-chain)
@@ -32,6 +34,7 @@ Se sei un **agente AI o uno sviluppatore** che sta lavorando su questo progetto,
 - **Multilingua** EN + ES + PT + IT + FR
 
 ### Cosa NON è
+
 - Non è un casinò (sono mercati di previsione, non azzardo)
 - Non è custodial (utenti hanno sempre il controllo dei loro fondi)
 - Non è solo italiano (è globale, italiano una delle lingue)
@@ -62,21 +65,21 @@ Se sei un **agente AI o uno sviluppatore** che sta lavorando su questo progetto,
 
 ### Chi fa cosa (tabella riassuntiva)
 
-| Operazione | Responsabile |
-|---|---|
-| **Decisioni strategiche** ("vogliamo questa feature?") | Feliciano |
-| **Direzione prodotto** | Feliciano |
-| **Marketing + lancio** | Feliciano |
-| **Configurazione runtime** (fees, feature flags via admin pannello) | Feliciano (UI clicca-clicca) |
-| **Lettura documentazione + decisioni implementative** | Cowork |
-| **Preparazione prompt operativi** | Cowork |
-| **Review codice + acceptance criteria** | Cowork |
-| **Aggiornare HANDOFF-LOG** | Cowork |
-| **Scrivere tutto il codice** | Claude in VS Code |
-| **Git: commit, push, PR, merge** | Claude in VS Code |
-| **Supabase: applicare migrations (staging E production)** | Claude in VS Code |
-| **Deploy edge functions** | GitHub Actions automatico |
-| **Run tests** | Claude in VS Code + GitHub Actions |
+| Operazione                                                          | Responsabile                       |
+| ------------------------------------------------------------------- | ---------------------------------- |
+| **Decisioni strategiche** ("vogliamo questa feature?")              | Feliciano                          |
+| **Direzione prodotto**                                              | Feliciano                          |
+| **Marketing + lancio**                                              | Feliciano                          |
+| **Configurazione runtime** (fees, feature flags via admin pannello) | Feliciano (UI clicca-clicca)       |
+| **Lettura documentazione + decisioni implementative**               | Cowork                             |
+| **Preparazione prompt operativi**                                   | Cowork                             |
+| **Review codice + acceptance criteria**                             | Cowork                             |
+| **Aggiornare HANDOFF-LOG**                                          | Cowork                             |
+| **Scrivere tutto il codice**                                        | Claude in VS Code                  |
+| **Git: commit, push, PR, merge**                                    | Claude in VS Code                  |
+| **Supabase: applicare migrations (staging E production)**           | Claude in VS Code                  |
+| **Deploy edge functions**                                           | GitHub Actions automatico          |
+| **Run tests**                                                       | Claude in VS Code + GitHub Actions |
 
 ---
 
@@ -89,6 +92,7 @@ Se sei un **agente AI o uno sviluppatore** che sta lavorando su questo progetto,
 **Tu sei Claude in VS Code, l'esecutore del progetto Predimark V2.**
 
 Il tuo ruolo:
+
 1. **Ricevi prompt operativi** da Feliciano (via copy-paste). I prompt sono preparati da Cowork.
 2. **Esegui il task descritto** nel prompt scrivendo codice, eseguendo comandi, applicando migrations, gestendo git.
 3. **Aspetti il prossimo prompt** dopo aver completato lo sprint corrente. Non agisci di tua iniziativa fuori dal task.
@@ -96,12 +100,14 @@ Il tuo ruolo:
 ### 3.2 — Cosa hai a disposizione
 
 Nella cartella `~/predimark-v2/` trovi:
+
 - `docs/` — tutti i 10 documenti del progetto. Consultali quando il prompt fa riferimento a un Doc specifico
 - `app/`, `components/`, `lib/`, `supabase/` — codice del progetto (vuoto inizialmente)
 - `.env.local` — env vars con credenziali (Privy, Supabase, GitHub PAT, MoonPay, Anthropic API)
 - `package.json` — dipendenze npm
 
 Hai accesso a:
+
 - **Filesystem locale** della cartella `~/predimark-v2/`
 - **Git CLI** con Personal Access Token configurato (puoi push, mergiare PR)
 - **Supabase CLI** con service role keys (puoi applicare migrations a staging e production)
@@ -111,6 +117,7 @@ Hai accesso a:
 ### 3.3 — Cosa NON fare
 
 **Mai**:
+
 - ❌ Iniziare a scrivere codice senza un prompt esplicito da Feliciano
 - ❌ Decidere autonomamente di aggiungere feature non richieste
 - ❌ Cambiare architettura/stack senza approvazione (lo stack è fissato in Doc 5)
@@ -122,6 +129,7 @@ Hai accesso a:
 - ❌ Fare refactor di file fuori dallo scope dello sprint corrente
 
 **Sempre**:
+
 - ✅ Leggere il prompt fino in fondo prima di iniziare
 - ✅ Consultare i Doc referenziati (es. "vedi Doc 6 sezione 1.1")
 - ✅ Lavorare su feature branch (`feature/sprint-X.Y.Z-short-desc`)
@@ -178,18 +186,21 @@ Quando ricevi un prompt da Feliciano:
 ### 3.6 — Convenzioni di codice
 
 **TypeScript**:
+
 - `strict: true` sempre
 - Niente `any` (usa `unknown` se davvero non sai)
 - Tipi espliciti per export pubblici
 - Interface > Type per oggetti, Type per union/literal
 
 **React**:
+
 - Functional components con hooks
 - Server Components di default in App Router (Next 16)
 - Client Components SOLO quando servono (state, event handlers, browser APIs) — usa `'use client'`
 - Custom hooks per logica condivisa
 
 **File naming**:
+
 - Componenti: `PascalCase.tsx` (es. `EventCard.tsx`)
 - Hooks: `useCamelCase.ts` (es. `useLiveMidpoint.ts`)
 - Utilities: `camelCase.ts` (es. `formatPrice.ts`)
@@ -197,21 +208,25 @@ Quando ricevi un prompt da Feliciano:
 - Routes App Router: `kebab-case` per folder
 
 **Imports**:
+
 - Absolute paths con `@/` (es. `import { Button } from '@/components/ui/button'`)
 - Mai relativi profondi (`../../../`)
 
 **Styling**:
+
 - Solo Tailwind classes che riferiscono CSS vars in `globals.css`
 - Niente colori hardcoded, niente inline styles (eccetto valori dinamici come progress bar width)
 - Niente emoji nelle UI (sempre Lucide React icons)
 
 **Comments**:
+
 - Spiega il "perché", non il "cosa" (il codice già dice il cosa)
 - TODO: con descrizione chiara + nome ("TODO: handle edge case X — Cowork")
 
 ### 3.7 — Quando uno sprint è "done"
 
 Uno sprint è completato quando:
+
 - ✅ Tutti gli acceptance criteria del Doc 9 sono verificati
 - ✅ Codice committato e pushato su feature branch
 - ✅ PR aperta con descrizione completa
@@ -225,12 +240,14 @@ Niente sprint "parzialmente completato". O è done o non è done.
 ### 3.8 — Cosa fai all'inizio di una nuova sessione
 
 Se è la **primissima volta** che lavori sul progetto:
+
 1. Leggi questo Doc 10 fino in fondo
 2. Apri `~/predimark-v2/docs/HANDOFF-LOG.md` per vedere lo stato corrente
 3. Apri `~/predimark-v2/docs/09-ROADMAP-AND-SPRINT-PLAN-v2.md` per vedere gli sprint
 4. Aspetta il prompt di Feliciano
 
 Se è una **sessione successiva** (continui dopo break):
+
 1. Apri HANDOFF-LOG per vedere ultimo sprint chiuso
 2. Verifica che la cartella sia in stato pulito (`git status`)
 3. Aspetta il prompt
@@ -246,6 +263,7 @@ Se è una **sessione successiva** (continui dopo break):
 **Tu sei Cowork, l'architetto e planner del progetto Predimark V2.**
 
 Il tuo ruolo:
+
 1. **Leggi i Doc 1-10** all'inizio del progetto (e re-leggi quando ne aggiorni uno)
 2. **Prepari prompt operativi** per Claude in VS Code, basandoti sugli sprint nel Doc 9
 3. **Verifichi** il codice prodotto da Claude in VS Code (review + acceptance criteria)
@@ -257,10 +275,13 @@ Il tuo ruolo:
 Quando arriva il momento di iniziare uno sprint:
 
 #### Step 1: identifica lo sprint
+
 Leggi HANDOFF-LOG per vedere ultimo chiuso. Trova il prossimo sprint nel Doc 9 v2 (rispettando dipendenze).
 
 #### Step 2: raccogli il contesto
+
 Leggi nel Doc 9 v2:
+
 - Sprint ID + titolo
 - Cosa produce
 - Acceptance criteria
@@ -269,29 +290,34 @@ Leggi nel Doc 9 v2:
 Apri i Doc 1-8 referenziati e prendi le sezioni rilevanti.
 
 #### Step 3: scrivi il prompt
+
 Format raccomandato:
 
 ```markdown
 ## SPRINT [ID]: [Titolo]
 
 ### Contesto
+
 Stiamo costruendo Predimark V2. Il setup è già fatto (vedi HANDOFF-LOG per stato corrente).
 Per questo sprint, riferiti a:
+
 - Doc 9 v2 sezione [Y.Y.Y]
 - Doc [N] sezione [X.X]
 
 ### Task
+
 [Descrizione del task in 2-3 frasi.]
 
 [INCLUDI INLINE le sezioni rilevanti dei Doc, es:]
 **Schema da implementare** (da Doc 6 sezione 1.1):
 \`\`\`sql
 CREATE TABLE users (
-  ... [SQL completo copiato dal Doc 6] ...
+... [SQL completo copiato dal Doc 6] ...
 );
 \`\`\`
 
 ### Step operativi
+
 1. Crea feature branch: `feature/sprint-X.Y.Z-short-desc`
 2. [Step concreto 1]
 3. [Step concreto 2]
@@ -300,11 +326,13 @@ CREATE TABLE users (
 6. Push + PR
 
 ### Acceptance criteria
+
 - [ ] [Criterion 1]
 - [ ] [Criterion 2]
 - [ ] [Criterion 3]
 
 ### Note
+
 - [Eventuale gotcha specifico]
 - [Riferimento a codice V1 da riusare se applicabile]
 - [Cosa segnalarmi se non chiaro]
@@ -313,12 +341,15 @@ Iniziamo. Procedi quando pronto.
 ```
 
 #### Step 4: condividi con Feliciano
+
 Scrivi il prompt in chat con Feliciano. Lui lo copy-paste in VS Code.
 
 #### Step 5: aspetta esecuzione
+
 Claude in VS Code lavora. Quando finisce, segnala in chat ("Sprint X.Y.Z completato, PR aperta #N").
 
 #### Step 6: review codice
+
 - Apri la PR su GitHub
 - Verifica acceptance criteria uno per uno
 - Test manuale se necessario
@@ -326,6 +357,7 @@ Claude in VS Code lavora. Quando finisce, segnala in chat ("Sprint X.Y.Z complet
 - Se non OK: lista cosa fixare
 
 #### Step 7: aggiorna HANDOFF-LOG
+
 Aggiungi entry sprint chiuso. Scegli prossimo sprint. Loop.
 
 ### 4.3 — Best practice per i prompt
@@ -343,6 +375,7 @@ Aggiungi entry sprint chiuso. Scegli prossimo sprint. Loop.
 ### 4.4 — Quando consultare Feliciano
 
 Decisioni che richiedono Feliciano:
+
 - ⚠️ Cambio scope sprint (es. "questo sprint è troppo grande, lo divido?")
 - ⚠️ Conflitto tra Doc (es. Doc 4 dice X, Doc 6 dice Y)
 - ⚠️ Decisione strategica (es. "manteniamo questa feature o la spostiamo a V1.1?")
@@ -350,6 +383,7 @@ Decisioni che richiedono Feliciano:
 - ⚠️ Rischio costi (es. "questo richiede passare a Supabase Pro $25/mese")
 
 Decisioni che NON richiedono Feliciano (decidi tu):
+
 - ✅ Naming di funzioni interne, file, branch
 - ✅ Ordine sprint paralleli (se non hanno dipendenze)
 - ✅ Dettagli implementativi (es. quale lib usare per X tra 2 simili)
@@ -555,30 +589,39 @@ Se sei Feliciano, Cowork, o Claude in VS Code e oggi è il **primo giorno** di l
 ## PARTE 8 — FAQ TECNICHE
 
 ### Q: Quale Node version usare?
+
 A: Node 20 LTS o superiore. Specificare in `.nvmrc`.
 
 ### Q: Come gestisco env vars senza esporle?
+
 A: Tutte le secrets in `.env.local` (gitignored). Service role keys mai in `NEXT_PUBLIC_*`. In Vercel, configura env vars per environment (development/staging/production).
 
 ### Q: Posso modificare i Doc se trovo errori?
+
 A: **Sì, ma con processo**. Cowork può segnalare errori a Feliciano. Se Feliciano approva, Cowork può aggiornare il Doc e bumpare la versione (es. v3 → v4) con changelog. Claude in VS Code non modifica Doc senza prompt esplicito.
 
 ### Q: Cosa faccio se uno sprint richiede una libreria non prevista nel Doc 5?
+
 A: **Cowork** valuta. Se è una lib piccola (utility) → ok aggiungere senza problemi. Se è un sostituto di lib core (es. cambiare wagmi con qualcos'altro) → Cowork chiede a Feliciano. Aggiornare Doc 5 di conseguenza.
 
 ### Q: Come si gestiscono breaking changes Polymarket?
+
 A: Monitor changelog Polymarket. Se cambiano API, aprire issue dedicata, sprint hotfix. La logica Polymarket è isolata in `lib/polymarket/`, quindi cambi lì.
 
 ### Q: Il progetto V1 esiste, posso copiare codice da V1?
+
 A: **Sì, espressamente raccomandato** per pattern collaudati: client Polymarket, classify event, charts SVG custom, WebSocket singleton, trading scaffold V2. Cowork lo segnala nei prompt. Mai copiare lineup mode (eliminato in V2) o PrediCoin (eliminato).
 
 ### Q: Cosa NON deve mai entrare nel codice committato?
+
 A: Service role keys, password, JWT tokens, API keys delle integration in plain text, dati personali utenti, log con email/IP, file `.env.local`.
 
 ### Q: Come gestisco i bug in produzione?
+
 A: Hotfix branch dal main → fix → PR → merge → deploy. Documentare in HANDOFF-LOG sotto "Hotfix" section.
 
 ### Q: Cosa faccio se Cowork e Claude in VS Code "non si parlano" bene?
+
 A: Tu (Feliciano) sei sempre l'intermediario. Se uno fa qualcosa di sbagliato, l'altro segnala a te. Tu decidi. Mai bypassare il loop.
 
 ---
@@ -588,6 +631,7 @@ A: Tu (Feliciano) sei sempre l'intermediario. Se uno fa qualcosa di sbagliato, l
 ### Account & credenziali
 
 **Feliciano possiede e gestisce**:
+
 - GitHub organization Predimark
 - Account Vercel (con team members)
 - Account Supabase (staging + production projects)
@@ -599,6 +643,7 @@ A: Tu (Feliciano) sei sempre l'intermediario. Se uno fa qualcosa di sbagliato, l
 - Email aziendale + dominio predimark.com
 
 **Cowork e Claude in VS Code accedono via**:
+
 - Personal Access Token GitHub (configurato in env locale Claude in VS Code)
 - Service role keys Supabase (configurate in env locale)
 - API keys per servizi esterni (in `.env.local`)
@@ -618,24 +663,25 @@ A: Tu (Feliciano) sei sempre l'intermediario. Se uno fa qualcosa di sbagliato, l
 
 Per riferimento rapido, cosa contiene ogni documento:
 
-| Doc | Nome | Cosa contiene | Audience |
-|---|---|---|---|
-| 1 | Vision & Product (v3) | Cosa costruiamo, perché, target user, modello economico | Tutti |
-| 2 | User Stories | 41 user stories in 10 flussi | Cowork (per validare features) |
-| 3 | Sitemap | ~95 routes del prodotto | Cowork (per orientarsi) |
-| 4 | Wireframes (7 pagine) | Layout dettagliato di Home, Evento, Profilo, Creator, Leaderboard, Admin, Signup | Cowork (per implementare UI) |
-| 5 | Tech Stack & Architettura | Next 16 + Supabase + Privy + ... | Cowork + Claude VS Code |
-| 6 | Database Schema | 25 tabelle SQL complete | Cowork + Claude VS Code |
-| 7 | API Design | ~80 endpoint REST + WebSocket | Cowork + Claude VS Code |
-| 8 | Design System | Colori, tipografia, componenti | Cowork + Claude VS Code |
-| 9 | Roadmap & Sprint Plan (v2) | 92 sprint distribuiti in 8 macro aree | Cowork (per preparare prompt) |
-| 10 | Project Memo | Questo file: onboarding, ruoli, glossario | Tutti |
+| Doc | Nome                       | Cosa contiene                                                                    | Audience                       |
+| --- | -------------------------- | -------------------------------------------------------------------------------- | ------------------------------ |
+| 1   | Vision & Product (v3)      | Cosa costruiamo, perché, target user, modello economico                          | Tutti                          |
+| 2   | User Stories               | 41 user stories in 10 flussi                                                     | Cowork (per validare features) |
+| 3   | Sitemap                    | ~95 routes del prodotto                                                          | Cowork (per orientarsi)        |
+| 4   | Wireframes (7 pagine)      | Layout dettagliato di Home, Evento, Profilo, Creator, Leaderboard, Admin, Signup | Cowork (per implementare UI)   |
+| 5   | Tech Stack & Architettura  | Next 16 + Supabase + Privy + ...                                                 | Cowork + Claude VS Code        |
+| 6   | Database Schema            | 25 tabelle SQL complete                                                          | Cowork + Claude VS Code        |
+| 7   | API Design                 | ~80 endpoint REST + WebSocket                                                    | Cowork + Claude VS Code        |
+| 8   | Design System              | Colori, tipografia, componenti                                                   | Cowork + Claude VS Code        |
+| 9   | Roadmap & Sprint Plan (v2) | 92 sprint distribuiti in 8 macro aree                                            | Cowork (per preparare prompt)  |
+| 10  | Project Memo               | Questo file: onboarding, ruoli, glossario                                        | Tutti                          |
 
 ---
 
 ## PARTE 11 — STATO INIZIALE PROGETTO
 
 Quando inizi (sprint 1.1.1):
+
 - ✅ Documentazione completa (10 doc)
 - ✅ Decisioni architetturali prese
 - ✅ Roadmap definita (92 sprint)
@@ -676,6 +722,7 @@ Quando devi prendere una decisione e i Doc non sono chiari:
 Questo è l'**ultimo documento** del progetto Predimark V2. Con i 10 documenti completi, il sistema è **pronto a essere avviato**.
 
 **Cosa succede adesso**:
+
 1. Feliciano copia i 10 documenti nella cartella `~/predimark-v2/docs/`
 2. Cowork legge tutto e prepara il primo prompt (Sprint 1.1.1)
 3. Loop di sprint inizia
@@ -687,5 +734,5 @@ Questo è l'**ultimo documento** del progetto Predimark V2. Con i 10 documenti c
 
 ---
 
-*Fine Documento 10 — Project Memo*
-*Fine del set documentale Predimark V2 (10 documenti totali)*
+_Fine Documento 10 — Project Memo_
+_Fine del set documentale Predimark V2 (10 documenti totali)_

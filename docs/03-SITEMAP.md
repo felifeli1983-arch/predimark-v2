@@ -6,6 +6,7 @@
 > Status: bozza v2 — sincronizzata con Doc 1 v3 e decisioni di Doc 4-9
 >
 > **Changelog v2 (rispetto a v1)**:
+>
 > - **Eliminata `/market/[id]`** (deep view): l'espansione orderbook è inline accordion in pagina evento (Doc 4 Pagina 2)
 > - **Demo mode separato architetturalmente**: aggiunte routes `/me/demo/*` parallele a `/me/*`
 > - **Distinzione esplicita** `/creator/[username]` (Verified Creators) vs `/trader/[address]` (External Polymarket)
@@ -25,6 +26,7 @@ Questo documento elenca **tutte le pagine** di Predimark V2, organizzate ad albe
 - Pianificare lo sviluppo pagina per pagina
 
 **Scelte architetturali finali (v2)**:
+
 - **Pagina 3 eliminata**: niente `/market/[id]` standalone, espansione inline accordion in pagina evento
 - **Demo mode separato architetturalmente** in `/me/demo/*` parallelo a `/me/*` (decisione Doc 1 v3 + Doc 4)
 - **Creator Program** con due URL distinti: `/creator/[username]` (Verified Predimark) vs `/trader/[address]` (External Polymarket esterno con disclaimer)
@@ -380,40 +382,45 @@ Switch nell'header: [REAL] ↔ [DEMO]
 
 ## Riassunto numerico (v2)
 
-| Categoria | Numero pagine |
-|---|---|
-| Pubbliche | 15 (rimossa /market/[id], aggiunta /signals/performance) |
-| Auth flow | 6 |
-| Profilo personale REAL | 22 |
-| Profilo personale DEMO (parallelo) | 7 |
-| Wallet & Trading | inglobato in /me/deposit, /me/withdraw, /me/kyc |
-| Creator Program (Verified + External distinti) | 4 routes principali |
-| Admin Panel | **36 sub-pages** in 12 gruppi (allineato Doc 4 Pagina 6) |
-| API Routes (`/api/v1/*` versioned) | ~80 endpoint dettagliati in Doc 7 |
-| PWA + Errori | 6 |
-| **Totale routes UI distinte** | **~110 route** |
+| Categoria                                      | Numero pagine                                            |
+| ---------------------------------------------- | -------------------------------------------------------- |
+| Pubbliche                                      | 15 (rimossa /market/[id], aggiunta /signals/performance) |
+| Auth flow                                      | 6                                                        |
+| Profilo personale REAL                         | 22                                                       |
+| Profilo personale DEMO (parallelo)             | 7                                                        |
+| Wallet & Trading                               | inglobato in /me/deposit, /me/withdraw, /me/kyc          |
+| Creator Program (Verified + External distinti) | 4 routes principali                                      |
+| Admin Panel                                    | **36 sub-pages** in 12 gruppi (allineato Doc 4 Pagina 6) |
+| API Routes (`/api/v1/*` versioned)             | ~80 endpoint dettagliati in Doc 7                        |
+| PWA + Errori                                   | 6                                                        |
+| **Totale routes UI distinte**                  | **~110 route**                                           |
 
 ---
 
 ## Convenzioni URL (v2)
 
 ### Slug human-readable per contenuti pubblici
+
 - `/event/2026-fifa-world-cup-winner` (no ID, slug pulito)
 - `/creator/theo4` (username scelto dal Verified Creator)
 
 ### Address per External Traders
+
 - `/trader/0x9d84ce0306...` (wallet address Ethereum, no slug — sono trader esterni non verificati)
 
 ### ID per contenuti tecnici
+
 - `/admin/users/[uuid]` (UUID Supabase)
 - `/admin/markets/[id]` (UUID Supabase)
 
 ### Query params per filtri/stato
+
 - `/leaderboard?period=30d&category=crypto&sort=roi&trader_type=verified`
 - `/?cat=sport&tag=premier-league`
 - Filtri salvabili → URL condivisibile con un click
 
 ### Demo mode: NO query param, ma route separate
+
 **v2 cambio importante**: il demo NON è più gestito via switch globale in `/me/*`, ma ha route separate `/me/demo/*` parallele a `/me/*`.
 
 - `/me/positions` → posizioni REAL
@@ -422,6 +429,7 @@ Switch nell'header: [REAL] ↔ [DEMO]
 Lo switch in header redirect tra le due route. Più chiaro a livello architetturale.
 
 ### API versioning
+
 - `/api/v1/*` per tutte le API attuali
 - Breaking changes futuri → `/api/v2/*`
 
@@ -430,26 +438,34 @@ Lo switch in header redirect tra le due route. Più chiaro a livello architettur
 ## Middleware e regole di accesso
 
 ### Middleware 1 — Auth check
+
 Applicato a:
+
 - `/me/*` → redirect a `/login` se non autenticato
 - `/creator/dashboard/*` → redirect se non autenticato (E non opt-in creator)
 - `/admin/*` → redirect E check ruolo admin
 - `/deposit`, `/withdraw`, `/trade/*` → redirect se non autenticato
 
 ### Middleware 2 — Geo-block
+
 Applicato a:
+
 - `/deposit`, `/withdraw`, `/trade/*` → redirect a `/geo-blocked` se IP da paese vietato
 - Altre pagine → header con banner "Trading not available in your region"
 
 Lista paesi geo-bloccati gestita in admin (configurabile runtime), default Polymarket geoblock list.
 
 ### Middleware 3 — Demo gate
+
 Applicato a:
+
 - `/deposit`, `/withdraw` → disabilitato in modalità Demo (toast "Switch to Real mode to deposit")
 - Tutto il resto: funziona uguale, switch globale gestisce il dataset
 
 ### Middleware 4 — Rate limit
+
 Applicato a:
+
 - `/api/*` → rate limit per IP/utente (vari livelli per tipo endpoint)
 - Login/signup → rate limit aggressivo per evitare brute force
 
@@ -458,12 +474,14 @@ Applicato a:
 ## Navigazione globale
 
 ### Header desktop
+
 ```
 [Logo Predimark] [Markets ▼] [Signals] [Leaderboard] [News] [Creator]
                                                               [Search] [REAL/DEMO switch] [🔔] [Profile ▼]
 ```
 
 ### Header mobile
+
 ```
 [☰ Menu] [Logo] [REAL/DEMO] [🔔] [Profile]
 ```
@@ -471,6 +489,7 @@ Applicato a:
 Menu hamburger contiene tutte le voci di navigazione + lingua + logout.
 
 ### Footer (sempre visibile, multi-colonna desktop, accordion mobile)
+
 ```
 PRODUCT          COMPANY          LEGAL                CONNECT
 - Markets        - About          - Terms              - Twitter
@@ -483,6 +502,7 @@ PRODUCT          COMPANY          LEGAL                CONNECT
 ```
 
 ### Bet Slip Drawer (multi-predizione)
+
 - Bottone fluttuante quando contiene mercati ("Bet Slip · 3" badge)
 - Slide-in da destra (desktop) / bottom (mobile)
 - Lista mercati selezionati con importo per ognuno
@@ -491,10 +511,11 @@ PRODUCT          COMPANY          LEGAL                CONNECT
 - Persiste tra navigazioni (Zustand persist)
 
 ### Switch Real/Demo (sempre visibile)
+
 - Toggle prominente nell'header
 - Default: Real (per utenti loggati che hanno depositato)
 - Default: Demo (per utenti loggati senza depositi)
-- Click cambia stato globale → tutte le pagine /me/* si aggiornano
+- Click cambia stato globale → tutte le pagine /me/\* si aggiornano
 - Persiste tra sessioni
 
 ---
@@ -502,6 +523,7 @@ PRODUCT          COMPANY          LEGAL                CONNECT
 ## Differenze rispetto a Predimark V1
 
 ### Pagine NUOVE in V2
+
 - `/signals` (lista segnali dedicata)
 - `/signals/performance` (calibration globale algoritmi — differenziatore)
 - `/trader/[address]` (profilo Top Trader Polymarket esterno con disclaimer)
@@ -517,11 +539,13 @@ PRODUCT          COMPANY          LEGAL                CONNECT
 - `/geo-blocked`, `/legal/responsible-trading`, `/about`, `/pricing`
 
 ### Pagine ELIMINATE da V1
+
 - `/me/lineups` e `/me/lineups/[id]` (lineup mode rimossa, V2 prediction-only)
 - `/prizes` e `/shop` (PrediCoin economy rimossa)
 - **`/market/[id]` (deep view eliminata in v2)** — l'espansione del singolo market è ora inline accordion in `/event/[slug]`
 
 ### Pagine MIGLIORATE da V1
+
 - `/` Home (5 CardKind, hero card grandi Dribbble-style, sidebar adattiva)
 - `/event/[slug]` (5 layout dedicati: binary, multi_outcome, multi_strike, h2h_sport, crypto_up_down) + espansione orderbook inline
 - `/leaderboard` (architettura ibrida adattiva 1-tab → 2-tab + Sharpe sort speciale)
@@ -530,13 +554,13 @@ PRODUCT          COMPANY          LEGAL                CONNECT
 
 ### Nuove distinzioni architetturali in v2
 
-| Aspetto | V1 | V2 |
-|---|---|---|
-| Profilo trader | Tutto in `/trader/[address]` indistinto | `/creator/[username]` (Verified) vs `/trader/[address]` (External) con disclaimer |
-| Demo mode | Switch globale, no route separate | Sub-pages `/me/demo/*` parallele con DB filter |
-| Leaderboard | 2 tab fisse (All / Verified) | Ibrida adattiva 1-tab → 2-tab (admin runtime) |
-| Pagina mercato singolo | `/market/[id]` standalone | Inline accordion in `/event/[slug]` |
-| API endpoints | `/api/polymarket/*` proxy | `/api/v1/*` resourceful versioning |
+| Aspetto                | V1                                      | V2                                                                                |
+| ---------------------- | --------------------------------------- | --------------------------------------------------------------------------------- |
+| Profilo trader         | Tutto in `/trader/[address]` indistinto | `/creator/[username]` (Verified) vs `/trader/[address]` (External) con disclaimer |
+| Demo mode              | Switch globale, no route separate       | Sub-pages `/me/demo/*` parallele con DB filter                                    |
+| Leaderboard            | 2 tab fisse (All / Verified)            | Ibrida adattiva 1-tab → 2-tab (admin runtime)                                     |
+| Pagina mercato singolo | `/market/[id]` standalone               | Inline accordion in `/event/[slug]`                                               |
+| API endpoints          | `/api/polymarket/*` proxy               | `/api/v1/*` resourceful versioning                                                |
 
 ---
 
@@ -552,6 +576,6 @@ PRODUCT          COMPANY          LEGAL                CONNECT
 
 ---
 
-*Fine Documento 3 v2 — Sitemap*
+_Fine Documento 3 v2 — Sitemap_
 
-*Fine Documento 3 — Sitemap*
+_Fine Documento 3 — Sitemap_

@@ -13,6 +13,7 @@
 Questo documento descrive la **Pagina Profilo Creator** (`/creator/[username]`) e il pattern simile per i **Top Trader esterni Polymarket** (`/trader/[address]`).
 
 Predimark adotta un'**architettura ibrida** dei creator/trader:
+
 - **Verified Creators**: utenti opt-in al programma Predimark, profilo completo, copy trading con revenue share 30%
 - **Top Traders Polymarket**: trader esterni monitorati via dati pubblici on-chain, profilo minimo, copy trading senza revenue al trader
 
@@ -24,20 +25,20 @@ Entrambi accessibili dalla **leaderboard ibrida** (descritta in Pagina 5).
 
 ### Architettura ibrida creator + trader
 
-| Aspetto | Verified Creator | Top Trader Polymarket |
-|---|---|---|
-| URL | `/creator/[username]` | `/trader/[address]` |
-| Identità | Username + foto + bio | Address troncato (0x9d84...0306) o nickname Polymarket |
-| Verifica | ✓ Verified badge | Nessun badge |
-| Onboarding | Opt-in via `/creator/apply` | Automatico (dati pubblici on-chain) |
-| Profilo | Completo: bio, social, score, achievements | Minimo: solo metriche on-chain |
-| Copy trading | ✅ Sì, con revenue share 30% al creator | ✅ Sì, senza revenue al trader (è esterno) |
-| Posizioni aperte | Pubbliche con delay 30 min | Sempre pubbliche (sono on-chain) |
-| Trade history | Dettagliato pubblico | Dettagliato pubblico (on-chain) |
-| Notifiche follow | Real-time push/email/Telegram | Polling on-chain (latency ~30s) |
-| Score Predimark | Calcolato (87/100 visibile) | Score "External" o "Public Wallet" |
-| Revenue share | 30% builder fee va al creator | 0% (trader esterno non sa) |
-| Disclaimer | Nessuno | "Trader non partner Predimark" |
+| Aspetto          | Verified Creator                           | Top Trader Polymarket                                  |
+| ---------------- | ------------------------------------------ | ------------------------------------------------------ |
+| URL              | `/creator/[username]`                      | `/trader/[address]`                                    |
+| Identità         | Username + foto + bio                      | Address troncato (0x9d84...0306) o nickname Polymarket |
+| Verifica         | ✓ Verified badge                           | Nessun badge                                           |
+| Onboarding       | Opt-in via `/creator/apply`                | Automatico (dati pubblici on-chain)                    |
+| Profilo          | Completo: bio, social, score, achievements | Minimo: solo metriche on-chain                         |
+| Copy trading     | ✅ Sì, con revenue share 30% al creator    | ✅ Sì, senza revenue al trader (è esterno)             |
+| Posizioni aperte | Pubbliche con delay 30 min                 | Sempre pubbliche (sono on-chain)                       |
+| Trade history    | Dettagliato pubblico                       | Dettagliato pubblico (on-chain)                        |
+| Notifiche follow | Real-time push/email/Telegram              | Polling on-chain (latency ~30s)                        |
+| Score Predimark  | Calcolato (87/100 visibile)                | Score "External" o "Public Wallet"                     |
+| Revenue share    | 30% builder fee va al creator              | 0% (trader esterno non sa)                             |
+| Disclaimer       | Nessuno                                    | "Trader non partner Predimark"                         |
 
 ### Perché questa scelta
 
@@ -211,6 +212,7 @@ PREDIMARK SCORE: 87/100  🏆 Tier: Gold
 ```
 
 **Score 0-100** calcolato da algoritmo proprietario che combina:
+
 - P&L cumulato (peso 25%)
 - Win rate (peso 20%)
 - Sharpe ratio (peso 20%)
@@ -219,6 +221,7 @@ PREDIMARK SCORE: 87/100  🏆 Tier: Gold
 - Community trust (followers, comments helpful — peso 10%)
 
 **Tier**:
+
 - 🏆 **Gold** (90-100): top elite
 - 🥈 **Silver** (75-89): consolidated trader
 - 🥉 **Bronze** (60-74): emerging trader
@@ -230,40 +233,50 @@ Tier mostrato come **icona colorata** accanto al numero. Tooltip explains: "Calc
 ### Bottoni azione (5 stati)
 
 #### Stato 1: Visitatore non loggato
+
 ```
 [ Follow @theo4 ]    [ Start Copy Trading → ]
    (outlined)             (filled blue)
 ```
+
 Click su qualsiasi → dialog "Crea account o accedi per usare questa funzione"
 
 #### Stato 2: Loggato + creator NON opt-in copy
+
 ```
 [ Follow @theo4 ]
    (filled blue)
 
 ⓘ Questo creator non offre copy trading
 ```
+
 Solo Follow visibile. Tooltip esplicativo.
 
 #### Stato 3: Loggato + creator opt-in copy
+
 ```
 [ Follow @theo4 ]    [ Start Copy Trading → ]
    (outlined)             (filled blue prominent)
 ```
+
 Entrambi attivi.
 
 #### Stato 4: Già segue
+
 ```
 [ ✓ Following ]    [ Start Copy Trading → ]
    (success green)       (filled blue)
 ```
+
 Follow diventa "Following" verde. Click → unfollow con dialog conferma.
 
 #### Stato 5: Già fa copy (e segue)
+
 ```
 [ ✓ Following ]    [ Manage Copy → ]
    (success green)       (outlined neutral)
 ```
+
 "Manage Copy" → naviga a `/me/sessions` per gestire/revocare la session.
 
 ### Bottoni secondari (sempre)
@@ -294,6 +307,7 @@ Follow diventa "Following" verde. Click → unfollow con dialog conferma.
    - **Privacy mode** (opzionale del creator): scale anonimizzata (mostra %, non $)
 
 2. **Posizioni aperte top 5** (con delay 30 min):
+
    ```
    Posizioni aperte di @theo4
    ┌──────────────────────────────────────────────────┐
@@ -344,6 +358,7 @@ Follow diventa "Following" verde. Click → unfollow con dialog conferma.
 ```
 
 Stessa struttura di `/me/positions` ma:
+
 - **Niente bottoni Sell/Trade** (sono posizioni del creator, non tue)
 - **Bottone "Copy this trade"** su ogni card (replica il singolo trade sul tuo wallet)
 - **Bottone "Vai al market"** per navigare alla pagina evento
@@ -355,12 +370,14 @@ Stessa struttura di `/me/positions` ma:
 ### Layout
 
 Stesso pattern di `/me/history`:
+
 - Header con totali (profit cumulato, win rate, trade count)
 - Filtri (Tutti/Vinti/Persi/Per categoria/Per periodo)
 - Sort (più recenti, P&L, hold time)
 - Lista verticale completa con badge WIN/LOSS
 
 **Differenze**:
+
 - Nessun "Export CSV" (privacy: solo lui può esportare i suoi)
 - Card cliccabile → naviga al market (per vedere come è andata)
 
@@ -371,6 +388,7 @@ Stesso pattern di `/me/history`:
 ### Layout
 
 Stesso pattern di `/me/stats` ma **pubblico**:
+
 - 8 metriche cards (P&L, Win rate, ROI, Trade count, Volume, Drawdown, Sharpe, Best trade)
 - Equity curve dettagliata
 - P&L per categoria (bar chart)
@@ -378,12 +396,14 @@ Stesso pattern di `/me/stats` ma **pubblico**:
 - Top 3 best/worst trade
 
 **Differenze**:
+
 - Periodo selezionabile: 7g/30g/90g/1y/all-time
 - Niente dati privati (saldo USDC, dettagli wallet)
 
 ### Calibration curve pubblica
 
 Il creator viene **valutato** dalla community in base a quanto è "calibrato":
+
 - Linea sotto diagonale = sovrastima → meno credibilità su Yes
 - Linea sopra diagonale = sottostima → più credibilità su Yes
 - Linea sulla diagonale = ben calibrato → trader affidabile
@@ -415,6 +435,7 @@ Il creator viene **valutato** dalla community in base a quanto è "calibrato":
 ```
 
 Feed cronologico di tutti i commenti pubblici lasciati dal creator sui mercati. Utile per:
+
 - Capire il "thinking" del creator
 - Vedere se la sua tesi convince
 - Engagement community
@@ -443,18 +464,18 @@ Feed cronologico di tutti i commenti pubblici lasciati dal creator sui mercati. 
 
 ### Elementi sostituiti per Top Trader esterno
 
-| Elemento | Verified Creator | Top Trader esterno |
-|---|---|---|
-| Avatar | Foto reale del creator | Icona generica (avatar gradient da hash address) |
-| Nome | Username + nome reale | Address troncato (0x9d84...0306) + nickname Polymarket se esiste |
-| Badge | ✓ Verified Creator | ⚠ External Trader |
-| Bio | Bio scelta dal creator | Niente (esterno non ha profilo) |
-| Social | Link sito/Twitter/Discord | Niente |
-| Score Predimark | 87/100 + Tier Gold | "External Wallet" (no calibration interna) |
-| Achievements | Sì (sbloccati su Predimark) | Niente |
-| Comments tab | Sì | Niente (commenti sono solo per utenti Predimark) |
-| Posizioni delay | 30 minuti (privacy creator) | Tempo reale (sono on-chain pubbliche da subito) |
-| Notifiche follow | Real-time push/email/Telegram | Polling on-chain (latency ~30s) |
+| Elemento         | Verified Creator              | Top Trader esterno                                               |
+| ---------------- | ----------------------------- | ---------------------------------------------------------------- |
+| Avatar           | Foto reale del creator        | Icona generica (avatar gradient da hash address)                 |
+| Nome             | Username + nome reale         | Address troncato (0x9d84...0306) + nickname Polymarket se esiste |
+| Badge            | ✓ Verified Creator            | ⚠ External Trader                                                |
+| Bio              | Bio scelta dal creator        | Niente (esterno non ha profilo)                                  |
+| Social           | Link sito/Twitter/Discord     | Niente                                                           |
+| Score Predimark  | 87/100 + Tier Gold            | "External Wallet" (no calibration interna)                       |
+| Achievements     | Sì (sbloccati su Predimark)   | Niente                                                           |
+| Comments tab     | Sì                            | Niente (commenti sono solo per utenti Predimark)                 |
+| Posizioni delay  | 30 minuti (privacy creator)   | Tempo reale (sono on-chain pubbliche da subito)                  |
+| Notifiche follow | Real-time push/email/Telegram | Polling on-chain (latency ~30s)                                  |
 
 ### Disclaimer prominente sempre visibile
 
@@ -475,11 +496,13 @@ Background giallo soft (non blu come info, non rosso come errore — è un warni
 ### Bottoni azione modificati
 
 **Copy Trading button con caution mark**:
+
 ```
 [ Start Copy Trading ⚠ → ]
 ```
 
 Click apre dialog speciale:
+
 ```
 ┌────────────────────────────────────────────────────────────┐
 │ Copy Trading External Trader                              │
@@ -665,23 +688,28 @@ Status: Pending review
 ## STATI DELLE PAGINE CREATOR
 
 ### Default
+
 Layout completo con dati real-time.
 
 ### Loading
+
 Skeleton placeholder per hero, metriche, contenuto tab.
 
 ### Empty state — Creator nuovo (poche posizioni/trade)
+
 ```
 "@theo4 ha appena iniziato"
 Ancora poche posizioni e trade. Torna presto per vedere come va.
 ```
 
 ### Creator non più attivo (suspended o opt-out)
+
 - Banner rosso in cima: "Questo creator non è più attivo"
 - Bottoni Follow/Copy disabilitati
 - Storico ancora visibile per trasparenza
 
 ### Errore (creator non esiste)
+
 404 standard con link "Torna a leaderboard".
 
 ---
@@ -699,27 +727,32 @@ Ancora poche posizioni e trade. Torna presto per vedere come va.
 ### Click su Follow
 
 Loggato:
+
 1. Click su "Follow" → API `/api/copy/follow`
 2. Bottone diventa "✓ Following" verde con animazione
 3. Notifiche per questo creator attivate (push + email + Telegram in base a settings)
 4. Toast "You're now following @theo4"
 
 Non loggato:
+
 1. Click → dialog "Crea account o accedi per seguire"
 2. Bottoni "Sign up" + "Login"
 
 ### Click su Copy Trading
 
 Loggato + creator opt-in:
+
 1. Click su "Start Copy Trading" → naviga a `/me/sessions/new?creator=theo4`
 2. Wizard setup session keys (definito in Pagina /me sessions)
 3. Conferma + firma Privy
 4. Toast "Copy trading attivato per @theo4"
 
 Loggato + creator NON opt-in:
+
 - Bottone non visibile
 
 Non loggato:
+
 - Dialog signup
 
 ### Click su Copy this trade (su una posizione singola)
@@ -734,19 +767,19 @@ Non loggato:
 
 ## DIFFERENZE TRA `/creator/[username]` E `/trader/[address]` — RIASSUNTO
 
-| Sezione | Verified Creator | Top Trader esterno |
-|---|---|---|
-| Hero | Foto + nome + bio + social + Score 87/100 + Tier Gold | Address + Polymarket nickname + Score "External" + warning |
-| Bottoni | [Follow] + [Copy] (filled) | [Follow] + [Copy ⚠] (con caution + dialog speciale) |
-| Disclaimer | Nessuno | Banner permanente "Trader esterno" |
-| Tab Overview | Equity + Posizioni delay 30min + Last trade + Achievements | Equity + Posizioni real-time + Last trade (no Achievements) |
-| Tab Positions | Lista con delay 30 min | Lista in real-time on-chain |
-| Tab History | Lista completa con bottoni Copy | Lista completa on-chain con bottoni Copy ⚠ |
-| Tab Stats | Tutte le metriche + Calibration curve | Solo metriche on-chain (no Calibration interna) |
-| Tab Comments | Sì | NO |
-| Notifiche follow | Push + email + Telegram real-time | Polling on-chain (delay ~30s) |
-| Revenue share | Sì 30% | No (esterno non sa) |
-| Service fee Predimark | Builder fee 0.5% (su tutti) | Builder fee 0.5% + Service fee 1% sui profitti |
+| Sezione               | Verified Creator                                           | Top Trader esterno                                          |
+| --------------------- | ---------------------------------------------------------- | ----------------------------------------------------------- |
+| Hero                  | Foto + nome + bio + social + Score 87/100 + Tier Gold      | Address + Polymarket nickname + Score "External" + warning  |
+| Bottoni               | [Follow] + [Copy] (filled)                                 | [Follow] + [Copy ⚠] (con caution + dialog speciale)         |
+| Disclaimer            | Nessuno                                                    | Banner permanente "Trader esterno"                          |
+| Tab Overview          | Equity + Posizioni delay 30min + Last trade + Achievements | Equity + Posizioni real-time + Last trade (no Achievements) |
+| Tab Positions         | Lista con delay 30 min                                     | Lista in real-time on-chain                                 |
+| Tab History           | Lista completa con bottoni Copy                            | Lista completa on-chain con bottoni Copy ⚠                  |
+| Tab Stats             | Tutte le metriche + Calibration curve                      | Solo metriche on-chain (no Calibration interna)             |
+| Tab Comments          | Sì                                                         | NO                                                          |
+| Notifiche follow      | Push + email + Telegram real-time                          | Polling on-chain (delay ~30s)                               |
+| Revenue share         | Sì 30%                                                     | No (esterno non sa)                                         |
+| Service fee Predimark | Builder fee 0.5% (su tutti)                                | Builder fee 0.5% + Service fee 1% sui profitti              |
 
 ---
 
@@ -779,6 +812,7 @@ Non loggato:
 ### Dati e API
 
 **Per Verified Creator**:
+
 - `/api/creator/[username]` — profilo completo
 - `/api/creator/[username]/positions` (con delay 30 min server-side)
 - `/api/creator/[username]/history` — trade chiusi
@@ -786,6 +820,7 @@ Non loggato:
 - `/api/creator/[username]/comments` — feed commenti
 
 **Per Top Trader esterno**:
+
 - Polymarket Data API `/leaderboard` per identificare top trader
 - Polymarket Data API `/positions?address=X` per posizioni live
 - Polymarket Data API `/trades?address=X` per history
@@ -830,5 +865,5 @@ Documenti che verranno costruiti nelle prossime sessioni:
 
 ---
 
-*Fine Documento 4 — Wireframes — Pagina 4 (Profilo creator)*
-*Continua con Pagina 5 (Leaderboard) nella sessione successiva*
+_Fine Documento 4 — Wireframes — Pagina 4 (Profilo creator)_
+_Continua con Pagina 5 (Leaderboard) nella sessione successiva_
