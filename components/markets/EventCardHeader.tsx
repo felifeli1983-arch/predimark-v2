@@ -31,10 +31,15 @@ export function EventCardHeader({
   return (
     <div
       style={{
+        /* Altezza fissa: tutte le card hanno body che parte dalla stessa Y.
+         * 80 = padding 12 top/bottom + slot 56 (titolo 2 righe + gap + tags). */
+        height: 80,
         display: 'flex',
         alignItems: 'flex-start',
         gap: '12px',
         padding: '12px',
+        flexShrink: 0,
+        boxSizing: 'border-box',
       }}
     >
       {/* Avatar/Image */}
@@ -68,7 +73,16 @@ export function EventCardHeader({
       </div>
 
       {/* Title + tags */}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+          height: '100%',
+        }}
+      >
         <h3
           className="line-clamp-2"
           style={{
@@ -79,6 +93,9 @@ export function EventCardHeader({
             color: 'var(--color-text-primary)',
             wordBreak: 'break-word',
             overflow: 'hidden',
+            /* min-height = 2 * fontSize * lineHeight: riserva sempre 2 righe
+             * anche se titolo è breve, così tags+separator restano alla stessa Y. */
+            minHeight: '2.6em',
           }}
         >
           {title}
