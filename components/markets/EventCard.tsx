@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { BinaryCard } from './cards/BinaryCard'
+import { MultiOutcomeCard } from './cards/MultiOutcomeCard'
+import { MultiStrikeCard } from './cards/MultiStrikeCard'
 
 interface EventCardProps {
   event: AuktoraEvent
@@ -42,17 +44,21 @@ function PlaceholderCard({ label }: { label: string }) {
 }
 
 export function EventCard({ event, onBookmark, onAddToSlip }: EventCardProps) {
-  const adapter = onAddToSlip
+  const binaryAdapter = onAddToSlip
     ? (eventId: string, outcome: 'yes' | 'no') => onAddToSlip(eventId, outcome)
     : undefined
 
   return (
     <Link href={`/event/${event.slug}`} style={cardStyle} className="hover-lift">
       {event.kind === 'binary' && (
-        <BinaryCard event={event} onBookmark={onBookmark} onAddToSlip={adapter} />
+        <BinaryCard event={event} onBookmark={onBookmark} onAddToSlip={binaryAdapter} />
       )}
-      {event.kind === 'multi_outcome' && <PlaceholderCard label="Multi outcome — coming soon" />}
-      {event.kind === 'multi_strike' && <PlaceholderCard label="Multi strike — coming soon" />}
+      {event.kind === 'multi_outcome' && (
+        <MultiOutcomeCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
+      )}
+      {event.kind === 'multi_strike' && (
+        <MultiStrikeCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
+      )}
       {event.kind === 'h2h_sport' && <PlaceholderCard label="H2H Sport — coming soon" />}
       {event.kind === 'crypto_up_down' && <PlaceholderCard label="Crypto — coming soon" />}
     </Link>

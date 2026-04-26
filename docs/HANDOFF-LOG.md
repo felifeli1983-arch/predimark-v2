@@ -7,15 +7,30 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.2.4 (WebSocket RTDS)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.3.2 (EventCard Multi-outcome + Multi-strike)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout globale ✅. Step 3.2 Polymarket API ✅. Sprint 3.2.3 WebSocket CLOB ✅. Sprint 3.3.1 EventCard Binary ✅. Rename→Auktora ✅. Fix tema ✅. Badge Slip rinviato a MA4. Prossimo: 3.2.4 RTDS WS → poi 3.3.2/3.3.3/3.3.4 card → poi 3.4.1 Home layout.
+- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 Layout ✅. Step 3.2 Polymarket API + WS layer ✅ (3.2.1/3.2.3/3.2.4). Sprint 3.3.1 EventCard Binary ✅. Prossimo: 3.3.2 → 3.3.3 → 3.3.4 card → 3.4.1 Home layout. Badge Slip rinviato a MA4.
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 3.2.4 — WebSocket RTDS singleton
+
+- **Chiuso**: 2026-04-26
+- **Commit**: `027d4a7` — feat: WebSocket RTDS singleton — activity feed + crypto live prices (3.2.4)
+- **Output**:
+  - `lib/ws/rtds.ts` (84 righe) — wrapper RTDS: `subscribeToActivity`, `subscribeToCryptoPrices`. URL: `wss://rpc.polymarket.com`. Topic: `activity` / `crypto_prices` (Binance) / `crypto_prices_chainlink` (Chainlink). Filter symbol case-insensitive inline nel listener
+  - `lib/ws/hooks/useCryptoLivePrice.ts` (54 righe) — `'use client'`, ritorna `{ price, change24h, loading }` per `symbol + source`. Reset su cambio parametri
+  - `lib/ws/hooks/useLiveActivity.ts` (61 righe) — `'use client'`, ritorna ultimi N trade, opzione `marketId` per filtraggio per mercato (usata dalla Crypto card live betting feed)
+- **Acceptance criteria**: `npx tsc --noEmit` exit 0 ✅, `npx eslint .` exit 0 ✅, 38/38 test pass ✅, `npm run build` exit 0 ✅, tutti i file ≤150 righe ✅
+- **Decisioni architetturali**:
+  - `SingletonWS` riusato senza modifiche — CLOB e RTDS sono connessioni separate automaticamente per URL diversi
+  - Regola sorgente prezzo rispettata: `source: 'chainlink'` → topic `crypto_prices_chainlink` (round 5m/15m), `source: 'binance'` → `crypto_prices` (round 1h/1d). Scelta delegata al consumer (la CryptoCard in 3.3.4 calcolerà la durata del round e passerà la source corretta)
+  - 1 `eslint-disable` mirato su pattern `setState` in reset subscription
+- **PR**: N/A
 
 ### ✅ Sprint 3.2.3 — WebSocket CLOB singleton
 
