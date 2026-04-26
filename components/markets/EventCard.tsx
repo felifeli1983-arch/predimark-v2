@@ -14,18 +14,17 @@ interface EventCardProps {
   onAddToSlip?: (eventId: string, outcome: string) => void
 }
 
+/*
+ * Altezza fissa standard per TUTTE le 5 variants (Doc 4 wireframe non
+ * specifica un'altezza in pixel ma il design vuole coerenza visiva fra
+ * variant — header ~70 + body ~210 + footer ~40 = 320).
+ */
+const CARD_HEIGHT = 320
+
 const cardStyle: React.CSSProperties = {
-  /*
-   * Wrapper flex column + height 100% per allineare footer fra variants:
-   * - grid stretcha già le righe alla card più alta (default align-items: stretch);
-   * - questo Link riempie la cella verticalmente;
-   * - ogni variant ha body con flex:1 → footer in fondo, allineato.
-   * Nessun min-height hardcoded: rispetta l'altezza naturale del contenuto
-   * (Doc 8 sez. 3.3 non specifica altezza, solo padding 16px e radius 12).
-   */
   display: 'flex',
   flexDirection: 'column',
-  height: '100%',
+  height: CARD_HEIGHT,
   background: 'var(--color-bg-secondary)',
   border: '1px solid var(--color-border-default)',
   borderRadius: 12,
