@@ -6,7 +6,7 @@ import {
   Home,
   Search,
   Zap,
-  ShoppingCart,
+  Ticket,
   MoreHorizontal,
   User,
   Bookmark,
@@ -57,7 +57,7 @@ const NAV_ITEMS = [
   { href: '/', icon: Home, label: 'Home' },
   { href: '/search', icon: Search, label: 'Search' },
   { href: '/signals', icon: Zap, label: 'Signals' },
-  { href: '/slip', icon: ShoppingCart, label: 'Slip' },
+  { href: '/slip', icon: Ticket, label: 'Slip' },
 ]
 
 export function BottomNav() {

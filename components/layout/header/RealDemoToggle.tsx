@@ -1,6 +1,6 @@
 'use client'
 
-import { Zap } from 'lucide-react'
+import { Banknote, Coins } from 'lucide-react'
 
 interface Props {
   isDemo: boolean
@@ -31,7 +31,7 @@ export function RealDemoToggle({ isDemo, onToggle }: Props) {
         letterSpacing: '0.05em',
       }}
     >
-      <Zap size={11} />
+      {isDemo ? <Coins size={11} /> : <Banknote size={11} />}
       {isDemo ? 'DEMO' : 'REAL'}
     </button>
   )
