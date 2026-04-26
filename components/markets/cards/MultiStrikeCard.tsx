@@ -50,6 +50,7 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
     <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
         title={event.title}
+        subtitle={event.description ?? null}
         image={event.image}
         tags={event.tags}
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
