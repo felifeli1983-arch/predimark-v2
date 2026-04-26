@@ -7,8 +7,8 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: 1.5.2 (da iniziare — Vitest + React Testing Library)
-- **Prossimo sprint**: 1.5.3 / 1.3.1 (Privy, se account pronto)
+- **Sprint corrente**: 1.5.3 (da iniziare — Docs + README)
+- **Prossimo sprint**: 1.3.1 (Privy, se account pronto) / 1.4.1 (Vercel, se account pronto)
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
 - **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata
@@ -16,6 +16,23 @@
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 1.5.2 — Vitest + React Testing Library
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente)
+- **Output**:
+  - Vitest 4.x con jsdom environment, `globals: true`
+  - React Testing Library + jest-dom matchers
+  - `vitest.config.ts` con alias `@/*` e coverage v8
+  - `vitest.setup.ts` con triple-slash reference `/// <reference types="vitest/globals" />` + `@testing-library/jest-dom`
+  - `lib/__tests__/utils.test.ts`: 3 test su `formatUSDC`
+  - `components/__tests__/Badge.test.tsx`: 4 test su componente Badge inline
+  - Script npm: `test`, `test:watch`, `test:ui`, `test:coverage`
+  - `validate` aggiornato: `typecheck && lint && test`
+  - Commit `de164f0` pushato su `main`
+- **Note**: Claude in VS Code ha usato `/// <reference types="vitest/globals" />` invece di aggiungere `vitest/globals` a `tsconfig.json.compilerOptions.types` — scelta corretta, evita di disabilitare l'auto-discovery dei `@types/*` che romperebbe Next.js
+- **PR**: N/A
 
 ### ✅ Sprint 1.5.1 — ESLint + Prettier + Husky pre-commit
 
@@ -139,7 +156,7 @@
 
 | MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
 | --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
-| MA1 | Foundation & Setup            | 4                 | 12            | ⏳ In corso                              |
+| MA1 | Foundation & Setup            | 5                 | 12            | ⏳ In corso                              |
 | MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
 | MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
 | MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
@@ -148,7 +165,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
 
-**Totale sprint**: 4 / 92
+**Totale sprint**: 5 / 92
 
 ---
 

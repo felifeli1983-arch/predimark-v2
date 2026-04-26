@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Predimark V2
 
-## Getting Started
+Prediction markets platform — powered by Polymarket.
 
-First, run the development server:
+## Stack
+
+- **Framework**: Next.js 16 + React 19 + TypeScript (strict)
+- **Styling**: Tailwind 4 (`@theme` in `globals.css`)
+- **State**: Zustand + TanStack Query v5
+- **Auth**: Privy (setup pendente)
+- **Database**: Supabase (staging + production — gestito da Cowork)
+- **Testing**: Vitest + React Testing Library
+- **Linting**: ESLint 9 flat config + Prettier + Husky pre-commit
+
+## Dev
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev          # avvia su localhost:3001
+npm run typecheck    # type check
+npm run lint         # eslint
+npm run test         # vitest run
+npm run validate     # typecheck + lint + test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Testing
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run test          # run once
+npm run test:watch    # watch mode
+npm run test:coverage # with coverage
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Struttura
 
-## Learn More
+```
+app/                  # Next.js App Router
+components/           # componenti React riutilizzabili
+  __tests__/          # test componenti
+lib/                  # utility e helpers
+  __tests__/          # test utility
+docs/                 # documentazione interna e prompt sprint
+public/               # asset statici
+supabase/migrations/  # migration DB (gestite da Cowork via MCP)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Variabili d'ambiente
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Copia `.env.example` in `.env.local` e compila con i valori reali:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+cp .env.example .env.local
+```
 
-## Deploy on Vercel
+## Note
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Porta default: 3001 (3000 potrebbe essere occupata)
+- Supabase DB gestito interamente da Cowork via MCP — non usare Supabase CLI
+- Documenti di design e sprint prompt in `docs/`
