@@ -17,6 +17,26 @@
 
 ## Sprint completati
 
+### ✅ Sprint 2.6.1 — POST /api/v1/auth/session — Privy JWT + geo-block + upsert user
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente)
+- **Output**:
+  - `@privy-io/server-auth@1.32.5` installato
+  - `lib/privy/server.ts` — singleton `PrivyClient`, `verifyPrivyToken()`, `getPrivyUser()`
+  - `lib/geo/resolveGeoBlock.ts` — `cf-ipcountry`/`x-vercel-ip-country` header → lookup `geo_blocks` → `allowed`/`demo_only`/`blocked`
+  - `app/api/v1/auth/session/route.ts` — handler `POST` con 401/403/500 handling
+  - 4 nuovi test (auth_missing, auth_invalid, geo_blocked, 200 ok)
+  - 17 test totali passati in 6 file, `npm run build` exit 0, `npm run validate` exit 0
+  - Commit `527faea` (database.types.ts 39 tabelle, --no-verify) + `1283bab` (sprint 2.6.1) pushati su `main`
+- **Intoppi risolti da Claude in VS Code**:
+  - `next dev` rimasto in background da sessione precedente teneva risorse: killato → typecheck tornato funzionante
+  - `node_modules` corrotto dopo installazioni multiple (stesso pattern commander): `rm -rf node_modules package-lock.json && npm install` → risolto
+- **Note**:
+  - RLS recursion segnalata da Claude in VS Code come "ancora pendente" — **in realtà già risolta**: Migration 013 applicata da Cowork su staging e production nella stessa giornata (vedi entry sotto). L'endpoint usa `createAdminClient` (bypass RLS) quindi non è impattato in ogni caso.
+  - Due flussi sync coesistono deliberatamente: `syncUserToSupabase` (Server Action, client-side login) + `/api/v1/auth/session` (API endpoint, JWT verification completa)
+- **PR**: N/A
+
 ### ✅ Fix Vercel Production Env Vars (fuori-sprint, post MA1)
 
 - **Chiuso**: 2026-04-26
@@ -301,16 +321,16 @@
 
 ## Riepilogo macro aree
 
-| MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
-| --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
-| MA1 | Foundation & Setup            | 12                | 12            | ✅ Completata                            |
-| MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
-| MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
-| MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
-| MA5 | User Profile & Demo           | 0                 | 9             | ⚪ Non iniziata                          |
-| MA6 | Creator Program & Leaderboard | 0                 | 11            | ⚪ Non iniziata                          |
-| MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
-| MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
+| MA  | Nome                          | Sprint completati | Sprint totali | Status                                        |
+| --- | ----------------------------- | ----------------- | ------------- | --------------------------------------------- |
+| MA1 | Foundation & Setup            | 12                | 12            | ✅ Completata                                 |
+| MA2 | Database & Auth               | 1 (su 2 rimasti)  | 11            | 🔶 DB anticipato da Cowork, Step 2.6 in corso |
+| MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                               |
+| MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                               |
+| MA5 | User Profile & Demo           | 0                 | 9             | ⚪ Non iniziata                               |
+| MA6 | Creator Program & Leaderboard | 0                 | 11            | ⚪ Non iniziata                               |
+| MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                               |
+| MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                               |
 
 **Totale sprint**: 12 / 92
 
