@@ -1,30 +1,56 @@
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-8 p-8">
+    <main
+      className="min-h-screen flex flex-col items-center justify-center gap-8 p-8"
+      style={{ background: 'var(--color-bg-primary)' }}
+    >
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-brand-primary)' }}>
+        <h1
+          className="font-bold mb-2"
+          style={{
+            color: 'var(--color-cta)',
+            fontSize: 'var(--text-4xl)',
+            fontWeight: 'var(--font-weight-bold)',
+          }}
+        >
           Predimark V2
         </h1>
-        <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+        <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-lg)' }}>
           Prediction markets, simplified.
         </p>
       </div>
 
       <div className="flex gap-3">
-        <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-900 text-green-300">
-          Next.js ✓
-        </span>
-        <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-900 text-blue-300">
-          Tailwind 4 ✓
-        </span>
-        <span className="px-3 py-1 rounded-full text-sm font-medium bg-purple-900 text-purple-300">
-          TypeScript ✓
-        </span>
+        {[
+          { label: 'Next.js ✓', bg: 'var(--color-success-bg)', color: 'var(--color-success)', border: 'var(--color-success)' },
+          { label: 'Tailwind 4 ✓', bg: 'var(--color-cta-bg)', color: 'var(--color-cta)', border: 'var(--color-cta)' },
+          { label: 'TypeScript ✓', bg: '#a855f715', color: 'var(--color-cat-culture)', border: 'var(--color-cat-culture)' },
+        ].map(({ label, bg, color, border }) => (
+          <span
+            key={label}
+            className="px-3 py-1 font-medium"
+            style={{
+              background: bg,
+              color,
+              border: `1px solid ${border}`,
+              borderRadius: 'var(--radius-full)',
+              fontSize: 'var(--text-sm)',
+            }}
+          >
+            {label}
+          </span>
+        ))}
       </div>
 
-      <p style={{ color: 'var(--color-text-muted)' }} className="text-sm">
-        Sprint 1.1.2 completato — stack base operativo
-      </p>
+      <a
+        href="/test-design-system"
+        style={{
+          color: 'var(--color-cta)',
+          fontSize: 'var(--text-sm)',
+        }}
+      >
+        → Apri test design system
+      </a>
     </main>
   )
 }

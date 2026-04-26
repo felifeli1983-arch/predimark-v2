@@ -7,8 +7,8 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: 1.1.2 (da iniziare — Init Next.js 16 project)
-- **Prossimo sprint**: 1.1.3
+- **Sprint corrente**: 1.1.3 (da iniziare — Design tokens globals.css completi)
+- **Prossimo sprint**: 1.1.4 o 1.5.1 (ESLint/Prettier)
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
 - **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata
@@ -16,6 +16,22 @@
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 1.1.2 — Init Next.js 16 project con stack base
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente)
+- **Output**:
+  - Next.js 16.2.4 + React 19.2.4 scaffoldato nella cartella esistente
+  - TypeScript strict (`strict: true` + `noUncheckedIndexedAccess: true`)
+  - Tailwind 4 via `@theme` in `globals.css` — no `tailwind.config.ts`
+  - Pacchetti: `lucide-react ^1.11.0`, `@tanstack/react-query ^5.100.5`, `zustand ^5.0.12`
+  - Home page placeholder funzionante su localhost:3001
+  - Commit `060af81` pushato su `main`
+- **Note**:
+  - `.gitignore` sostituito da create-next-app con versione migliore (`.env` + `.env.*` + `!.env.example`)
+  - `CLAUDE.md` → `AGENTS.md` generati automaticamente con istruzioni Next.js 16 per agenti — utili, lasciati
+  - Port 3001 usato (3000 occupato) — nessun impatto funzionale
+- **PR**: N/A (push diretto su main — CI non ancora configurata)
 
 ### ✅ Sprint 1.1.1 — Setup credenziali GitHub
 - **Chiuso**: 2026-04-26
@@ -92,7 +108,7 @@
 
 | MA | Nome | Sprint completati | Sprint totali | Status |
 |---|---|---|---|---|
-| MA1 | Foundation & Setup | 1 | 12 | ⏳ In corso |
+| MA1 | Foundation & Setup | 2 | 12 | ⏳ In corso |
 | MA2 | Database & Auth | ~10 | 11 | 🔶 DB setup anticipato da Cowork via MCP |
 | MA3 | Core Pages | 0 | 14 | ⚪ Non iniziata |
 | MA4 | Trading Core | 0 | 12 | ⚪ Non iniziata |
@@ -101,7 +117,7 @@
 | MA7 | Admin Panel | 0 | 13 | ⚪ Non iniziata |
 | MA8 | Polish, Testing, Launch | 0 | 10 | ⚪ Non iniziata |
 
-**Totale sprint**: 1 / 92
+**Totale sprint**: 2 / 92
 
 ---
 
