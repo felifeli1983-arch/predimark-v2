@@ -17,6 +17,25 @@
 
 ## Sprint completati
 
+### ✅ Decisioni architetturali — file split obbligatori (Cowork, fuori-sprint)
+
+- **Chiuso**: 2026-04-26
+- **Eseguito da**: Cowork (decisione architetturale + aggiornamento docs)
+- **Motivazione**: `Header.tsx` già a 611 righe allo sprint 3.1.1. La roadmap prevede componenti ben più complessi (event page con 5 layout, TradeWidget con EIP-712, admin panel). Senza regole esplicite Claude in VS Code scrive file monolitici → refactor doloroso a metà progetto.
+- **Output**:
+  - `AGENTS.md` aggiornato con sezione "Regole architetturali" che include:
+    - Limite 300 righe per componenti React, 150 per hook, 100 per route handler
+    - Regola critica inline style vs Tailwind visibility classes (causa bug responsive già trovata)
+    - Split obbligatori documentati per: Header, Event page, TradeWidget, Admin panel
+    - Pattern generale: page route max 80 righe JSX, resto in componenti feature
+  - `docs/PROMPT-SPRINT-3.1.1-R.md` — prompt pronto per Claude in VS Code per refactor Header
+- **Sprint da eseguire prima di 3.1.2**: Sprint 3.1.1-R (Header split) — zero nuove funzionalità, solo spostamento codice
+- **Strutture target documentate in AGENTS.md**:
+  - `components/layout/header/`: DesktopNav, DesktopSearch, MobileDrawer, ProfileDropdown, RealDemoToggle
+  - `app/event/[slug]/page.tsx` max 80 righe → layouts in `components/events/layouts/`
+  - `components/trade/trade/`: MarketTab, LimitTab, TradeConfirmModal, SignalBanner
+- **PR**: N/A
+
 ### ✅ Fix post-sprint 3.1.1 — PWA app shell + BottomNav desktop visibility + REAL/DEMO layout (Cowork)
 
 - **Chiuso**: 2026-04-26

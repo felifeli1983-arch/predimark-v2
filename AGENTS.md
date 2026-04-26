@@ -30,3 +30,76 @@ npm run test        # solo i test
 - Import alias: `@/` mappa alla root del progetto
 - Font: Inter via `next/font/google`, variabile CSS `--font-sans`
 - ESLint: `no-explicit-any: error`, `no-unused-vars: error` (prefix `_` per ignorare)
+
+## Regole architetturali — file size e split obbligatori
+
+### Limite dimensione file
+
+- Componenti React: **max 300 righe**. Sopra questa soglia, spezzare in sub-componenti.
+- Hook e utility: max 150 righe.
+- Route handler API: max 100 righe (logica pesante → funzioni separate in `lib/`).
+
+### Inline style e classi Tailwind — regola critica
+
+**Mai** mettere `display: 'flex'` (o qualsiasi valore display) in `style={}` inline quando lo stesso elemento usa classi Tailwind per la visibilità (`md:hidden`, `hidden md:flex`, ecc.).
+Gli stili inline hanno specificità più alta delle classi Tailwind e le sovrascrivono sempre.
+✅ Corretto: `className="flex md:hidden"` senza `display` in style
+❌ Sbagliato: `className="md:hidden" style={{ display: 'flex' }}`
+
+### Split obbligatori per componenti critici
+
+#### Header (`components/layout/Header.tsx`)
+
+Il file Header.tsx è un orchestratore leggero (~80 righe). I sub-componenti vivono in `components/layout/header/`:
+
+```
+components/layout/
+  Header.tsx                  ← import e composizione, max 80 righe
+  header/
+    DesktopNav.tsx            ← NAV_LINKS + link attivi (hidden md:flex)
+    DesktopSearch.tsx         ← search bar placeholder desktop
+    MobileDrawer.tsx          ← drawer hamburger (position:fixed overlay, md:hidden)
+    ProfileDropdown.tsx       ← avatar button + dropdown menu
+    RealDemoToggle.tsx        ← REAL/DEMO button con larghezza fissa
+```
+
+#### Pagina evento (`app/event/[slug]/page.tsx`)
+
+La page route è max 80 righe: legge slug, classifica il tipo, renderizza il layout corretto.
+I layout vivono in `components/events/layouts/`:
+
+```
+app/event/[slug]/
+  page.tsx                    ← classifica tipo → renderizza layout, max 80 righe
+components/events/
+  layouts/
+    BinaryLayout.tsx
+    MultiOutcomeLayout.tsx
+    MultiStrikeLayout.tsx
+    H2HSportLayout.tsx
+    CryptoRoundLayout.tsx
+  EventChart.tsx              ← SVG CandleChart custom (riusato da tutti i layout)
+  OrderbookPanel.tsx          ← orderbook expansion (riusato)
+```
+
+#### TradeWidget (`components/trade/`)
+
+```
+components/trade/
+  TradeWidget.tsx             ← shell + stato + context, max 150 righe
+  trade/
+    MarketTab.tsx             ← tab Mercato (importo, quick amounts, preview)
+    LimitTab.tsx              ← tab Limite (slider prezzo, preset scadenza)
+    TradeConfirmModal.tsx     ← modal conferma prima di submit
+    SignalBanner.tsx          ← banner segnale Predimark se attivo
+```
+
+#### Admin panel (`app/admin/`)
+
+Ogni sezione admin è una cartella separata con `page.tsx` + componenti propri.
+Non creare mai componenti admin in `components/` globali — sono specifici del pannello.
+
+### Pattern generale per pagine complesse
+
+Se una page route supera 80 righe di JSX, estrarre sezioni in componenti dedicati in `components/[feature]/`.
+Esempio: `app/page.tsx` (Home) deve importare `<HeroSection>`, `<CryptoLiveRail>`, `<MarketGrid>` — non scrivere tutto inline.
