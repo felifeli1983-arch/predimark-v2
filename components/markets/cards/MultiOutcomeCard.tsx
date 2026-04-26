@@ -45,7 +45,9 @@ export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
           <OutcomeRow
             key={m.id}
             market={m}
-            onClick={onAddToSlip ? () => onAddToSlip(event.id, m.id) : undefined}
+            withYesNo={isDateOutcomes}
+            onYesClick={onAddToSlip ? () => onAddToSlip(event.id, `${m.id}:yes`) : undefined}
+            onNoClick={onAddToSlip ? () => onAddToSlip(event.id, `${m.id}:no`) : undefined}
           />
         ))}
         {remaining > 0 && (
@@ -72,28 +74,23 @@ export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
   )
 }
 
-function OutcomeRow({ market, onClick }: { market: AuktoraMarket; onClick?: () => void }) {
+interface RowProps {
+  market: AuktoraMarket
+  withYesNo: boolean
+  onYesClick?: () => void
+  onNoClick?: () => void
+}
+
+function OutcomeRow({ market, withYesNo, onYesClick, onNoClick }: RowProps) {
   const pct = Math.round(market.yesPrice * 100)
-  const isInteractive = Boolean(onClick)
+
   return (
-    <button
-      type="button"
-      onClick={(e) => {
-        if (!onClick) return
-        e.preventDefault()
-        e.stopPropagation()
-        onClick()
-      }}
+    <div
       style={{
-        width: '100%',
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
+        gap: 8,
         padding: '6px 0',
-        background: 'none',
-        border: 'none',
-        cursor: isInteractive ? 'pointer' : 'default',
-        textAlign: 'left',
       }}
     >
       <span
@@ -111,7 +108,7 @@ function OutcomeRow({ market, onClick }: { market: AuktoraMarket; onClick?: () =
       </span>
       <div
         style={{
-          width: 80,
+          width: 70,
           height: 4,
           background: 'var(--color-bg-tertiary)',
           borderRadius: 2,
@@ -132,7 +129,7 @@ function OutcomeRow({ market, onClick }: { market: AuktoraMarket; onClick?: () =
           fontSize: 12,
           fontWeight: 600,
           color: 'var(--color-text-primary)',
-          minWidth: 32,
+          minWidth: 30,
           textAlign: 'right',
           fontVariantNumeric: 'tabular-nums',
           flexShrink: 0,
@@ -140,6 +137,48 @@ function OutcomeRow({ market, onClick }: { market: AuktoraMarket; onClick?: () =
       >
         {pct}%
       </span>
+      {withYesNo && (
+        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+          <MiniBtn label="Sì" variant="yes" onClick={onYesClick} />
+          <MiniBtn label="No" variant="no" onClick={onNoClick} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+function MiniBtn({
+  label,
+  variant,
+  onClick,
+}: {
+  label: string
+  variant: 'yes' | 'no'
+  onClick?: () => void
+}) {
+  const isYes = variant === 'yes'
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        if (!onClick) return
+        e.preventDefault()
+        e.stopPropagation()
+        onClick()
+      }}
+      style={{
+        padding: '3px 8px',
+        borderRadius: 5,
+        fontSize: 10,
+        fontWeight: 700,
+        cursor: 'pointer',
+        background: isYes ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
+        color: isYes ? 'var(--color-success)' : 'var(--color-danger)',
+        border: `1px solid ${isYes ? 'var(--color-success)' : 'var(--color-danger)'}`,
+        letterSpacing: '0.04em',
+      }}
+    >
+      {label}
     </button>
   )
 }

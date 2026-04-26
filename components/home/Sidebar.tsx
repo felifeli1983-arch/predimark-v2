@@ -6,6 +6,8 @@ import { SidebarPortfolio } from './SidebarPortfolio'
 import { SidebarSignals } from './SidebarSignals'
 import { SidebarActivity } from './SidebarActivity'
 import { SidebarHotNow } from './SidebarHotNow'
+import { SidebarWatchlist } from './SidebarWatchlist'
+import { SidebarNews } from './SidebarNews'
 import { CryptoLiveRail } from './CryptoLiveRail'
 
 /**
@@ -94,11 +96,17 @@ export function Sidebar() {
         </section>
       )}
 
-      {authenticated && <SidebarPortfolio />}
-      <CryptoLiveRail />
+      {/* Ordine adattivo da Doc 4 wireframe Pagina 1 sezione "Sidebar adattiva":
+       *   Stato 1 (guest):     Demo CTA → Signals → HotNow → News → Activity
+       *   Stato 2 (logged):    Portfolio → Signals → Watchlist → HotNow → Activity
+       * Per ora rendiamo entrambe le facce + CryptoLiveRail come bonus stato. */}
+      {authenticated ? <SidebarPortfolio /> : null}
       <SidebarSignals />
-      <SidebarActivity />
+      {authenticated ? <SidebarWatchlist /> : null}
+      <CryptoLiveRail />
       <SidebarHotNow />
+      <SidebarNews />
+      <SidebarActivity />
     </aside>
   )
 }

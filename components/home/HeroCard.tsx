@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { ArrowRight } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 
 const THEME_TOKEN: Record<string, string> = {
@@ -18,14 +19,27 @@ const THEME_TOKEN: Record<string, string> = {
   technology: 'var(--color-cat-tech)',
 }
 
-function pickAccent(tags: string[]): string {
+const CTA_BY_TAG: Record<string, string> = {
+  sport: 'Games',
+  sports: 'Games',
+  politics: 'Dashboard',
+  crypto: 'Markets',
+  culture: 'Markets',
+  news: 'Markets',
+  geopolitics: 'Dashboard',
+  economy: 'Markets',
+  business: 'Markets',
+  tech: 'Markets',
+}
+
+function pickAccent(tags: string[]): { color: string; cta: string } {
   for (const tag of tags) {
     const t = tag.toLowerCase()
     for (const [hint, token] of Object.entries(THEME_TOKEN)) {
-      if (t.includes(hint)) return token
+      if (t.includes(hint)) return { color: token, cta: CTA_BY_TAG[hint] ?? 'Markets' }
     }
   }
-  return 'var(--color-cta)'
+  return { color: 'var(--color-cta)', cta: 'Markets' }
 }
 
 interface Props {
@@ -35,10 +49,11 @@ interface Props {
 
 export function HeroCard({ event, size = 'small' }: Props) {
   const [imgFailed, setImgFailed] = useState(false)
-  const accent = pickAccent(event.tags)
+  const { color: accent, cta } = pickAccent(event.tags)
   const isBig = size === 'big'
   const market = event.markets[0]
   const yesPct = market ? Math.round(market.yesPrice * 100) : 50
+  const subtitle = market?.question && market.question !== event.title ? market.question : null
 
   return (
     <Link
@@ -49,7 +64,7 @@ export function HeroCard({ event, size = 'small' }: Props) {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
-        height: isBig ? 240 : 200,
+        height: isBig ? 320 : 152,
         borderRadius: 12,
         overflow: 'hidden',
         textDecoration: 'none',
@@ -71,7 +86,7 @@ export function HeroCard({ event, size = 'small' }: Props) {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            opacity: 0.4,
+            opacity: 0.45,
             mixBlendMode: 'overlay',
           }}
         />
@@ -82,43 +97,88 @@ export function HeroCard({ event, size = 'small' }: Props) {
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)',
+            'linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)',
         }}
       />
-      <div style={{ position: 'relative', padding: '12px 16px 14px' }}>
+      <div style={{ position: 'relative', padding: isBig ? '20px 22px' : '12px 14px' }}>
         <h3
           style={{
             margin: 0,
             color: '#fff',
-            fontSize: isBig ? 20 : 16,
+            fontSize: isBig ? 26 : 15,
             fontWeight: 700,
-            lineHeight: 1.25,
+            lineHeight: 1.2,
+            letterSpacing: '-0.01em',
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: isBig ? 2 : 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
           }}
         >
           {event.title}
         </h3>
+        {isBig && subtitle && (
+          <p
+            style={{
+              margin: '6px 0 0',
+              fontSize: 13,
+              fontWeight: 400,
+              color: 'rgba(255,255,255,0.85)',
+              lineHeight: 1.4,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {subtitle}
+          </p>
+        )}
         <div
           style={{
-            marginTop: 8,
+            marginTop: isBig ? 14 : 6,
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'space-between',
             gap: 12,
-            fontSize: 13,
-            color: 'rgba(255,255,255,0.85)',
           }}
         >
-          {market && (
-            <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
-              Yes {yesPct}%
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {market && (
+              <span
+                style={{
+                  fontSize: isBig ? 14 : 12,
+                  fontVariantNumeric: 'tabular-nums',
+                  fontWeight: 700,
+                  color: '#fff',
+                }}
+              >
+                Yes {yesPct}%
+              </span>
+            )}
+            <span style={{ fontSize: isBig ? 12 : 10, color: 'rgba(255,255,255,0.7)' }}>
+              ${(event.totalVolume / 1_000_000).toFixed(1)}M Vol
+            </span>
+          </div>
+          {isBig && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#fff',
+                background: 'rgba(255,255,255,0.18)',
+                backdropFilter: 'blur(4px)',
+                padding: '6px 12px',
+                borderRadius: 999,
+              }}
+            >
+              {cta}
+              <ArrowRight size={12} />
             </span>
           )}
-          <span style={{ fontSize: 11, opacity: 0.7 }}>
-            ${(event.totalVolume / 1_000_000).toFixed(1)}M Vol
-          </span>
         </div>
       </div>
     </Link>

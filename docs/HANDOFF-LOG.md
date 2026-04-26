@@ -11,7 +11,57 @@
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 ✅. Step 3.2 WS ✅. Step 3.3 tutte e 5 le EventCard ✅. Step 3.4.1 Home page reale ✅. Prossimo: 3.5.x pagina evento.
+- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 ✅. Step 3.2 WS ✅. Step 3.3 tutte e 5 le EventCard ✅. Step 3.4.1 Home page reale ✅. **Audit 2026-04-27 completato** — trovati 10 gap, 7 fix prompt creati. Eseguire tutti i fix prima di Sprint 3.5.x.
+
+---
+
+## ⚠️ Fix pendenti — DA ESEGUIRE prima di Sprint 3.5.1
+
+| Fix                  | File                                               | Priorità | Problema                                                                       |
+| -------------------- | -------------------------------------------------- | -------- | ------------------------------------------------------------------------------ |
+| `PROMPT-FIX-3.1.1-A` | `lib/stores/themeStore.ts` + Header                | 🔴 ALTA  | REAL/DEMO toggle non persiste (useState locale → deve essere Zustand)          |
+| `PROMPT-FIX-3.3.1-A` | `EventCardHeader.tsx` + `HeroCard.tsx`             | 🔴 ALTA  | `<img>` raw invece di `next/image` (violazione Doc 5 + performance)            |
+| `PROMPT-FIX-3.3.3-A` | `mappers.test.ts`                                  | ✅ DONE  | Test outcomes[] — già eseguito commit c53a604                                  |
+| `PROMPT-FIX-3.4.1-A` | `HeroZone.tsx`                                     | 🔴 ALTA  | Hero carousel mobile mancante (stack verticale invece di swipe carousel)       |
+| `PROMPT-FIX-3.4.1-B` | `app/page.tsx` + nuovo `MobileSidebarRails.tsx`    | 🔴 ALTA  | Sidebar mobile completamente assente (tutto hidden md:flex)                    |
+| `PROMPT-FIX-3.4.1-C` | `Sidebar.tsx` + nuovi SidebarNews/SidebarWatchlist | 🟠 MEDIA | Sidebar solo 2 stati (deve essere 3: guest/no-deposit/active) + News mancante  |
+| `PROMPT-FIX-3.4.1-D` | `MarketsFilters.tsx` + `MarketsGrid.tsx`           | 🟠 MEDIA | Search markets + toggle Animations + sub-filtri Related mancanti               |
+| `PROMPT-FIX-3.4.1-E` | `HeroCard.tsx` + `MarketsGrid.tsx`                 | 🔴 ALTA  | Colori hardcoded in HeroCard + bottone [+ Slip] invisibile in tutta la griglia |
+
+---
+
+### ✅ Fix 3.4.1 — Layout home 3 correzioni critiche (applicato 2026-04-27)
+
+Audit agent contro `docs/04-WIREFRAMES-pagina1-home-v2.md` ha identificato e corretto 3 problemi strutturali:
+
+**Fix 1 — CryptoLiveRail rimosso dal top-level**
+
+- Era posizionato tra NavTabs e HeroZone come rail orizzontale a tutta larghezza — non previsto dal wireframe
+- Spostato dentro `Sidebar.tsx` come sezione "Hot Crypto" con titolo, griglia 2 colonne, 6 box compatti
+- `CryptoLiveRail.tsx` adattato: rimosso `overflowX: auto`, aggiunta `section` con `gridTemplateColumns: '1fr 1fr'`
+- `app/page.tsx`: rimosso `<CryptoLiveRail />` dal top-level
+
+**Fix 2 — Grid mercati: 5 colonne → 3 colonne corrette**
+
+- `repeat(auto-fill, minmax(280px, 1fr))` su 1440px produceva ~5 colonne
+- Wireframe spec: 3 desktop / 2 tablet / 1 mobile
+- Cambiato in `MarketsGrid.tsx`: `className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"` via Tailwind
+- `layout` è ora una prop ricevuta dall'esterno (non più useState interno)
+
+**Fix 3 — MarketsFilters estratto da MarketsGrid**
+
+- Filtri erano nested dentro `MarketsGrid` — wireframe li vuole sopra la griglia come sezione separata
+- Creato `MarketsSection.tsx` (nuovo): container client che ospita `MarketsFilters` + `MarketsGrid` e possiede il `layout` state condiviso tra i due
+- `app/page.tsx` aggiornato: `<MarketsSection initialEvents={filtered} />` sostituisce la coppia separata
+
+**Layout risultante (conforme al wireframe):**
+
+```
+NavTabs
+grid 2-col [main (1fr) | sidebar (320px)]
+  main: HeroZone → MarketsFilters → MarketsGrid (3-col)
+  sidebar: Guest CTA | Portfolio | Hot Crypto (2×3) | Signals | Activity | HotNow
+```
 
 ---
 
