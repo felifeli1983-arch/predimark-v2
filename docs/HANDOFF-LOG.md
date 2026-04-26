@@ -7,15 +7,43 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.1.2 o 3.2.1 (da decidere)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.1.3 (Footer minimal)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 completata ✅. MA2 completata ✅. Sprint 3.1.1 completato ✅ — PWA app shell attiva, Header+BottomNav in flex flow, More menu con contenuto Doc 4. Bug pendenti: dark/light toggle cambia icona ma non colori CSS (Tailwind 4 specificity — deferrito a sprint dedicato).
+- **Note speciali**: MA1 ✅. MA2 ✅. Sprint 3.1.1-R ✅ Header split 9 file. Sprint 3.1.2 ✅ BottomNav completo (badge Slip rinviato a MA4 — richiede slipStore). Bug noto: dark/light toggle cambia icona ma non colori CSS (Tailwind 4 specificity, deferrito).
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 3.1.2 — BottomNav mobile completo
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (analisi Doc 4 + file reali)
+- **Output**: BottomNav già completo da Sprint 3.1.1 + post-sprint fixes — 5 voci (Home, Search, Signals, Slip, More), active state, More sheet con contenuto esatto Doc 4, PWA in-flow
+- **Deferred**: badge numerico su Slip (`[🛒3]` da Doc 4) richiede `slipStore` Zustand → rinviato al primo sprint MA4 trading
+- **PR**: N/A
+
+### ✅ Sprint 3.1.1-R — Header split in sub-componenti
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Claude in VS Code (acceptance criteria auto-verificati)
+- **Commit**: `b31241a` — 12 file, +841/-573
+- **Output**:
+  - `Header.tsx` ridotto a orchestratore da 68 righe (era 611)
+  - `header/DesktopNav.tsx` — 37 righe
+  - `header/DesktopSearch.tsx` — 29 righe
+  - `header/MobileDrawer.tsx` — 132 righe
+  - `header/ProfileDropdown.tsx` — 136 righe
+  - `header/RealDemoToggle.tsx` — 38 righe
+  - `header/HeaderActions.tsx` — 188 righe (aggiunto rispetto al prompt: wrapper barra destra, necessario per rispettare limite 90 righe su Header.tsx)
+  - `header/styles.ts` — 39 righe (CSSProperties condivisi)
+  - `header/nav-links.ts` — 7 righe (NAV_LINKS array)
+  - 21 test passati, `npm run validate` exit 0, `npm run build` exit 0
+- **Deviazione motivata**: prompt prevedeva 5 sub-componenti, Claude in VS Code ne ha estratti 7 + 2 file costanti. Tutti e 5 i componenti del prompt presenti; i 2 aggiuntivi (HeaderActions, styles/nav-links) migliorano separazione e rispettano il vincolo righe.
+- **Zero modifiche funzionali** — comportamento identico, zero `display` inline su elementi responsive
+- **PR**: N/A
 
 ### ✅ Decisioni architetturali — file split obbligatori (Cowork, fuori-sprint)
 
@@ -414,7 +442,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                               |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                               |
 
-**Totale sprint**: 13 / 92
+**Totale sprint**: 15 / 92
 
 ---
 

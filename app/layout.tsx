@@ -6,6 +6,7 @@ import { ReactQueryProvider } from '@/providers/ReactQueryProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { Header } from '@/components/layout/Header'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { Footer } from '@/components/layout/Footer'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -71,9 +72,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     overflowY: 'auto',
                     WebkitOverflowScrolling: 'touch',
                     overscrollBehavior: 'contain',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
                 >
                   {children}
+                  <Footer />
                 </main>
                 <BottomNav />
               </div>
