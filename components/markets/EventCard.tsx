@@ -15,7 +15,17 @@ interface EventCardProps {
 }
 
 const cardStyle: React.CSSProperties = {
-  display: 'block',
+  /*
+   * Wrapper flex column + height 100% + min-height per garantire
+   * COERENZA del footer fra tutte le 5 variants:
+   * - in una griglia 3-col, le righe stretch alla card più alta;
+   * - questo Link riempie la cella;
+   * - ogni variant ha body con flex:1 → footer sempre allineato in basso.
+   */
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+  minHeight: 360,
   background: 'var(--color-bg-secondary)',
   border: '1px solid var(--color-border-default)',
   borderRadius: 12,

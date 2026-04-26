@@ -51,7 +51,7 @@ export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
   const marketId = market?.id ?? ''
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
         title={event.title}
         image={event.image}
@@ -60,7 +60,16 @@ export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
       />
 
-      <div style={{ padding: '8px 12px 12px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div
+        style={{
+          padding: '8px 12px 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          flex: 1,
+          justifyContent: 'center',
+        }}
+      >
         {/* Riga nomi + percentuali */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
           <TeamLabel outcome={teamA} align="left" />

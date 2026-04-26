@@ -19,7 +19,7 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
   const noPct = Math.round(noPrice * 100)
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
         title={event.title}
         image={event.image}
@@ -32,6 +32,8 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
           padding: '8px 12px 12px',
           alignItems: 'center',
           gap: 12,
+          flex: 1,
+          justifyContent: 'center',
         }}
         className="flex flex-col"
       >

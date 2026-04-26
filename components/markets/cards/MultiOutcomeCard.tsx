@@ -32,7 +32,7 @@ export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
   const isDateOutcomes = top.length > 0 && dateLike >= Math.ceil(top.length / 2)
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
         title={event.title}
         image={event.image}
@@ -40,7 +40,7 @@ export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
       />
 
-      <div style={{ padding: '4px 12px 8px' }}>
+      <div style={{ padding: '4px 12px 8px', flex: 1 }}>
         {top.map((m) => (
           <OutcomeRow
             key={m.id}

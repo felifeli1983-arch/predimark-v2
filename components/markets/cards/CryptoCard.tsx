@@ -99,7 +99,7 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
   const livePriceDelta = livePrice !== null && target !== null ? livePrice - target : null
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
         title={event.title}
         image={event.image}
@@ -108,7 +108,7 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
       />
 
-      <div style={{ padding: '8px 12px 12px', display: 'flex', gap: 12 }}>
+      <div style={{ padding: '8px 12px 12px', display: 'flex', gap: 12, flex: 1 }}>
         {/* Sezione sinistra: prezzi + bottoni */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
           {/* Prezzo target */}

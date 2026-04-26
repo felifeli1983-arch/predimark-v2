@@ -49,6 +49,8 @@ export function EventCardFooter({
         padding: '10px 12px',
         borderTop: '1px solid var(--color-border-subtle)',
         gap: 12,
+        marginTop: 'auto', // spinge il footer SEMPRE in fondo nella card flex-col
+        flexShrink: 0,
       }}
     >
       <span

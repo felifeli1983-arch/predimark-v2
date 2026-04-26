@@ -47,7 +47,7 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
   const currentIndex = top.findIndex((m) => m.yesPrice > 0.5)
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
         title={event.title}
         image={event.image}
@@ -55,7 +55,7 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
       />
 
-      <div style={{ padding: '4px 12px 8px' }}>
+      <div style={{ padding: '4px 12px 8px', flex: 1 }}>
         {top.map((m, i) => (
           <StrikeRow
             key={m.id}
