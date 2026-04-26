@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
@@ -75,16 +76,14 @@ export function HeroCard({ event, size = 'small' }: Props) {
       }}
     >
       {!imgFailed && event.image && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={event.image}
           alt=""
+          fill
+          priority={isBig}
+          sizes={isBig ? '(max-width: 1024px) 100vw, 60vw' : '(max-width: 1024px) 100vw, 40vw'}
           onError={() => setImgFailed(true)}
           style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
             objectFit: 'cover',
             opacity: 0.45,
             mixBlendMode: 'overlay',
