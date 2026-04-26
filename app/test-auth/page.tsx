@@ -5,14 +5,6 @@ import { useAuth } from '@/lib/hooks/useAuth'
 export default function TestAuthPage() {
   const { ready, authenticated, user, login, logout } = useAuth()
 
-  if (!ready) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p style={{ color: 'var(--color-text-secondary)' }}>Loading...</p>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen p-8" style={{ background: 'var(--color-bg-primary)' }}>
       <h1 className="text-2xl font-bold mb-8" style={{ color: 'var(--color-text-primary)' }}>
@@ -20,15 +12,30 @@ export default function TestAuthPage() {
       </h1>
 
       <div className="space-y-4">
-        <div style={{ color: 'var(--color-text-secondary)' }}>
-          Status:{' '}
-          <span
-            style={{
-              color: authenticated ? 'var(--color-success)' : 'var(--color-danger)',
-            }}
-          >
-            {authenticated ? 'Autenticato' : 'Non autenticato'}
-          </span>
+        <div
+          className="p-3 rounded font-mono text-sm"
+          style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text-primary)' }}
+        >
+          <div>
+            ready:{' '}
+            <span style={{ color: ready ? 'var(--color-success)' : 'var(--color-warning)' }}>
+              {String(ready)}
+            </span>
+          </div>
+          <div>
+            authenticated:{' '}
+            <span
+              style={{ color: authenticated ? 'var(--color-success)' : 'var(--color-text-muted)' }}
+            >
+              {String(authenticated)}
+            </span>
+          </div>
+          <div>
+            appId env:{' '}
+            <span style={{ color: 'var(--color-text-secondary)' }}>
+              {process.env.NEXT_PUBLIC_PRIVY_APP_ID ? 'present' : 'MISSING'}
+            </span>
+          </div>
         </div>
 
         {authenticated && user && (
@@ -50,13 +57,15 @@ export default function TestAuthPage() {
         ) : (
           <button
             onClick={login}
-            className="px-6 py-2 rounded font-semibold"
+            disabled={!ready}
+            className="px-6 py-2 rounded font-semibold disabled:opacity-50"
             style={{
-              background: 'var(--color-brand-primary)',
-              color: 'var(--color-bg-primary)',
+              background: 'var(--color-cta)',
+              color: 'white',
+              cursor: ready ? 'pointer' : 'not-allowed',
             }}
           >
-            Login con Privy
+            {ready ? 'Login con Privy' : 'Privy non pronto…'}
           </button>
         )}
       </div>

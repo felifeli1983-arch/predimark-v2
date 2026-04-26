@@ -7,8 +7,9 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: 1.3.1 (Privy) o 1.4.1 (Vercel) — dipende da quale account è pronto
-- **Prossimo sprint**: l'altro tra 1.3.1 e 1.4.1
+- **Sprint corrente**: 1.4.1 (Vercel deploy) — se account pronto, altrimenti 1.3.2 (Privy + Supabase sync)
+- **Prossimo sprint**: l'altro tra i due sopra
+- **Nota**: verifica manuale modal Privy su `/test-auth` pendente (da fare nel browser)
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
 - **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata
@@ -16,6 +17,25 @@
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 1.3.1 — Setup Privy — PrivyProvider + wallet auth base
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente)
+- **Output**:
+  - `@privy-io/react-auth@3.22.2` installato
+  - `providers/PrivyProvider.tsx` con `loginMethods: ['email', 'wallet']`, theme dark, accent `#00E5FF`
+  - `app/layout.tsx` wrappa con `<PrivyProvider>`
+  - `lib/hooks/useAuth.ts` con interfaccia `AuthUser` e hook `useAuth`
+  - `app/test-auth/page.tsx` pagina verifica manuale
+  - `lib/hooks/__tests__/useAuth.test.ts` 2 test
+  - 9 test totali passati, `npm run validate` exit 0
+  - Commit `ff91b49` pushato su `main`
+- **Note**:
+  - Privy v3 API breaking change: `embeddedWallets.createOnLogin` → `embeddedWallets.ethereum.createOnLogin` — corretta da Claude in VS Code
+  - `module` → `mod` in test per ESLint `@next/next/no-assign-module-variable` — corretta da Claude in VS Code
+  - Verifica manuale modal Privy su `/test-auth` **pendente** — Feliciano deve verificare nel browser
+- **PR**: N/A
 
 ### ✅ Sprint 1.5.3 — Docs in cartella progetto + README
 
@@ -168,7 +188,7 @@
 
 | MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
 | --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
-| MA1 | Foundation & Setup            | 6                 | 12            | ⏳ In corso                              |
+| MA1 | Foundation & Setup            | 7                 | 12            | ⏳ In corso                              |
 | MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
 | MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
 | MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
@@ -177,7 +197,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
 
-**Totale sprint**: 6 / 92
+**Totale sprint**: 7 / 92
 
 ---
 
