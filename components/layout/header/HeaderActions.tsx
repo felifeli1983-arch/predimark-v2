@@ -2,6 +2,7 @@
 
 import { Bell, Gift, Sun, Moon } from 'lucide-react'
 import type { AuthUser } from '@/lib/hooks/useAuth'
+import { useThemeStore } from '@/lib/stores/themeStore'
 import { ProfileDropdown } from './ProfileDropdown'
 import { RealDemoToggle } from './RealDemoToggle'
 
@@ -9,25 +10,13 @@ interface Props {
   ready: boolean
   authenticated: boolean
   user: AuthUser | null
-  theme: 'dark' | 'light'
-  toggleTheme: () => void
   login: () => void
   logout: () => void
-  isDemo: boolean
-  onDemoToggle: () => void
 }
 
-export function HeaderActions({
-  ready,
-  authenticated,
-  user,
-  theme,
-  toggleTheme,
-  login,
-  logout,
-  isDemo,
-  onDemoToggle,
-}: Props) {
+export function HeaderActions({ ready, authenticated, user, login, logout }: Props) {
+  // theme + isDemo dal Zustand store globale (persiste in localStorage)
+  const { theme, toggleTheme, isDemo, toggleDemo } = useThemeStore()
   return (
     <div
       style={{
@@ -150,7 +139,7 @@ export function HeaderActions({
         <Bell size={15} />
       </button>
 
-      {authenticated && <RealDemoToggle isDemo={isDemo} onToggle={onDemoToggle} />}
+      {authenticated && <RealDemoToggle isDemo={isDemo} onToggle={toggleDemo} />}
 
       {!ready ? (
         <div

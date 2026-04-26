@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import { Menu } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/hooks/useAuth'
-import { useThemeStore } from '@/lib/stores/themeStore'
 import { DesktopNav } from './header/DesktopNav'
 import { DesktopSearch } from './header/DesktopSearch'
 import { MobileDrawer } from './header/MobileDrawer'
@@ -14,10 +13,8 @@ import { HEADER_OUTER, HEADER_INNER, HAMBURGER, LOGO } from './header/styles'
 
 export function Header() {
   const { ready, authenticated, user, login, logout } = useAuth()
-  const { theme, toggleTheme } = useThemeStore()
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isDemo, setIsDemo] = useState(false)
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -49,12 +46,8 @@ export function Header() {
             ready={ready}
             authenticated={authenticated}
             user={user}
-            theme={theme}
-            toggleTheme={toggleTheme}
             login={login}
             logout={logout}
-            isDemo={isDemo}
-            onDemoToggle={() => setIsDemo((v) => !v)}
           />
         </div>
       </header>
