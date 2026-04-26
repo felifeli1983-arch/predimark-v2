@@ -4,12 +4,13 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { EventCard } from '@/components/markets/EventCard'
-import { MarketsFilters } from './MarketsFilters'
 
 interface Props {
   initialEvents: AuktoraEvent[]
   /** Pagina iniziale visibile, default 20 */
   pageSize?: number
+  /** Layout grid (default 'grid') | 'list' */
+  layout?: 'grid' | 'list'
 }
 
 type SortKey = 'volume24h' | 'newest' | 'closing-soon'
@@ -26,20 +27,22 @@ function sortEvents(events: AuktoraEvent[], sort: SortKey): AuktoraEvent[] {
   return arr
 }
 
-export function MarketsGrid({ initialEvents, pageSize = 20 }: Props) {
+export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: Props) {
   const searchParams = useSearchParams()
   const sort = (searchParams.get('sort') as SortKey) ?? 'volume24h'
-  const [layout, setLayout] = useState<'grid' | 'list'>('grid')
   const [visible, setVisible] = useState(pageSize)
 
   const sorted = useMemo(() => sortEvents(initialEvents, sort), [initialEvents, sort])
   const visibleEvents = sorted.slice(0, visible)
   const hasMore = visible < sorted.length
 
+  // Grid: 3 colonne desktop, 2 tablet (sm), 1 mobile.
+  // 'list': 1 colonna su tutti i breakpoint.
+  const gridClass =
+    layout === 'list' ? 'grid grid-cols-1' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+
   return (
     <section style={{ flex: 1, minWidth: 0 }}>
-      <MarketsFilters layout={layout} onLayoutChange={setLayout} />
-
       {sorted.length === 0 ? (
         <div
           style={{
@@ -53,15 +56,7 @@ export function MarketsGrid({ initialEvents, pageSize = 20 }: Props) {
         </div>
       ) : (
         <>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns:
-                layout === 'list' ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: 12,
-              padding: '12px 16px',
-            }}
-          >
+          <div className={gridClass} style={{ gap: 12, padding: '12px 16px' }}>
             {visibleEvents.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}

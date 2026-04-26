@@ -1,21 +1,42 @@
 # Predimark V2 — Handoff Log
 
 > Aggiornato da Cowork dopo ogni sprint chiuso
-> Ultimo update: 2026-04-26
+> Ultimo update: 2026-04-27
 
 ---
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.4.1 (Home page layout completo)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.5.x (Pagina evento `/event/[slug]`)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 ✅. Step 3.2 WS ✅. Step 3.3 tutte e 5 le EventCard ✅ (40/40 test). Prossimo: 3.4.1 Home layout completo.
+- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 ✅. Step 3.2 WS ✅. Step 3.3 tutte e 5 le EventCard ✅. Step 3.4.1 Home page reale ✅. Prossimo: 3.5.x pagina evento.
 
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 3.4.1 — Home page layout completo
+
+- **Chiuso**: 2026-04-27
+- **Commit**: `429301a` — feat: Home page layout completo — Hero, NavTabs, Sidebar, CryptoRail, MarketsGrid (3.4.1)
+- **Output** (13 file, +1008/-22):
+  - `app/page.tsx` (54 righe) — Server Component ISR: `fetchFeaturedEvents(40)`, legge `searchParams.category` e `searchParams.sort`, filtra eventi per categoria lato server, divide hero (top 3) da griglia (resto). Layout: 1 col mobile → `grid-cols-[minmax(0,1fr)_300px]` desktop
+  - `components/home/NavTabs.tsx` (101 righe) — 13 categorie (LIVE·All·For You·Politics·Sports·Crypto·Esports·Mentions·Creators·Pop Culture·Business·Science·Geopolitics). Stato in URL via `router.push(?category=)`. `●LIVE` con pallino rosso pulsante. Scrollabile orizzontalmente, `scrollbarWidth: none`
+  - `components/home/HeroZone.tsx` (38 righe) — Desktop: 1 big hero (60%) + 2 small impilati (40%) via `md:grid-cols-2`. Mobile: stack verticale
+  - `components/home/HeroCard.tsx` (125 righe) — gradient mood color derivato dai tag dell'evento (`--color-cat-sport`, `--color-cat-politics`, ecc.). Overlay immagine. Prop `size: 'big' | 'small'`
+  - `components/home/CryptoLiveRail.tsx` (97 righe) — 6 coin (BTC/ETH/SOL/XRP/DOGE/BNB) via `useCryptoLivePrice(symbol, 'binance')`. Prezzo live + variazione 24h colorata verde/rosso. Scroll orizzontale
+  - `components/home/Sidebar.tsx` (102 righe) — `'use client'`, sticky (`position: sticky; top: 12px; alignSelf: flex-start`), hidden mobile (`hidden md:flex`). Adattiva: guest → CTA Sign in + Demo Mode link; logged → `SidebarPortfolio`
+  - `components/home/SidebarPortfolio.tsx` (72 righe) — stub placeholder fino a MA4
+  - `components/home/SidebarSignals.tsx` (33 righe) — stub placeholder fino a MA5
+  - `components/home/SidebarActivity.tsx` (79 righe) — live via `useLiveActivity()`, ultimi 5 trade con timestamp relativo
+  - `components/home/SidebarHotNow.tsx` (60 righe) — tag cloud degli argomenti più tradati
+  - `components/home/MarketsGrid.tsx` (94 righe) — `'use client'`, sort via `searchParams.sort` (volume24h/newest/closing-soon), toggle Grid/List (stato locale), paginazione manuale "Carica altri" (+20 per click). Usa `EventCard` per ogni evento
+  - `components/home/MarketsFilters.tsx` (121 righe) — dropdown Sort + toggle layout Grid/List. Sort aggiorna URL via `router.push`
+- **Acceptance criteria**: `tsc --noEmit` exit 0 ✅, NavTabs URL state ✅, HeroZone 3 card ✅, CryptoLiveRail 6 coin live ✅, Sidebar adattiva guest/logged ✅, Sidebar sticky ✅, MarketsGrid sort ✅, paginazione manuale ✅, layout 3 colonne desktop ✅, 1 colonna mobile ✅, nessun colore hardcoded ✅
+- **Stub noti**: SidebarPortfolio e SidebarSignals sono placeholder — dati reali in MA4/MA5
+- **PR**: N/A
 
 ### ✅ Sprint 3.3.4 — EventCard Crypto Up/Down
 

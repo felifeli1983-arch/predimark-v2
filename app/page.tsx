@@ -1,9 +1,8 @@
 import { fetchFeaturedEvents } from '@/lib/polymarket/queries'
 import { mapGammaEvent } from '@/lib/polymarket/mappers'
 import { NavTabs } from '@/components/home/NavTabs'
-import { CryptoLiveRail } from '@/components/home/CryptoLiveRail'
 import { HeroZone } from '@/components/home/HeroZone'
-import { MarketsGrid } from '@/components/home/MarketsGrid'
+import { MarketsSection } from '@/components/home/MarketsSection'
 import { Sidebar } from '@/components/home/Sidebar'
 
 interface SearchParams {
@@ -31,21 +30,20 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   return (
     <div>
       <NavTabs />
-      <CryptoLiveRail />
-      <HeroZone events={heroEvents} />
       <div
+        className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_320px]"
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
           gap: 12,
           maxWidth: 1440,
           margin: '0 auto',
           padding: '0 0 24px',
         }}
-        className="md:grid-cols-[minmax(0,1fr)_300px]"
       >
-        <MarketsGrid initialEvents={filtered} />
-        <div style={{ padding: '0 16px' }}>
+        <main style={{ minWidth: 0 }}>
+          <HeroZone events={heroEvents} />
+          <MarketsSection initialEvents={filtered} />
+        </main>
+        <div style={{ padding: '12px 16px 0 0' }}>
           <Sidebar />
         </div>
       </div>

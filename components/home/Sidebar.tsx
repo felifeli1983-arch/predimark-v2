@@ -6,6 +6,7 @@ import { SidebarPortfolio } from './SidebarPortfolio'
 import { SidebarSignals } from './SidebarSignals'
 import { SidebarActivity } from './SidebarActivity'
 import { SidebarHotNow } from './SidebarHotNow'
+import { CryptoLiveRail } from './CryptoLiveRail'
 
 /**
  * Sidebar adattiva:
@@ -94,6 +95,7 @@ export function Sidebar() {
       )}
 
       {authenticated && <SidebarPortfolio />}
+      <CryptoLiveRail />
       <SidebarSignals />
       <SidebarActivity />
       <SidebarHotNow />

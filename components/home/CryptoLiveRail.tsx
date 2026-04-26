@@ -30,15 +30,13 @@ function CoinTile({ symbol, label }: { symbol: string; label: string }) {
   return (
     <div
       style={{
-        flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
-        padding: '8px 14px',
-        background: 'var(--color-bg-secondary)',
-        border: '1px solid var(--color-border-subtle)',
-        borderRadius: 8,
-        minWidth: 110,
+        padding: '6px 8px',
+        background: 'var(--color-bg-tertiary)',
+        borderRadius: 6,
+        minWidth: 0,
       }}
     >
       <div
@@ -80,18 +78,37 @@ function CoinTile({ symbol, label }: { symbol: string; label: string }) {
 
 export function CryptoLiveRail() {
   return (
-    <div
+    <section
       style={{
-        display: 'flex',
-        gap: 8,
-        overflowX: 'auto',
-        padding: '8px 16px 12px',
-        scrollbarWidth: 'none',
+        background: 'var(--color-bg-secondary)',
+        border: '1px solid var(--color-border-subtle)',
+        borderRadius: 10,
+        padding: '12px 14px',
       }}
     >
-      {COINS.map((c) => (
-        <CoinTile key={c.symbol} symbol={c.symbol} label={c.label} />
-      ))}
-    </div>
+      <h3
+        style={{
+          margin: '0 0 10px',
+          fontSize: 12,
+          fontWeight: 700,
+          color: 'var(--color-text-primary)',
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+        }}
+      >
+        Hot Crypto
+      </h3>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 6,
+        }}
+      >
+        {COINS.map((c) => (
+          <CoinTile key={c.symbol} symbol={c.symbol} label={c.label} />
+        ))}
+      </div>
+    </section>
   )
 }
