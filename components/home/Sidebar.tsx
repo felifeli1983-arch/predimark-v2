@@ -8,17 +8,27 @@ import { SidebarActivity } from './SidebarActivity'
 import { SidebarHotNow } from './SidebarHotNow'
 import { SidebarWatchlist } from './SidebarWatchlist'
 import { SidebarNews } from './SidebarNews'
-import { CryptoLiveRail } from './CryptoLiveRail'
 
 /**
- * Sidebar adattiva:
- * - Guest: CTA Sign in + Demo Mode + Hot Now + Activity
- * - Logged: Portfolio + Signals + Activity + Hot Now
+ * Sidebar adattiva (Doc 4 — 3 stati):
+ *  Stato 1 — Guest:        Demo CTA → Signals → HotNow → News → Activity
+ *  Stato 2 — Logged no $:  Portfolio (deposit-cta) → Signals → Watchlist (empty) → HotNow → Activity
+ *  Stato 3 — Logged + $:   Portfolio (active) → Signals → Watchlist → HotNow → Activity
  *
- * Sticky desktop. Hidden mobile (md:block).
+ * Sticky desktop. Hidden mobile (MobileSidebarRails copre quel caso).
  */
 export function Sidebar() {
   const { authenticated, ready, login } = useAuth()
+  // TODO MA4: collegare a balances reali Supabase. Per ora hasDeposit = false sempre.
+  const hasDeposit = false
+
+  const state: 'guest' | 'logged-no-deposit' | 'logged-active' = !ready
+    ? 'guest'
+    : !authenticated
+      ? 'guest'
+      : hasDeposit
+        ? 'logged-active'
+        : 'logged-no-deposit'
 
   return (
     <aside
@@ -32,81 +42,101 @@ export function Sidebar() {
         width: '100%',
       }}
     >
-      {ready && !authenticated && (
-        <section
-          style={{
-            background: 'var(--color-bg-secondary)',
-            border: '1px solid var(--color-cta)',
-            borderRadius: 10,
-            padding: '14px',
-          }}
-        >
-          <h3
-            style={{
-              margin: 0,
-              fontSize: 13,
-              fontWeight: 700,
-              color: 'var(--color-text-primary)',
-              marginBottom: 4,
-            }}
-          >
-            Inizia a tradare
-          </h3>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 11,
-              color: 'var(--color-text-muted)',
-              marginBottom: 10,
-              lineHeight: 1.5,
-            }}
-          >
-            Accedi per piazzare trade reali o esplora in modalità Demo.
-          </p>
-          <button
-            type="button"
-            onClick={login}
-            style={{
-              width: '100%',
-              padding: '8px 12px',
-              borderRadius: 7,
-              background: 'var(--color-cta)',
-              color: '#fff',
-              border: 'none',
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: 'pointer',
-              marginBottom: 6,
-            }}
-          >
-            Sign in
-          </button>
-          <Link
-            href="/?demo=1"
-            style={{
-              display: 'block',
-              textAlign: 'center',
-              fontSize: 11,
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-            }}
-          >
-            Prova in Demo Mode →
-          </Link>
-        </section>
+      {state === 'guest' && (
+        <>
+          <GuestDemoCta onLogin={login} />
+          <SidebarSignals />
+          <SidebarHotNow />
+          <SidebarNews />
+          <SidebarActivity />
+        </>
       )}
 
-      {/* Ordine adattivo da Doc 4 wireframe Pagina 1 sezione "Sidebar adattiva":
-       *   Stato 1 (guest):     Demo CTA → Signals → HotNow → News → Activity
-       *   Stato 2 (logged):    Portfolio → Signals → Watchlist → HotNow → Activity
-       * Per ora rendiamo entrambe le facce + CryptoLiveRail come bonus stato. */}
-      {authenticated ? <SidebarPortfolio /> : null}
-      <SidebarSignals />
-      {authenticated ? <SidebarWatchlist /> : null}
-      <CryptoLiveRail />
-      <SidebarHotNow />
-      <SidebarNews />
-      <SidebarActivity />
+      {state === 'logged-no-deposit' && (
+        <>
+          <SidebarPortfolio mode="deposit-cta" />
+          <SidebarSignals />
+          <SidebarWatchlist populated={false} />
+          <SidebarHotNow />
+          <SidebarActivity />
+        </>
+      )}
+
+      {state === 'logged-active' && (
+        <>
+          <SidebarPortfolio mode="active" />
+          <SidebarSignals />
+          <SidebarWatchlist populated />
+          <SidebarHotNow />
+          <SidebarActivity />
+        </>
+      )}
     </aside>
+  )
+}
+
+function GuestDemoCta({ onLogin }: { onLogin: () => void }) {
+  return (
+    <section
+      style={{
+        background: 'var(--color-bg-secondary)',
+        border: '1px solid var(--color-cta)',
+        borderRadius: 10,
+        padding: '14px',
+      }}
+    >
+      <h3
+        style={{
+          margin: 0,
+          fontSize: 13,
+          fontWeight: 700,
+          color: 'var(--color-text-primary)',
+          marginBottom: 4,
+        }}
+      >
+        Try Demo Mode
+      </h3>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 11,
+          color: 'var(--color-text-muted)',
+          marginBottom: 10,
+          lineHeight: 1.5,
+        }}
+      >
+        Esplora con $10k paper money — nessun rischio, nessuna registrazione.
+      </p>
+      <button
+        type="button"
+        onClick={onLogin}
+        style={{
+          width: '100%',
+          padding: '8px 12px',
+          borderRadius: 7,
+          background: 'var(--color-cta)',
+          color: '#fff',
+          border: 'none',
+          fontSize: 12,
+          fontWeight: 600,
+          cursor: 'pointer',
+          marginBottom: 6,
+        }}
+      >
+        Sign in
+      </button>
+      <Link
+        href="/?demo=1"
+        style={{
+          display: 'block',
+          textAlign: 'center',
+          fontSize: 11,
+          color: 'var(--color-text-secondary)',
+          textDecoration: 'none',
+        }}
+      >
+        Try Demo →
+      </Link>
+    </section>
   )
 }
