@@ -7,9 +7,9 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: 1.4.1 (Vercel deploy) — se account pronto, altrimenti 1.3.2 (Privy + Supabase sync)
+- **Sprint corrente**: 1.4.2 (CORS Supabase) o 1.3.2 (Privy ↔ Supabase sync)
 - **Prossimo sprint**: l'altro tra i due sopra
-- **Nota**: verifica E2E Privy completata ✅
+- **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA1 — Foundation & Setup
 - **Blockers attivi**: nessuno
 - **Note speciali**: DB setup completato da Cowork via MCP (vedi sotto) — MA2 parzialmente anticipata
@@ -17,6 +17,19 @@
 ---
 
 ## Sprint completati
+
+### ✅ Sprint 1.4.1 — Configurazione Vercel — vercel.json + metadata produzione
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente)
+- **Output**:
+  - `vercel.json` con security headers (X-Frame-Options DENY, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)
+  - `app/layout.tsx` con metadata produzione: `title.template '%s | Auktora'`, metadataBase, OpenGraph, Twitter card, `robots: noindex/nofollow`
+  - `NEXT_PUBLIC_APP_URL` aggiunto a `.env.local` (localhost:3001) e `.env.example` (auktora.com)
+  - `npm run build` exit 0, 4 route static prerendered
+  - Commit `2098925` pushato su `main`, deploy Vercel automatico attivato
+- **Note**: CSP (Content-Security-Policy) deferito a MA8 — bloccherebbe Privy/Supabase. `robots: noindex` da abilitare in MA8 pre-launch.
+- **PR**: N/A
 
 ### ✅ Sprint 1.3.1 — Setup Privy — PrivyProvider + wallet auth base
 
@@ -190,7 +203,7 @@
 
 | MA  | Nome                          | Sprint completati | Sprint totali | Status                                   |
 | --- | ----------------------------- | ----------------- | ------------- | ---------------------------------------- |
-| MA1 | Foundation & Setup            | 7                 | 12            | ⏳ In corso                              |
+| MA1 | Foundation & Setup            | 8                 | 12            | ⏳ In corso                              |
 | MA2 | Database & Auth               | ~10               | 11            | 🔶 DB setup anticipato da Cowork via MCP |
 | MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                          |
 | MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                          |
@@ -199,7 +212,7 @@
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                          |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                          |
 
-**Totale sprint**: 7 / 92
+**Totale sprint**: 8 / 92
 
 ---
 
