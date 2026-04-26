@@ -7,15 +7,45 @@
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — Core Pages (primo sprint da definire)
+- **Sprint corrente**: MA3 — prossimo: Sprint 3.1.2 o 3.2.1 (da decidere)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
 - **Macro Area attiva**: MA3 — Core Pages
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 completata ✅ (12/12 sprint). MA2 completata ✅ (tutti sprint). Vercel production env vars corrette ✅. TypeScript types completi ✅ (39 tabelle, commit 527faea). Endpoint `/api/v1/auth/session` funzionante in produzione ✅. E2E test confermato in browser ✅.
+- **Note speciali**: MA1 completata ✅. MA2 completata ✅. Sprint 3.1.1 completato ✅ — PWA app shell attiva, Header+BottomNav in flex flow, More menu con contenuto Doc 4. Bug pendenti: dark/light toggle cambia icona ma non colori CSS (Tailwind 4 specificity — deferrito a sprint dedicato).
 
 ---
 
 ## Sprint completati
+
+### ✅ Fix post-sprint 3.1.1 — PWA app shell + BottomNav desktop visibility + REAL/DEMO layout (Cowork)
+
+- **Chiuso**: 2026-04-26
+- **Eseguito da**: Cowork (modifiche dirette ai file)
+- **Output**:
+  - **`app/layout.tsx`** — ristrutturato come PWA app shell: `html+body overflow:hidden`, solo `<main>` scrolla, Header e BottomNav in flex flow (no `position: fixed`). Fix iOS Safari: `-webkit-fill-available` su html e body. `overscrollBehavior: 'contain'` su main per Chrome Android.
+  - **`app/globals.css`** — aggiunto: `html { height: 100%; height: -webkit-fill-available }`, `body { overflow: hidden; height: 100%; height: -webkit-fill-available }`, `[data-theme='light']` block (manuale toggle via Zustand), `.no-animations` class
+  - **`components/layout/BottomNav.tsx`** — rimosso `position: fixed`, aggiunto `flexShrink: 0` (in-flow PWA). Bottom sheet "More" implementato con contenuto esatto Doc 4 (MORE_ITEMS_AUTHENTICATED: Profile, Watchlist, Following, Sessions, Achievements, Settings, Classifica, Creator program, About, Pricing, Help, Legal; MORE_ITEMS_GUEST: sottoinsieme + CTA "Accedi/Registrati"). Fix visibilità desktop: `className="flex md:hidden"` — `display: flex` inline override rimosso.
+  - **`components/layout/Header.tsx`** — fix REAL/DEMO layout shift: `width: '70px'; justifyContent: 'center'` (larghezza fissa per entrambi gli stati). Header `flexShrink: 0; position: relative` (no sticky — è fuori dal container che scrolla). Responsive breakpoints: Portfolio/Cash `lg:flex` (1024px+), Deposit/theme/gift `md:flex` (768px+), REAL/DEMO solo authenticated.
+- **Causa root BottomNav trembling**: `position: fixed` in un contesto PWA dove html/body non scrollano genera jank su GPU composite layer. Fix definitivo: in-flow flex.
+- **Causa root BottomNav su desktop**: `style={{ display: 'flex' }}` inline sovrascriveva `md:hidden` (specificità inline > classi). Fix: `display` rimosso dall'inline, aggiunto `flex` al className.
+- **Note**: Commit da fare con tutte le modifiche di questa sessione.
+- **PR**: N/A
+
+### ✅ Sprint 3.1.1 — Root layout + Header globale + BottomNav stub — MA3 INIZIATA
+
+- **Chiuso**: 2026-04-26
+- **Verificato da**: Cowork (file letti direttamente + commit confermato)
+- **Output**:
+  - `providers/ReactQueryProvider.tsx` — TanStack Query client con `staleTime: 30s, gcTime: 5min, retry: 1, refetchOnWindowFocus: false`
+  - `lib/stores/themeStore.ts` — Zustand persist store con `isDark`, `animationsEnabled`, toggle actions, persisted in localStorage come `predimark-theme`
+  - `providers/ThemeProvider.tsx` — legge store Zustand, setta `data-theme` attribute su `document.documentElement`, sync con `useEffect`
+  - `components/layout/Header.tsx` — header completo desktop+mobile: logo Auktora, portfolio/cash (lg+), deposit (md+), theme toggle (md+), gift (md+), REAL/DEMO (authenticated), avatar+dropdown (authenticated), hamburger (mobile)
+  - `components/layout/BottomNav.tsx` — stub con 4 voci principali (Home, Search, Signals, Slip) + More button
+  - `app/layout.tsx` — provider chain `ReactQueryProvider > PrivyProvider > ThemeProvider`, app shell div flex column
+  - 21 test passati in 7 file, `npm run build` exit 0
+  - Commit `770db31` pushato su `main`
+- **Note**: post-sprint fixes applicati da Cowork (vedi entry sopra) — PWA restructure, REAL/DEMO, More menu contenuto Doc 4, fix desktop visibility
+- **PR**: N/A
 
 ### ✅ Sprint 2.6.2 — useSession hook + /test-signup E2E page — MA2 CHIUSA
 
@@ -358,14 +388,14 @@
 | --- | ----------------------------- | ----------------- | ------------- | --------------------------------------------- |
 | MA1 | Foundation & Setup            | 12                | 12            | ✅ Completata                                 |
 | MA2 | Database & Auth               | 1 (su 2 rimasti)  | 11            | 🔶 DB anticipato da Cowork, Step 2.6 in corso |
-| MA3 | Core Pages                    | 0                 | 14            | ⚪ Non iniziata                               |
+| MA3 | Core Pages                    | 1                 | 14            | 🔵 In corso — Sprint 3.1.1 completato         |
 | MA4 | Trading Core                  | 0                 | 12            | ⚪ Non iniziata                               |
 | MA5 | User Profile & Demo           | 0                 | 9             | ⚪ Non iniziata                               |
 | MA6 | Creator Program & Leaderboard | 0                 | 11            | ⚪ Non iniziata                               |
 | MA7 | Admin Panel                   | 0                 | 13            | ⚪ Non iniziata                               |
 | MA8 | Polish, Testing, Launch       | 0                 | 10            | ⚪ Non iniziata                               |
 
-**Totale sprint**: 12 / 92
+**Totale sprint**: 13 / 92
 
 ---
 

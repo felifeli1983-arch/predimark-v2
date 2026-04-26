@@ -75,10 +75,9 @@ export function BottomNav() {
        * md:hidden lo nasconde su desktop (≥768px).
        */}
       <nav
-        className="md:hidden"
+        className="flex md:hidden"
         style={{
           flexShrink: 0,
-          display: 'flex',
           background: 'var(--color-bg-secondary)',
           borderTop: '1px solid var(--color-border-default)',
           paddingBottom: 'env(safe-area-inset-bottom)',
