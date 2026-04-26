@@ -30,9 +30,22 @@ function sortEvents(events: AuktoraEvent[], sort: SortKey): AuktoraEvent[] {
 export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: Props) {
   const searchParams = useSearchParams()
   const sort = (searchParams.get('sort') as SortKey) ?? 'volume24h'
+  const q = searchParams.get('q')?.toLowerCase().trim() ?? ''
+  const activeTag = searchParams.get('tag') ?? 'all'
   const [visible, setVisible] = useState(pageSize)
 
-  const sorted = useMemo(() => sortEvents(initialEvents, sort), [initialEvents, sort])
+  const filtered = useMemo(() => {
+    if (!q && activeTag === 'all') return initialEvents
+    const tagLower = activeTag.toLowerCase()
+    return initialEvents.filter((ev) => {
+      const matchQ = !q || ev.title.toLowerCase().includes(q)
+      const matchTag =
+        activeTag === 'all' || ev.tags.some((t) => t.toLowerCase().includes(tagLower))
+      return matchQ && matchTag
+    })
+  }, [initialEvents, q, activeTag])
+
+  const sorted = useMemo(() => sortEvents(filtered, sort), [filtered, sort])
   const visibleEvents = sorted.slice(0, visible)
   const hasMore = visible < sorted.length
 
@@ -52,7 +65,9 @@ export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: P
             fontSize: 13,
           }}
         >
-          Nessun mercato trovato per questa categoria.
+          {q || activeTag !== 'all'
+            ? 'No markets match the current filters.'
+            : 'Nessun mercato trovato per questa categoria.'}
         </div>
       ) : (
         <>

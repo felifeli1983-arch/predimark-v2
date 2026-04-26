@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { LayoutGrid, List, Search, SlidersHorizontal, Zap, ZapOff } from 'lucide-react'
 import { useThemeStore } from '@/lib/stores/themeStore'
@@ -12,6 +13,18 @@ const SORT_OPTIONS = [
   { value: 'edge', label: 'Edge highest' },
 ] as const
 
+const RELATED_TAGS = [
+  { slug: 'all', label: 'All' },
+  { slug: 'trending', label: 'Trending' },
+  { slug: 'breaking', label: 'Breaking' },
+  { slug: 'politics', label: 'Politics' },
+  { slug: 'crypto', label: 'Crypto' },
+  { slug: 'nfl', label: 'NFL' },
+  { slug: 'gpt-5', label: 'GPT-5' },
+] as const
+
+const SEARCH_DEBOUNCE_MS = 300
+
 interface Props {
   layout: 'grid' | 'list'
   onLayoutChange: (l: 'grid' | 'list') => void
@@ -23,8 +36,13 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
   const searchParams = useSearchParams()
   const sort = searchParams.get('sort') ?? 'volume24h'
   const category = searchParams.get('category') ?? 'all'
-  const queryStr = searchParams.get('q') ?? ''
+  const activeTag = searchParams.get('tag') ?? 'all'
+  const initialQuery = searchParams.get('q') ?? ''
   const { animationsEnabled, setAnimationsEnabled } = useThemeStore()
+
+  // Debounce locale per il search input
+  const [queryInput, setQueryInput] = useState(initialQuery)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   function setParam(key: string, value: string, defaultValue: string) {
     const params = new URLSearchParams(searchParams.toString())
@@ -33,6 +51,22 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
     const qs = params.toString()
     router.push(qs ? `${pathname}?${qs}` : pathname)
   }
+
+  // Push debounced del search query
+  useEffect(() => {
+    if (queryInput === initialQuery) return
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (queryInput.trim()) params.set('q', queryInput.trim())
+      else params.delete('q')
+      const qs = params.toString()
+      router.push(qs ? `${pathname}?${qs}` : pathname)
+    }, SEARCH_DEBOUNCE_MS)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [queryInput, initialQuery, pathname, router, searchParams])
 
   return (
     <div
@@ -43,6 +77,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
         padding: '12px 16px 0',
       }}
     >
+      {/* PRIMA RIGA: titolo + filtri */}
       <div
         style={{
           display: 'flex',
@@ -65,7 +100,6 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
         </h2>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-          {/* Filters drawer button (stub) */}
           <button
             type="button"
             aria-label="Filtri avanzati"
@@ -75,7 +109,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
               alignItems: 'center',
               gap: 4,
               background: 'var(--color-bg-secondary)',
-              border: '1px solid var(--color-border-default)',
+              border: '1px solid var(--color-border-subtle)',
               color: 'var(--color-text-secondary)',
               borderRadius: 6,
               padding: '4px 10px',
@@ -87,14 +121,13 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             Filters
           </button>
 
-          {/* Search markets — input mini */}
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
               background: 'var(--color-bg-secondary)',
-              border: '1px solid var(--color-border-default)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: 6,
               padding: '4px 8px',
               minWidth: 180,
@@ -104,8 +137,8 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             <input
               type="search"
               placeholder="Search markets…"
-              defaultValue={queryStr}
-              onChange={(e) => setParam('q', e.target.value, '')}
+              value={queryInput}
+              onChange={(e) => setQueryInput(e.target.value)}
               style={{
                 background: 'none',
                 border: 'none',
@@ -118,7 +151,6 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             />
           </div>
 
-          {/* Animations toggle */}
           <button
             type="button"
             onClick={() => setAnimationsEnabled(!animationsEnabled)}
@@ -126,7 +158,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             title={animationsEnabled ? 'Animations: on' : 'Animations: off'}
             style={{
               background: 'var(--color-bg-secondary)',
-              border: '1px solid var(--color-border-default)',
+              border: '1px solid var(--color-border-subtle)',
               color: animationsEnabled ? 'var(--color-cta)' : 'var(--color-text-muted)',
               borderRadius: 6,
               padding: '4px 8px',
@@ -139,7 +171,6 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             {animationsEnabled ? <Zap size={12} /> : <ZapOff size={12} />}
           </button>
 
-          {/* Sort */}
           <label style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Sort</label>
           <select
             value={sort}
@@ -147,7 +178,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             style={{
               background: 'var(--color-bg-secondary)',
               color: 'var(--color-text-primary)',
-              border: '1px solid var(--color-border-default)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: 6,
               padding: '4px 8px',
               fontSize: 12,
@@ -161,12 +192,11 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             ))}
           </select>
 
-          {/* Layout toggle */}
           <div
             style={{
               display: 'flex',
               background: 'var(--color-bg-secondary)',
-              border: '1px solid var(--color-border-default)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: 6,
               padding: 2,
             }}
@@ -207,6 +237,45 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* SECONDA RIGA: sub-filtri Related (tag scrollabili) */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 4,
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          paddingBottom: 4,
+        }}
+      >
+        {RELATED_TAGS.map((tag) => {
+          const isActive = activeTag === tag.slug
+          return (
+            <button
+              key={tag.slug}
+              type="button"
+              onClick={() => setParam('tag', tag.slug, 'all')}
+              style={{
+                padding: '4px 10px',
+                borderRadius: 999,
+                fontSize: 12,
+                fontWeight: isActive ? 600 : 500,
+                whiteSpace: 'nowrap',
+                cursor: 'pointer',
+                flexShrink: 0,
+                background: isActive ? 'var(--color-cta-bg)' : 'transparent',
+                color: isActive ? 'var(--color-cta)' : 'var(--color-text-muted)',
+                border: isActive
+                  ? '1px solid var(--color-cta)'
+                  : '1px solid var(--color-border-subtle)',
+                transition: 'background 150ms, color 150ms',
+              }}
+            >
+              {tag.label}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
