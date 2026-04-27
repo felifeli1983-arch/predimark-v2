@@ -7,6 +7,8 @@ export interface BalanceState {
   usdcLocked: number
   demoBalance: number
   demoLocked: number
+  realPortfolioValue: number
+  demoPortfolioValue: number
   /** True dopo il primo fetch riuscito */
   hydrated: boolean
 }
@@ -27,6 +29,8 @@ const INITIAL_STATE: BalanceState = {
   usdcLocked: 0,
   demoBalance: 10000, // default schema (mostriamo questo durante la fase pre-hydrate)
   demoLocked: 0,
+  realPortfolioValue: 0,
+  demoPortfolioValue: 0,
   hydrated: false,
 }
 
@@ -38,6 +42,8 @@ export const useBalance = create<BalanceStore>()((set) => ({
       usdcLocked: b.usdcLocked,
       demoBalance: b.demoBalance,
       demoLocked: b.demoLocked,
+      realPortfolioValue: b.realPortfolioValue,
+      demoPortfolioValue: b.demoPortfolioValue,
       hydrated: true,
     }),
   setDemoBalance: (newBalance) => set({ demoBalance: newBalance }),

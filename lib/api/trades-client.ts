@@ -54,12 +54,14 @@ export async function postTradeSubmit(
   return (await res.json()) as TradeSubmitResponse
 }
 
-/** GET /api/v1/balances — saldo USDC reale + demo dell'utente */
+/** GET /api/v1/balances — saldo USDC reale + demo + portfolio dell'utente */
 export interface UserBalance {
   usdcBalance: number
   usdcLocked: number
   demoBalance: number
   demoLocked: number
+  realPortfolioValue: number
+  demoPortfolioValue: number
 }
 
 export async function fetchUserBalance(token: string): Promise<UserBalance> {

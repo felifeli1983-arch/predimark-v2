@@ -1,6 +1,7 @@
 'use client'
 
-import { Bell, Gift, Sun, Moon, Wallet } from 'lucide-react'
+import { Bell, Gift, Sun, Moon, Wallet, TrendingUp } from 'lucide-react'
+import type { ReactNode } from 'react'
 import type { AuthUser } from '@/lib/hooks/useAuth'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { useBalance } from '@/lib/stores/useBalance'
@@ -21,7 +22,11 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
   // Balance dallo store (sync via BalanceHydrator)
   const usdcBalance = useBalance((s) => s.usdcBalance)
   const demoBalance = useBalance((s) => s.demoBalance)
+  const realPortfolioValue = useBalance((s) => s.realPortfolioValue)
+  const demoPortfolioValue = useBalance((s) => s.demoPortfolioValue)
   const cashAvailable = isDemo ? demoBalance : usdcBalance
+  const portfolioValue = isDemo ? demoPortfolioValue : realPortfolioValue
+  const accent = isDemo ? 'var(--color-warning)' : 'var(--color-cta)'
 
   return (
     <div
@@ -36,34 +41,20 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
       {authenticated && (
         <div
           className="hidden lg:flex"
-          style={{
-            gap: 6,
-            marginRight: '6px',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            padding: '6px 10px',
-            borderRadius: 8,
-            background: 'var(--color-bg-tertiary)',
-            border: '1px solid var(--color-border-subtle)',
-            /* Larghezza fissa: REAL e DEMO non spostano la nav bar */
-            minWidth: 130,
-          }}
-          aria-label={`Saldo ${isDemo ? 'demo' : 'reale'} ${cashAvailable.toFixed(2)} USDC`}
+          style={{ gap: 8, marginRight: '6px', alignItems: 'center' }}
         >
-          <Wallet
-            size={13}
-            style={{ color: isDemo ? 'var(--color-warning)' : 'var(--color-cta)' }}
+          <BalancePill
+            label="Portfolio"
+            icon={<TrendingUp size={13} style={{ color: accent }} />}
+            value={portfolioValue}
+            isDemo={isDemo}
           />
-          <strong
-            style={{
-              fontSize: 12,
-              color: isDemo ? 'var(--color-warning)' : 'var(--color-text-primary)',
-              fontVariantNumeric: 'tabular-nums',
-              fontWeight: 600,
-            }}
-          >
-            ${cashAvailable.toFixed(2)}
-          </strong>
+          <BalancePill
+            label="Contanti"
+            icon={<Wallet size={13} style={{ color: accent }} />}
+            value={cashAvailable}
+            isDemo={isDemo}
+          />
         </div>
       )}
 
@@ -176,6 +167,63 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
           Sign in
         </button>
       )}
+    </div>
+  )
+}
+
+/** Pill compatto per Portfolio o Contanti — larghezza fissa, niente shift al toggle DEMO/REAL. */
+function BalancePill({
+  label,
+  icon,
+  value,
+  isDemo,
+}: {
+  label: string
+  icon: ReactNode
+  value: number
+  isDemo: boolean
+}) {
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '5px 10px',
+        borderRadius: 8,
+        background: 'var(--color-bg-tertiary)',
+        border: '1px solid var(--color-border-subtle)',
+        minWidth: 130,
+        justifyContent: 'flex-end',
+      }}
+      aria-label={`${label} ${isDemo ? 'demo' : 'reale'} ${value.toFixed(2)} USDC`}
+    >
+      {icon}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+        <span
+          style={{
+            fontSize: 9,
+            color: 'var(--color-text-muted)',
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            lineHeight: 1,
+            fontWeight: 600,
+          }}
+        >
+          {label}
+        </span>
+        <strong
+          style={{
+            fontSize: 12,
+            color: isDemo ? 'var(--color-warning)' : 'var(--color-text-primary)',
+            fontVariantNumeric: 'tabular-nums',
+            fontWeight: 600,
+            lineHeight: 1.2,
+          }}
+        >
+          ${value.toFixed(2)}
+        </strong>
+      </div>
     </div>
   )
 }
