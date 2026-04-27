@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/providers/ThemeProvider'
 import { Header } from '@/components/layout/Header'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Footer } from '@/components/layout/Footer'
+import { NavTabs } from '@/components/home/NavTabs'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     flexDirection: 'column',
                   }}
                 >
+                  <NavTabs />
                   {children}
                   <Footer />
                 </main>

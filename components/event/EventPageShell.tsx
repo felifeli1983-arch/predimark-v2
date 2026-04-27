@@ -22,81 +22,97 @@ export function EventPageShell({ event }: Props) {
   const isResolved = event.closed
 
   return (
-    <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 0 24px' }}>
-      {/* Mobile: back. Desktop: breadcrumb */}
-      <div className="md:hidden" style={{ padding: '12px 16px 4px' }}>
-        <Link
-          href="/"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            color: 'var(--color-text-secondary)',
-            fontSize: 13,
-            textDecoration: 'none',
-          }}
-        >
-          <ChevronLeft size={14} />
-          Indietro
-        </Link>
-      </div>
-      <nav
-        aria-label="breadcrumb"
-        className="hidden md:flex"
+    <div
+      className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_320px]"
+      style={{
+        gap: 12,
+        maxWidth: 1440,
+        margin: '0 auto',
+        padding: '0 0 24px',
+        width: '100%',
+      }}
+    >
+      <main
         style={{
-          alignItems: 'center',
-          gap: 6,
-          padding: '12px 16px 4px',
-          fontSize: 12,
-          color: 'var(--color-text-muted)',
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+          padding: '12px 16px 0',
         }}
       >
-        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-          Home
-        </Link>
-        <ChevronRight size={12} />
-        <Link
-          href={`/?category=${encodeURIComponent(primaryTag)}`}
-          style={{ color: 'inherit', textDecoration: 'none', textTransform: 'capitalize' }}
-        >
-          {primaryTag}
-        </Link>
-        <ChevronRight size={12} />
-        <span
+        {/* Mobile: back. Desktop: breadcrumb */}
+        <div className="md:hidden">
+          <Link
+            href="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              color: 'var(--color-text-secondary)',
+              fontSize: 13,
+              textDecoration: 'none',
+            }}
+          >
+            <ChevronLeft size={14} />
+            Indietro
+          </Link>
+        </div>
+        <nav
+          aria-label="breadcrumb"
+          className="hidden md:flex"
           style={{
-            color: 'var(--color-text-secondary)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            color: 'var(--color-text-muted)',
           }}
         >
-          {event.title}
-        </span>
-      </nav>
+          <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+            Home
+          </Link>
+          <ChevronRight size={12} />
+          <Link
+            href={`/?category=${encodeURIComponent(primaryTag)}`}
+            style={{ color: 'inherit', textDecoration: 'none', textTransform: 'capitalize' }}
+          >
+            {primaryTag}
+          </Link>
+          <ChevronRight size={12} />
+          <span
+            style={{
+              color: 'var(--color-text-secondary)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {event.title}
+          </span>
+        </nav>
 
-      {isResolved && <ResolvedBanner />}
+        {isResolved && <ResolvedBanner />}
 
-      <div
-        className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_320px]"
-        style={{ gap: 12, padding: '0 16px' }}
+        <EventHero event={event} />
+        <ChartHistoryStub />
+        <EventProbabilities event={event} onTrade={handleTradeStub} />
+        {/* Sidebar inline su mobile */}
+        <div className="md:hidden">
+          <EventSidebarStub event={event} layout="inline" />
+        </div>
+        <EventInfoTabs event={event} />
+      </main>
+      <aside
+        className="hidden md:block"
+        style={{
+          alignSelf: 'start',
+          position: 'sticky',
+          top: 8,
+          padding: '12px 16px 0 0',
+        }}
       >
-        <main style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <EventHero event={event} />
-          <ChartHistoryStub />
-          <EventProbabilities event={event} onTrade={handleTradeStub} />
-          {/* Sidebar inline su mobile */}
-          <div className="md:hidden">
-            <EventSidebarStub event={event} layout="inline" />
-          </div>
-          <EventInfoTabs event={event} />
-        </main>
-        <aside
-          className="hidden md:block"
-          style={{ alignSelf: 'start', position: 'sticky', top: 8 }}
-        >
-          <EventSidebarStub event={event} layout="sidebar" />
-        </aside>
-      </div>
+        <EventSidebarStub event={event} layout="sidebar" />
+      </aside>
     </div>
   )
 }
@@ -105,7 +121,6 @@ function ResolvedBanner() {
   return (
     <div
       style={{
-        margin: '8px 16px',
         padding: '10px 14px',
         borderRadius: 8,
         background: 'var(--color-warning-bg)',
