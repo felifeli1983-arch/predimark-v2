@@ -10,6 +10,7 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { Footer } from '@/components/layout/Footer'
 import { NavTabs } from '@/components/home/NavTabs'
 import { WatchlistHydrator } from '@/components/WatchlistHydrator'
+import { BalanceHydrator } from '@/components/BalanceHydrator'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -87,6 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </main>
                 <BottomNav />
                 <WatchlistHydrator />
+                <BalanceHydrator />
               </div>
             </ThemeProvider>
           </PrivyProvider>

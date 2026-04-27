@@ -3,6 +3,7 @@
 import { Bell, Gift, Sun, Moon } from 'lucide-react'
 import type { AuthUser } from '@/lib/hooks/useAuth'
 import { useThemeStore } from '@/lib/stores/themeStore'
+import { useBalance } from '@/lib/stores/useBalance'
 import { ProfileDropdown } from './ProfileDropdown'
 import { RealDemoToggle } from './RealDemoToggle'
 
@@ -17,6 +18,11 @@ interface Props {
 export function HeaderActions({ ready, authenticated, user, login, logout }: Props) {
   // theme + isDemo dal Zustand store globale (persiste in localStorage)
   const { theme, toggleTheme, isDemo, toggleDemo } = useThemeStore()
+  // Balance dallo store (sync via BalanceHydrator)
+  const usdcBalance = useBalance((s) => s.usdcBalance)
+  const demoBalance = useBalance((s) => s.demoBalance)
+  const cashAvailable = isDemo ? demoBalance : usdcBalance
+
   return (
     <div
       style={{
@@ -37,28 +43,31 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
               fontSize: '12px',
               color: 'var(--color-text-secondary)',
               whiteSpace: 'nowrap',
+              fontWeight: 600,
             }}
           >
             Portfolio{' '}
             <strong
-              style={{ color: 'var(--color-text-primary)', fontVariantNumeric: 'tabular-nums' }}
+              style={{
+                color: isDemo ? 'var(--color-warning)' : 'var(--color-text-primary)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
             >
-              $0.00
+              ${cashAvailable.toFixed(2)}
             </strong>
-          </span>
-          <span
-            style={{
-              fontSize: '12px',
-              color: 'var(--color-text-secondary)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Cash{' '}
-            <strong
-              style={{ color: 'var(--color-text-primary)', fontVariantNumeric: 'tabular-nums' }}
-            >
-              $0.00
-            </strong>
+            {isDemo && (
+              <span
+                style={{
+                  marginLeft: 4,
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: '0.05em',
+                  color: 'var(--color-warning)',
+                }}
+              >
+                DEMO
+              </span>
+            )}
           </span>
         </div>
       )}

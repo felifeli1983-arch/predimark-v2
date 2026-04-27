@@ -5,6 +5,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import { postTradeSubmit, TradeError, type TradeSubmitPayload } from '@/lib/api/trades-client'
 import type { TradeSubmitResponse } from '@/app/api/v1/trades/submit/route'
 import { useTradeWidget } from '@/lib/stores/useTradeWidget'
+import { balanceActions } from '@/lib/stores/useBalance'
 
 export type TradeSubmitStatus = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -72,6 +73,10 @@ export function useTradeSubmit(): UseTradeSubmitResult {
       const res = await postTradeSubmit(token, payload)
       setResult(res)
       setStatus('success')
+      // Aggiorna live il saldo nello store globale (Header + TradeBalanceBadge si aggiornano)
+      if (res.newDemoBalance !== null) {
+        balanceActions.setDemoBalance(res.newDemoBalance)
+      }
       closeWidget()
       return res
     } catch (err) {

@@ -5,7 +5,12 @@ import type { AuktoraEvent, AuktoraMarket, AuktoraOutcome } from '@/lib/polymark
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { OutcomeRowFull } from './OutcomeRowFull'
 
-type TradeHandler = (eventId: string, marketId: string, side: string) => void
+/**
+ * Handler chiamato dai bottoni outcome dentro la pagina evento.
+ * Riceve (marketId, side) — l'event è già noto al parent (EventPageShell)
+ * che ha questo componente in scope.
+ */
+type TradeHandler = (marketId: string, side: string) => void
 
 interface Props {
   event: AuktoraEvent
@@ -13,20 +18,18 @@ interface Props {
 }
 
 export function EventProbabilities({ event, onTrade }: Props) {
-  const trade = (marketId: string, side: string) => onTrade(event.id, marketId, side)
-
   switch (event.kind) {
     case 'binary':
-      return <BinaryView event={event} onTrade={trade} />
+      return <BinaryView event={event} onTrade={onTrade} />
     case 'h2h_sport':
-      return <H2HView event={event} onTrade={trade} />
+      return <H2HView event={event} onTrade={onTrade} />
     case 'crypto_up_down':
-      return <CryptoView event={event} onTrade={trade} />
+      return <CryptoView event={event} onTrade={onTrade} />
     case 'multi_strike':
-      return <StrikeListView event={event} onTrade={trade} />
+      return <StrikeListView event={event} onTrade={onTrade} />
     case 'multi_outcome':
     default:
-      return <OutcomeListView event={event} onTrade={trade} />
+      return <OutcomeListView event={event} onTrade={onTrade} />
   }
 }
 
