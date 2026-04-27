@@ -5,12 +5,12 @@ export type { PositionItem, TradeHistoryItem }
 
 interface PositionsResponse {
   items: PositionItem[]
-  meta: { total: number; totalValue: number; totalPnl: number }
+  meta: { total: number; page: number; perPage: number; totalValue: number; totalPnl: number }
 }
 
 interface TradesResponse {
   items: TradeHistoryItem[]
-  meta: { total: number }
+  meta: { total: number; page: number; perPage: number }
 }
 
 async function authedGet<T>(token: string, url: string): Promise<T> {
@@ -28,11 +28,19 @@ async function authedGet<T>(token: string, url: string): Promise<T> {
   return (await res.json()) as T
 }
 
+interface PositionsListOpts {
+  page?: number
+  perPage?: number
+}
+
 export async function fetchOpenPositions(
   token: string,
-  isDemo: boolean
+  isDemo: boolean,
+  opts: PositionsListOpts = {}
 ): Promise<PositionsResponse> {
   const params = new URLSearchParams({ is_demo: String(isDemo), only_open: 'true' })
+  if (opts.page) params.set('page', String(opts.page))
+  if (opts.perPage) params.set('per_page', String(opts.perPage))
   return authedGet<PositionsResponse>(token, `/api/v1/users/me/positions?${params}`)
 }
 
@@ -40,6 +48,8 @@ interface HistoryFilters {
   isDemo: boolean
   type?: 'open' | 'close' | 'resolution'
   period?: 'today' | '7d' | '30d' | 'all'
+  page?: number
+  perPage?: number
 }
 
 export async function fetchTradesHistory(
@@ -49,6 +59,8 @@ export async function fetchTradesHistory(
   const params = new URLSearchParams({ is_demo: String(filters.isDemo) })
   if (filters.type) params.set('type', filters.type)
   if (filters.period) params.set('period', filters.period)
+  if (filters.page) params.set('page', String(filters.page))
+  if (filters.perPage) params.set('per_page', String(filters.perPage))
   return authedGet<TradesResponse>(token, `/api/v1/users/me/trades?${params}`)
 }
 

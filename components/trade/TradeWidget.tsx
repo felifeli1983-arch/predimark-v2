@@ -151,7 +151,7 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
           </div>
 
           {/* Body — Mercato o Limite */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px' }}>
             {mode === 'market' ? <TradeMarketTab /> : <TradeLimitTab />}
           </div>
 

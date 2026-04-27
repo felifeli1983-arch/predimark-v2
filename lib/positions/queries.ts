@@ -30,12 +30,12 @@ interface ListOptions {
   offset?: number
 }
 
-/** Lista positions con join markets, filtrate per is_demo + open. */
+/** Lista positions con join markets, filtrate per is_demo + open. Ritorna anche count totale. */
 export async function listUserPositions(
   supabase: SupabaseClient<Database>,
   userId: string,
   opts: ListOptions
-): Promise<PositionItem[] | { error: string }> {
+): Promise<{ items: PositionItem[]; total: number } | { error: string }> {
   let query = supabase
     .from('positions')
     .select(
@@ -44,7 +44,8 @@ export async function listUserPositions(
         current_price, current_value, unrealized_pnl, unrealized_pnl_pct,
         is_demo, is_open, opened_at, closed_at,
         markets ( id, polymarket_market_id, slug, title, image_url, category )
-      `
+      `,
+      { count: 'exact' }
     )
     .eq('user_id', userId)
     .eq('is_demo', opts.isDemo)
@@ -57,10 +58,10 @@ export async function listUserPositions(
     query = query.range(opts.offset ?? 0, (opts.offset ?? 0) + opts.limit - 1)
   }
 
-  const { data, error } = await query
+  const { data, error, count } = await query
   if (error) return { error: error.message }
 
-  return (data ?? []).map((row) => ({
+  const items = (data ?? []).map((row) => ({
     id: row.id,
     marketId: row.market_id,
     polymarketMarketId: row.markets?.polymarket_market_id ?? '',
@@ -81,6 +82,37 @@ export async function listUserPositions(
     openedAt: row.opened_at,
     closedAt: row.closed_at,
   }))
+
+  return { items, total: count ?? items.length }
+}
+
+/**
+ * Aggregate (totalValue, totalPnl) calcolato server-side su TUTTE le positions
+ * dell'user che matchano i filtri — indipendente dalla paginazione.
+ */
+export async function summarizeUserPositions(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  opts: { isDemo: boolean; onlyOpen?: boolean }
+): Promise<{ totalValue: number; totalPnl: number } | { error: string }> {
+  let query = supabase
+    .from('positions')
+    .select('current_value, unrealized_pnl')
+    .eq('user_id', userId)
+    .eq('is_demo', opts.isDemo)
+  if (opts.onlyOpen) query = query.eq('is_open', true)
+
+  const { data, error } = await query
+  if (error) return { error: error.message }
+  const totalValue = (data ?? []).reduce(
+    (acc, r) => acc + (r.current_value !== null ? Number(r.current_value) : 0),
+    0
+  )
+  const totalPnl = (data ?? []).reduce(
+    (acc, r) => acc + (r.unrealized_pnl !== null ? Number(r.unrealized_pnl) : 0),
+    0
+  )
+  return { totalValue, totalPnl }
 }
 
 /** Lookup singola position con verifica ownership. */

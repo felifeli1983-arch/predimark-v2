@@ -473,7 +473,7 @@ html[data-theme='light'] {
   left: 0;
   right: 0;
   bottom: 0;
-  max-height: 90vh;
+  max-height: 90dvh;
   background: var(--color-bg-secondary);
   border-top: 1px solid var(--color-border-subtle);
   border-top-left-radius: 16px;
@@ -482,6 +482,7 @@ html[data-theme='light'] {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
   animation: trade-slide-up 200ms ease-out;
 }
 @keyframes trade-slide-up {

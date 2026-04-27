@@ -12,7 +12,8 @@ export function PositionsList() {
   const { ready, authenticated, getAccessToken, login } = usePrivy()
   const isDemo = useThemeStore((s) => s.isDemo)
   const [items, setItems] = useState<PositionItem[]>([])
-  const [meta, setMeta] = useState<{ totalValue: number; totalPnl: number }>({
+  const [meta, setMeta] = useState<{ total: number; totalValue: number; totalPnl: number }>({
+    total: 0,
     totalValue: 0,
     totalPnl: 0,
   })
@@ -35,7 +36,11 @@ export function PositionsList() {
         const data = await fetchOpenPositions(token, isDemo)
         if (!cancelled) {
           setItems(data.items)
-          setMeta({ totalValue: data.meta.totalValue, totalPnl: data.meta.totalPnl })
+          setMeta({
+            total: data.meta.total,
+            totalValue: data.meta.totalValue,
+            totalPnl: data.meta.totalPnl,
+          })
           setLoading(false)
         }
       } catch (err) {
@@ -95,7 +100,7 @@ export function PositionsList() {
           value={`${meta.totalPnl >= 0 ? '+' : ''}$${meta.totalPnl.toFixed(2)}`}
           color={meta.totalPnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)'}
         />
-        <Stat label="Posizioni aperte" value={String(items.length)} />
+        <Stat label="Posizioni aperte" value={String(meta.total)} />
       </header>
 
       <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 8 }}>

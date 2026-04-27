@@ -44,12 +44,12 @@ function periodCutoff(period: PeriodFilter): string | null {
   return new Date(now - days * 24 * 60 * 60 * 1000).toISOString()
 }
 
-/** Storico trade dell'utente con join markets + filtri opzionali. */
+/** Storico trade dell'utente con join markets + filtri opzionali + count totale. */
 export async function listTradesHistory(
   supabase: SupabaseClient<Database>,
   userId: string,
   opts: ListOptions
-): Promise<TradeHistoryItem[] | { error: string }> {
+): Promise<{ items: TradeHistoryItem[]; total: number } | { error: string }> {
   let query = supabase
     .from('trades')
     .select(
@@ -57,7 +57,8 @@ export async function listTradesHistory(
         id, market_id, trade_type, side, shares, price, total_amount,
         pnl, pnl_pct, is_win, is_demo, source, executed_at,
         markets ( polymarket_market_id, slug, title, image_url )
-      `
+      `,
+      { count: 'exact' }
     )
     .eq('user_id', userId)
     .eq('is_demo', opts.isDemo)
@@ -70,10 +71,10 @@ export async function listTradesHistory(
     query = query.range(opts.offset ?? 0, (opts.offset ?? 0) + opts.limit - 1)
   }
 
-  const { data, error } = await query
+  const { data, error, count } = await query
   if (error) return { error: error.message }
 
-  return (data ?? []).map((row) => ({
+  const items = (data ?? []).map((row) => ({
     id: row.id,
     marketId: row.market_id,
     polymarketMarketId: row.markets?.polymarket_market_id ?? '',
@@ -92,4 +93,6 @@ export async function listTradesHistory(
     source: row.source,
     executedAt: row.executed_at,
   }))
+
+  return { items, total: count ?? items.length }
 }
