@@ -57,6 +57,8 @@ export function EventCardFooter({
     >
       <span
         style={{
+          flex: 1,
+          minWidth: 0,
           fontSize: 11,
           color: 'var(--color-text-muted)',
           whiteSpace: 'nowrap',
@@ -84,15 +86,16 @@ export function EventCardFooter({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            background: 'var(--color-bg-elevated)',
-            border: '1px solid var(--color-border-subtle)',
-            color: 'var(--color-text-secondary)',
+            background: 'var(--color-cta-bg)',
+            border: '1px solid var(--color-cta)',
+            color: 'var(--color-cta)',
             borderRadius: 6,
             padding: '4px 8px',
             fontSize: 11,
             fontWeight: 600,
             cursor: 'pointer',
             flexShrink: 0,
+            lineHeight: 1,
           }}
         >
           <Plus size={11} />
