@@ -466,6 +466,46 @@ html[data-theme='light'] {
   transition-duration: 0ms !important;
 }
 
+/* Trade Widget bottom sheet (mobile <lg) */
+.trade-widget-sheet {
+  position: fixed;
+  z-index: 110;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 90vh;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border-subtle);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: trade-slide-up 200ms ease-out;
+}
+@keyframes trade-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Loader2 lucide spin */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* StarToggle watchlist — hover effect (warning color più acceso) */
 .star-toggle {
   cursor: pointer;
