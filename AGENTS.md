@@ -16,11 +16,29 @@ La cartella `predimark-v2/` e il repo GitHub restano invariati — sono nomi inf
 
 ## Regole generali
 
-- Non modificare `docs/HANDOFF-LOG.md` — lo gestisce Cowork
-- Non eseguire migration Supabase — le gestisce Cowork via MCP
 - Non installare Playwright — end-to-end rinviato a MA8
 - Usare `vitest` (non Jest)
 - TypeScript strict — niente `any` espliciti
+
+## Modalità operativa
+
+VS Code Claude (questo agente) gestisce l'intero progetto in autonomia: codice,
+DB Supabase via MCP, planning sprint, decisioni architetturali. Cowork è
+disattivato a partire da MA4.
+
+### Matrice autonomia DB Supabase (MCP)
+
+| Tipo operazione                               | Quando                 | Conferma utente |
+| --------------------------------------------- | ---------------------- | --------------- |
+| Read-only (`list_tables`, `get_logs`,         | sempre                 | NO              |
+| `generate_typescript_types`, ecc.)            |                        |                 |
+| Write su staging (`hhuwxcijarcyivwzpqfp`)     | sempre, senza chiedere | NO              |
+| Write su prod (`vlrvixndaeqcxftovzmw`)        | solo dopo OK utente    | SÌ, esplicita   |
+| Drop / truncate / destructive (qualsiasi env) | con OK utente          | SÌ, esplicita   |
+
+L'agente PUÒ aggiornare `docs/HANDOFF-LOG.md` quando completa uno sprint,
+documentando cosa è cambiato (file, migration, decisioni). Resta un changelog
+tecnico, non un canale verso Cowork.
 
 ## Comandi utili
 
