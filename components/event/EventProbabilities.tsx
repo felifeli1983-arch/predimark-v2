@@ -66,6 +66,7 @@ function BigBtn({
   return (
     <button
       type="button"
+      className={`btn-trade ${isYes ? 'btn-trade-yes' : 'btn-trade-no'}`}
       onClick={onClick}
       style={{
         flex: 1,
@@ -73,10 +74,6 @@ function BigBtn({
         borderRadius: 10,
         fontSize: 16,
         fontWeight: 700,
-        cursor: 'pointer',
-        background: isYes ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
-        color: isYes ? 'var(--color-success)' : 'var(--color-danger)',
-        border: `1px solid ${isYes ? 'var(--color-success)' : 'var(--color-danger)'}`,
       }}
     >
       {label}
@@ -130,27 +127,27 @@ function H2HView({ event, onTrade }: ViewProps) {
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        {outcomes.map((o: AuktoraOutcome) => (
-          <button
-            key={o.name}
-            type="button"
-            onClick={() => onTrade(market.id, o.name)}
-            style={{
-              flex: 1,
-              minWidth: 120,
-              padding: '14px 18px',
-              borderRadius: 10,
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: 'pointer',
-              background: 'var(--color-bg-tertiary)',
-              color: 'var(--color-text-primary)',
-              border: '1px solid var(--color-border-subtle)',
-            }}
-          >
-            {o.name}
-          </button>
-        ))}
+        {outcomes.map((o: AuktoraOutcome) => {
+          const isFav = o.price >= 0.5
+          return (
+            <button
+              key={o.name}
+              type="button"
+              className={`btn-trade ${isFav ? 'btn-trade-team-favorite' : 'btn-trade-team'}`}
+              onClick={() => onTrade(market.id, o.name)}
+              style={{
+                flex: 1,
+                minWidth: 120,
+                padding: '14px 18px',
+                borderRadius: 10,
+                fontSize: 14,
+                fontWeight: 700,
+              }}
+            >
+              {o.name}
+            </button>
+          )
+        })}
       </div>
     </Card>
   )
@@ -295,6 +292,7 @@ function ActionButton({
   return (
     <button
       type="button"
+      className={`btn-trade ${isUp ? 'btn-trade-up' : 'btn-trade-down'}`}
       onClick={onClick}
       style={{
         flex: 1,
@@ -302,10 +300,6 @@ function ActionButton({
         borderRadius: 10,
         fontSize: 14,
         fontWeight: 700,
-        cursor: 'pointer',
-        background: isUp ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
-        color: isUp ? 'var(--color-success)' : 'var(--color-danger)',
-        border: `1px solid ${isUp ? 'var(--color-success)' : 'var(--color-danger)'}`,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',

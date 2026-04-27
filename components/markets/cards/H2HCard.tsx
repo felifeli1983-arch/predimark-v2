@@ -189,25 +189,16 @@ function TeamButton({
   const isFavorite = outcome.price > 0.5
   const isMuted = variant === 'muted'
 
-  const bg = isMuted
-    ? 'var(--color-bg-tertiary)'
+  const buttonClass = isMuted
+    ? 'btn-trade btn-trade-team'
     : isFavorite
-      ? 'var(--color-success-bg)'
-      : 'var(--color-bg-tertiary)'
-  const fg = isMuted
-    ? 'var(--color-text-secondary)'
-    : isFavorite
-      ? 'var(--color-success)'
-      : 'var(--color-text-primary)'
-  const border = isMuted
-    ? 'var(--color-border-default)'
-    : isFavorite
-      ? 'var(--color-success)'
-      : 'var(--color-border-default)'
+      ? 'btn-trade btn-trade-team-favorite'
+      : 'btn-trade btn-trade-team'
 
   return (
     <button
       type="button"
+      className={buttonClass}
       onClick={(e) => {
         if (!onClick) return
         e.preventDefault()
@@ -221,9 +212,6 @@ function TeamButton({
         fontSize: 12,
         fontWeight: 600,
         cursor: onClick ? 'pointer' : 'default',
-        background: bg,
-        color: fg,
-        border: `1px solid ${border}`,
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis',

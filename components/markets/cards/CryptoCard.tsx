@@ -243,6 +243,7 @@ function ActionButton({
   return (
     <button
       type="button"
+      className={`btn-trade ${isUp ? 'btn-trade-up' : 'btn-trade-down'}`}
       onClick={(e) => {
         if (!onClick) return
         e.preventDefault()
@@ -258,9 +259,6 @@ function ActionButton({
         padding: '6px 4px',
         borderRadius: 6,
         cursor: onClick ? 'pointer' : 'default',
-        background: isUp ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
-        color: isUp ? 'var(--color-success)' : 'var(--color-danger)',
-        border: `1px solid ${isUp ? 'var(--color-success)' : 'var(--color-danger)'}`,
       }}
     >
       <span

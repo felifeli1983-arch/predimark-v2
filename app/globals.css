@@ -465,3 +465,70 @@ html[data-theme='light'] {
   animation-duration: 0ms !important;
   transition-duration: 0ms !important;
 }
+
+/* Trade buttons (Yes/No, Sì/No, Up/Down, Team) — Polymarket-style hover.
+   Default: bordo + testo colore pieno, sfondo a 15% di opacità.
+   Hover: solid fill (sfondo colore pieno + testo bianco). */
+.btn-trade {
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
+}
+.btn-trade-yes {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+}
+.btn-trade-yes:hover {
+  background: var(--color-success);
+  color: #fff;
+}
+.btn-trade-no {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+.btn-trade-no:hover {
+  background: var(--color-danger);
+  color: #fff;
+}
+/* Crypto Up/Down riusano gli stessi colori Yes/No */
+.btn-trade-up {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+}
+.btn-trade-up:hover {
+  background: var(--color-success);
+  color: #fff;
+}
+.btn-trade-down {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+.btn-trade-down:hover {
+  background: var(--color-danger);
+  color: #fff;
+}
+/* Team button H2H — neutro o evidenziato se favorito */
+.btn-trade-team {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+}
+.btn-trade-team:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-text-secondary);
+}
+.btn-trade-team-favorite {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+}
+.btn-trade-team-favorite:hover {
+  background: var(--color-success);
+  color: #fff;
+}

@@ -179,6 +179,7 @@ function SideBtn({
   return (
     <button
       type="button"
+      className={`btn-trade ${isYes ? 'btn-trade-yes' : 'btn-trade-no'}`}
       onClick={(e) => {
         e.preventDefault()
         onClick(e)
@@ -188,10 +189,6 @@ function SideBtn({
         borderRadius: 6,
         fontSize: 11,
         fontWeight: 700,
-        cursor: 'pointer',
-        background: isYes ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
-        color: isYes ? 'var(--color-success)' : 'var(--color-danger)',
-        border: `1px solid ${isYes ? 'var(--color-success)' : 'var(--color-danger)'}`,
         letterSpacing: '0.04em',
       }}
     >

@@ -60,6 +60,7 @@ export function BinaryCard({ event, onBookmark }: BinaryCardProps) {
         <div className="flex w-full" style={{ gap: 8 }}>
           <button
             type="button"
+            className="btn-trade btn-trade-yes"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -71,16 +72,13 @@ export function BinaryCard({ event, onBookmark }: BinaryCardProps) {
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 600,
-              cursor: 'pointer',
-              background: 'var(--color-success-bg)',
-              color: 'var(--color-success)',
-              border: '1px solid var(--color-success)',
             }}
           >
             Yes {yesPct}%
           </button>
           <button
             type="button"
+            className="btn-trade btn-trade-no"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -92,10 +90,6 @@ export function BinaryCard({ event, onBookmark }: BinaryCardProps) {
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 600,
-              cursor: 'pointer',
-              background: 'var(--color-danger-bg)',
-              color: 'var(--color-danger)',
-              border: '1px solid var(--color-danger)',
             }}
           >
             No {noPct}%
