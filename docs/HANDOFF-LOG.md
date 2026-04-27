@@ -1,32 +1,42 @@
-# Predimark V2 — Handoff Log
+# Auktora (Predimark V2) — Handoff Log
 
-> Aggiornato da Cowork dopo ogni sprint chiuso
-> Ultimo update: 2026-04-27
+> Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
+> Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
+> Ultimo update: 2026-04-27 (sera)
 
 ---
 
 ## Stato corrente
 
-- **Sprint corrente**: MA3 — prossimo: Sprint 3.5.x (Pagina evento `/event/[slug]`)
+- **Sprint corrente**: MA4.2 chiuso → MA4.2.1 fix UX (hover stellina + self-healing API + sidebar reale) → MA4.2.2 fix DB (drop UNIQUE markets.slug)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
-- **Macro Area attiva**: MA3 — Core Pages
+- **Macro Area attiva**: MA4 Trading Core — Watchlist functional ✅, prossimo MA4.3 Trade Widget
 - **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. Step 3.1 ✅. Step 3.2 WS ✅. Step 3.3 tutte e 5 le EventCard ✅. Step 3.4.1 Home page reale ✅. **Audit 2026-04-27 completato** — trovati 10 gap, 7 fix prompt creati. Eseguire tutti i fix prima di Sprint 3.5.x.
+- **Note speciali**: MA1 ✅. MA2 ✅. MA3 ✅ (incl. 5 fix iterativi). MA4.1 ✅ (Bet Slip foundation, poi rolled back). MA4.1-BIS ✅ (rimosso Bet Slip, Polymarket-style cards, hover effects, StarToggle placeholder). MA4.2 ✅ (Watchlist functional con DB). Migration DB applicata staging+prod il 2026-04-27. Handoff Cowork→VS Code completo dal 2026-04-27 sera (autonomia totale DB).
+
+## Migration DB applicate
+
+| Migration                  | Staging       | Prod          | Razionale                                                                                                                                               |
+| -------------------------- | ------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `drop_markets_slug_unique` | ✅ 2026-04-27 | ✅ 2026-04-27 | UNIQUE su `markets.slug` impediva di salvare più mercati dello stesso evento Polymarket (es. candidati multi-outcome). Sostituito con INDEX non-unique. |
 
 ---
 
 ## ⚠️ Fix pendenti — DA ESEGUIRE prima di Sprint 3.5.1
 
-| Fix                  | File                                               | Priorità | Problema                                                                       |
-| -------------------- | -------------------------------------------------- | -------- | ------------------------------------------------------------------------------ |
-| `PROMPT-FIX-3.1.1-B` | `lib/stores/themeStore.ts` + Header                | 🔴 ALTA  | REAL/DEMO toggle non persiste (useState locale → deve essere Zustand)          |
-| `PROMPT-FIX-3.3.1-A` | `EventCardHeader.tsx` + `HeroCard.tsx`             | 🔴 ALTA  | `<img>` raw invece di `next/image` (violazione Doc 5 + performance)            |
-| `PROMPT-FIX-3.3.3-A` | `mappers.test.ts`                                  | ✅ DONE  | Test outcomes[] — già eseguito commit c53a604                                  |
-| `PROMPT-FIX-3.4.1-A` | `HeroZone.tsx`                                     | 🔴 ALTA  | Hero carousel mobile mancante (stack verticale invece di swipe carousel)       |
-| `PROMPT-FIX-3.4.1-B` | `app/page.tsx` + nuovo `MobileSidebarRails.tsx`    | 🔴 ALTA  | Sidebar mobile completamente assente (tutto hidden md:flex)                    |
-| `PROMPT-FIX-3.4.1-C` | `Sidebar.tsx` + nuovi SidebarNews/SidebarWatchlist | 🟠 MEDIA | Sidebar solo 2 stati (deve essere 3: guest/no-deposit/active) + News mancante  |
-| `PROMPT-FIX-3.4.1-D` | `MarketsFilters.tsx` + `MarketsGrid.tsx`           | 🟠 MEDIA | Search markets + toggle Animations + sub-filtri Related mancanti               |
-| `PROMPT-FIX-3.4.1-E` | `HeroCard.tsx` + `MarketsGrid.tsx`                 | 🔴 ALTA  | Colori hardcoded in HeroCard + bottone [+ Slip] invisibile in tutta la griglia |
+| Fix                  | File                                               | Priorità | Problema                                                                     |
+| -------------------- | -------------------------------------------------- | -------- | ---------------------------------------------------------------------------- |
+| `PROMPT-FIX-3.1.1-B` | `lib/stores/themeStore.ts` + Header                | ✅ DONE  | REAL/DEMO persistito in themeStore — commit VS Code MA3                      |
+| `PROMPT-FIX-3.3.1-A` | `EventCardHeader.tsx` + `HeroCard.tsx`             | ✅ DONE  | `next/image` + remotePatterns applicato                                      |
+| `PROMPT-FIX-3.3.1-B` | `mappers.ts` + `MultiOutcomeCard.tsx`              | ✅ DONE  | groupItemTitle mapper + outcomeLabel helper — commit `3c6ca69`               |
+| `fix-mobile-rails`   | `MobileSidebarRails.tsx`                           | ✅ DONE  | display:flex inline override md:hidden rimosso                               |
+| `fix-ssr-dark`       | `app/layout.tsx`                                   | ✅ DONE  | data-theme="dark" su html tag — dark mode SSR default                        |
+| `PROMPT-FIX-3.3.3-A` | `mappers.test.ts`                                  | ✅ DONE  | Test outcomes[] — già eseguito commit c53a604                                |
+| `PROMPT-FIX-3.4.1-A` | `HeroZone.tsx`                                     | ✅ DONE  | Hero carousel mobile con scroll-snap + IntersectionObserver — commit VS Code |
+| `PROMPT-FIX-3.4.1-B` | `app/page.tsx` + nuovo `MobileSidebarRails.tsx`    | ✅ DONE  | MobileSidebarRails.tsx creato — commit VS Code MA3                           |
+| `PROMPT-FIX-3.4.1-C` | `Sidebar.tsx` + nuovi SidebarNews/SidebarWatchlist | ✅ DONE  | Sidebar 3 stati implementata — commit VS Code MA3                            |
+| `PROMPT-FIX-3.4.1-D` | `MarketsFilters.tsx` + `MarketsGrid.tsx`           | ✅ DONE  | Search + animations toggle + sub-filtri Related — commit `029dedd`           |
+| `PROMPT-FIX-3.4.1-E` | `HeroCard.tsx` + `MarketsGrid.tsx`                 | ✅ DONE  | Colori → token hero invarianti, slip stub visibile — commit `ce34352`        |
 
 ---
 
@@ -66,6 +76,55 @@ grid 2-col [main (1fr) | sidebar (320px)]
 ---
 
 ## Sprint completati
+
+### ✅ Handoff VS Code → Cowork — Decisioni utente MA3 + Architettura MA4
+
+- **Data**: 2026-04-27
+- **Commit VS Code**: `0d14f40` — `docs/HANDOFF-FROM-VSCODE-MA3-USER-DECISIONS.md`
+- **Letto da Cowork**: sì — DB verificato via Supabase MCP
+
+**Decisioni utente MA3 recepite (divergenze dai prompt originali):**
+
+- Rebrand Auktora definitivo nel codice (infrastruttura `predimark-v2` invariata)
+- EventCard: `height: 260px` fisso su tutte le 5 varianti (header 80 + body 140 + footer 40)
+- Sottotitoli rimossi da card (description Polymarket troppo lunga) — usarli solo nella event detail page
+- Bordi ovunque → `--color-border-subtle` (minimalismo)
+- Font ridotti nei chart (DonutChart 0.22/0.12, Thermometer senza testo interno)
+- NavTabs allineata a Header (maxWidth 1440 wrapper)
+- CryptoLiveRail rimosso completamente dalla home (non previsto da Doc 4)
+- Sidebar 3 stati: `hasDeposit = false` stub in attesa MA4
+- Hero carousel mobile: scroll-snap nativo + IntersectionObserver (no lib esterne)
+- `animationsEnabled` in themeStore (toggle ⚡ in MarketsFilters)
+- `isDemo` in themeStore persistito (localStorage `auktora-theme`)
+- `onAddToSlip` stub: `handleAddToSlip(eventId, outcome)` — da estendere in MA4
+- 6 token CSS hero invarianti aggiunti: `--color-hero-overlay-strong/soft`, `--color-text-on-image/muted/faint`, `--color-hero-cta-bg`
+
+**Architettura MA4 — decisioni Cowork (da DB verificato):**
+
+| Open item MA4        | Stato                                        | Note                                                                                                                    |
+| -------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Saldo/cash/P&L       | ✅ Schema pronto                             | `balances`: `usdc_balance` + `demo_balance` (default $10k) + P&L separati per modalità                                  |
+| DEMO saldo separato? | ✅ Risposta: stesso record, colonne separate | `demo_balance`/`demo_total_pnl` vs `usdc_balance`/`real_total_pnl`. `positions.is_demo` + `trades.is_demo` per filtrare |
+| Watchlist schema     | ✅ Schema pronto                             | `watchlist(user_id, market_id, notify_*)` — `market_id` → UUID interno, `markets.polymarket_market_id` → CLOB token     |
+| useBetSlip store     | 🔵 Design pronto, da implementare            | Store Zustand: `legs: BetLeg[]` + `isOpen` + CRUD legs + open/closeDrawer                                               |
+| RLS recursion        | ✅ CHIUSO                                    | Migration 013 SECURITY DEFINER applicata su staging + production — non bloccante                                        |
+
+**Firma corretta `BetLeg` per MA4:**
+
+```ts
+interface BetLeg {
+  eventId: string // markets.polymarket_event_id
+  marketId: string // markets.polymarket_market_id (CLOB token per ordini)
+  internalMarketId: string // markets.id (UUID per DB references)
+  outcome: 'YES' | 'NO'
+  price: number // probabilità 0–1 al momento dell'aggiunta
+  size: number // USDC input utente
+}
+```
+
+Lo stub attuale `handleAddToSlip(eventId, outcome)` **non passa** `marketId` né `price` — il prompt MA4 dovrà allineare la firma.
+
+---
 
 ### ✅ Sprint 3.4.1 — Home page layout completo
 
