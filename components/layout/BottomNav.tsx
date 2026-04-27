@@ -9,7 +9,6 @@ import {
   Star,
   MoreHorizontal,
   User,
-  Bookmark,
   Users,
   Activity,
   Trophy,
@@ -30,7 +29,7 @@ import { useAuth } from '@/lib/hooks/useAuth'
    ────────────────────────────────────────── */
 const MORE_ITEMS_AUTHENTICATED = [
   { href: '/me', icon: User, label: 'Profile' },
-  { href: '/me/watchlist', icon: Bookmark, label: 'Watchlist' },
+  { href: '/me/watchlist', icon: Star, label: 'Watchlist' },
   { href: '/following', icon: Users, label: 'Following' },
   { href: '/me/positions', icon: Activity, label: 'Sessions' },
   { href: '/me/stats', icon: Trophy, label: 'Achievements' },
