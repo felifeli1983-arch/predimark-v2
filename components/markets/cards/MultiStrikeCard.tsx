@@ -1,6 +1,7 @@
 'use client'
 
 import type { AuktoraEvent, AuktoraMarket } from '@/lib/polymarket/mappers'
+import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 
@@ -9,7 +10,7 @@ const TOP_N = 4
 interface Props {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (eventId: string, outcomeId: string) => void
+  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 const STRIKE_RX = /\$?([\d,]+(?:\.\d+)?)\s*([kKmMbB])?/
@@ -46,6 +47,18 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
   // Soglia "corrente": la più alta con prob > 50%
   const currentIndex = top.findIndex((m) => m.yesPrice > 0.5)
 
+  function addStrike(market: AuktoraMarket) {
+    if (!onAddToSlip) return
+    onAddToSlip({
+      eventId: event.id,
+      marketId: market.id,
+      outcome: 'yes',
+      priceAtAdd: market.yesPrice,
+      marketTitle: event.title,
+      outcomeLabel: market.question,
+    })
+  }
+
   return (
     <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
@@ -61,7 +74,7 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
             key={m.id}
             market={m}
             highlighted={i === currentIndex}
-            onClick={onAddToSlip ? () => onAddToSlip(event.id, m.id) : undefined}
+            onClick={onAddToSlip ? () => addStrike(m) : undefined}
           />
         ))}
         {remaining > 0 && (
@@ -81,7 +94,7 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
       <EventCardFooter
         volume={event.totalVolume}
         endDate={event.endDate}
-        onAddToSlip={onAddToSlip && top[0] ? () => onAddToSlip(event.id, top[0]!.id) : undefined}
+        onAddToSlip={onAddToSlip && top[0] ? () => addStrike(top[0]!) : undefined}
       />
     </div>
   )

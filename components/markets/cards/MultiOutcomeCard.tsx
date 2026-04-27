@@ -1,6 +1,7 @@
 'use client'
 
 import type { AuktoraEvent, AuktoraMarket } from '@/lib/polymarket/mappers'
+import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 
@@ -9,7 +10,7 @@ const TOP_N = 3
 interface Props {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (eventId: string, outcomeId: string) => void
+  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 const MONTH_RX = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
@@ -40,6 +41,20 @@ export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
   const dateLike = top.filter((m) => looksLikeDate(outcomeLabel(m))).length
   const isDateOutcomes = top.length > 0 && dateLike >= Math.ceil(top.length / 2)
 
+  function addOutcome(market: AuktoraMarket, side: 'yes' | 'no') {
+    if (!onAddToSlip) return
+    const label = outcomeLabel(market)
+    const price = side === 'yes' ? market.yesPrice : market.noPrice
+    onAddToSlip({
+      eventId: event.id,
+      marketId: market.id,
+      outcome: `${market.id}:${side}`,
+      priceAtAdd: price,
+      marketTitle: event.title,
+      outcomeLabel: `${label} ${side === 'yes' ? 'Sì' : 'No'}`,
+    })
+  }
+
   return (
     <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
@@ -55,8 +70,8 @@ export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
             key={m.id}
             market={m}
             withYesNo={isDateOutcomes}
-            onYesClick={onAddToSlip ? () => onAddToSlip(event.id, `${m.id}:yes`) : undefined}
-            onNoClick={onAddToSlip ? () => onAddToSlip(event.id, `${m.id}:no`) : undefined}
+            onYesClick={onAddToSlip ? () => addOutcome(m, 'yes') : undefined}
+            onNoClick={onAddToSlip ? () => addOutcome(m, 'no') : undefined}
           />
         ))}
         {remaining > 0 && (
@@ -76,7 +91,7 @@ export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
       <EventCardFooter
         volume={event.totalVolume}
         endDate={event.endDate}
-        onAddToSlip={onAddToSlip && top[0] ? () => onAddToSlip(event.id, top[0]!.id) : undefined}
+        onAddToSlip={onAddToSlip && top[0] ? () => addOutcome(top[0]!, 'yes') : undefined}
       />
     </div>
   )

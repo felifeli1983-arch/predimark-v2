@@ -10,7 +10,7 @@ interface Props {
   highlighted?: boolean
   /** Label custom (es. groupItemTitle pulito); fallback a market.question */
   label?: string
-  onTrade: (marketId: string, outcome: 'yes' | 'no') => void
+  onTrade: (side: 'yes' | 'no') => void
 }
 
 export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
@@ -106,7 +106,7 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
             variant="yes"
             onClick={(e) => {
               e.stopPropagation()
-              onTrade(market.id, 'yes')
+              onTrade('yes')
             }}
           />
           <SideBtn
@@ -114,7 +114,7 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
             variant="no"
             onClick={(e) => {
               e.stopPropagation()
-              onTrade(market.id, 'no')
+              onTrade('no')
             }}
           />
         </div>

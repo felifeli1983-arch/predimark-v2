@@ -1,6 +1,7 @@
 'use client'
 
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
+import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { DonutChart } from '../charts/DonutChart'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
@@ -8,7 +9,7 @@ import { EventCardFooter } from '../EventCardFooter'
 interface BinaryCardProps {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (eventId: string, outcome: 'yes' | 'no') => void
+  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) {
@@ -17,6 +18,30 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
   const noPrice = market?.noPrice ?? 1 - yesPrice
   const yesPct = Math.round(yesPrice * 100)
   const noPct = Math.round(noPrice * 100)
+
+  function addYes() {
+    if (!market || !onAddToSlip) return
+    onAddToSlip({
+      eventId: event.id,
+      marketId: market.id,
+      outcome: 'yes',
+      priceAtAdd: yesPrice,
+      marketTitle: event.title,
+      outcomeLabel: 'Yes',
+    })
+  }
+
+  function addNo() {
+    if (!market || !onAddToSlip) return
+    onAddToSlip({
+      eventId: event.id,
+      marketId: market.id,
+      outcome: 'no',
+      priceAtAdd: noPrice,
+      marketTitle: event.title,
+      outcomeLabel: 'No',
+    })
+  }
 
   return (
     <div className="flex flex-col" style={{ flex: 1 }}>
@@ -47,7 +72,7 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              onAddToSlip?.(event.id, 'yes')
+              addYes()
             }}
             style={{
               flex: 1,
@@ -68,7 +93,7 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              onAddToSlip?.(event.id, 'no')
+              addNo()
             }}
             style={{
               flex: 1,
@@ -90,7 +115,7 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
       <EventCardFooter
         volume={event.totalVolume}
         endDate={event.endDate}
-        onAddToSlip={onAddToSlip ? () => onAddToSlip(event.id, 'yes') : undefined}
+        onAddToSlip={onAddToSlip ? addYes : undefined}
       />
     </div>
   )

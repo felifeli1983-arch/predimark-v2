@@ -8,6 +8,7 @@ import { useCountdown } from '@/lib/hooks/useCountdown'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 import { useLiveActivity } from '@/lib/ws/hooks/useLiveActivity'
+import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 import { Thermometer } from '../charts/Thermometer'
@@ -15,7 +16,7 @@ import { Thermometer } from '../charts/Thermometer'
 interface Props {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (eventId: string, outcome: string) => void
+  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 const SHORT_ROUND_MS = 30 * 60 * 1000 // ≤30min → Chainlink, oltre → Binance
@@ -98,6 +99,19 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
   const lastTrade = activity[0]
   const livePriceDelta = livePrice !== null && target !== null ? livePrice - target : null
 
+  function addSide(side: 'up' | 'down') {
+    if (!onAddToSlip || !market) return
+    const isUp = side === 'up'
+    onAddToSlip({
+      eventId: event.id,
+      marketId: market.id,
+      outcome: isUp ? 'up' : 'down',
+      priceAtAdd: isUp ? upProb : downProb,
+      marketTitle: event.title,
+      outcomeLabel: isUp ? 'Up' : 'Down',
+    })
+  }
+
   return (
     <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
@@ -167,7 +181,7 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
                 percent={upPct}
                 variant="up"
                 lastAmount={lastTrade?.side === 'BUY' ? lastTrade.amount : null}
-                onClick={onAddToSlip ? () => onAddToSlip(event.id, market?.id ?? 'yes') : undefined}
+                onClick={onAddToSlip ? () => addSide('up') : undefined}
               />
               <ActionButton
                 label="Down"
@@ -175,7 +189,7 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
                 percent={downPct}
                 variant="down"
                 lastAmount={lastTrade?.side === 'SELL' ? lastTrade.amount : null}
-                onClick={onAddToSlip ? () => onAddToSlip(event.id, market?.id ?? 'no') : undefined}
+                onClick={onAddToSlip ? () => addSide('down') : undefined}
               />
             </div>
           </div>
@@ -206,7 +220,7 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
       <EventCardFooter
         volume={event.totalVolume}
         endDate={event.endDate}
-        onAddToSlip={onAddToSlip ? () => onAddToSlip(event.id, market?.id ?? '') : undefined}
+        onAddToSlip={onAddToSlip ? () => addSide('up') : undefined}
       />
     </div>
   )

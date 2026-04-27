@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
+import { betSlipActions } from '@/lib/stores/useBetSlip'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { EventHero } from './EventHero'
 import { EventProbabilities } from './EventProbabilities'
@@ -11,11 +12,6 @@ import { EventSidebarStub } from './EventSidebarStub'
 
 interface Props {
   event: AuktoraEvent
-}
-
-// TODO MA4: collegare a useBetSlip().addLeg()
-function handleTradeStub(eventId: string, marketId: string, outcome: string) {
-  console.warn('[Trade stub]', eventId, marketId, outcome)
 }
 
 export function EventPageShell({ event }: Props) {
@@ -86,7 +82,7 @@ export function EventPageShell({ event }: Props) {
 
         <EventHero event={event} />
         <ChartHistoryStub />
-        <EventProbabilities event={event} onTrade={handleTradeStub} />
+        <EventProbabilities event={event} onAddToSlip={betSlipActions.addLeg} />
         {/* Sidebar inline su mobile + tablet portrait (<1024px) */}
         <div className="lg:hidden">
           <EventSidebarStub event={event} layout="inline" />

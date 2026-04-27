@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
+import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { BinaryCard } from './cards/BinaryCard'
 import { MultiOutcomeCard } from './cards/MultiOutcomeCard'
 import { MultiStrikeCard } from './cards/MultiStrikeCard'
@@ -11,7 +12,7 @@ import { CryptoCard } from './cards/CryptoCard'
 interface EventCardProps {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (eventId: string, outcome: string) => void
+  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 /*
@@ -35,14 +36,10 @@ const cardStyle: React.CSSProperties = {
 }
 
 export function EventCard({ event, onBookmark, onAddToSlip }: EventCardProps) {
-  const binaryAdapter = onAddToSlip
-    ? (eventId: string, outcome: 'yes' | 'no') => onAddToSlip(eventId, outcome)
-    : undefined
-
   return (
     <Link href={`/event/${event.slug}`} style={cardStyle} className="hover-lift">
       {event.kind === 'binary' && (
-        <BinaryCard event={event} onBookmark={onBookmark} onAddToSlip={binaryAdapter} />
+        <BinaryCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
       )}
       {event.kind === 'multi_outcome' && (
         <MultiOutcomeCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />

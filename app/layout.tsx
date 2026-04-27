@@ -9,6 +9,8 @@ import { Header } from '@/components/layout/Header'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Footer } from '@/components/layout/Footer'
 import { NavTabs } from '@/components/home/NavTabs'
+import { BetSlipDrawer } from '@/components/slip/BetSlipDrawer'
+import { BetSlipFAB } from '@/components/slip/BetSlipFAB'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -85,6 +87,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Footer />
                 </main>
                 <BottomNav />
+                <BetSlipDrawer />
+                <BetSlipFAB />
               </div>
             </ThemeProvider>
           </PrivyProvider>

@@ -1,13 +1,14 @@
 'use client'
 
 import type { AuktoraEvent, AuktoraOutcome } from '@/lib/polymarket/mappers'
+import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 
 interface Props {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (eventId: string, outcomeId: string) => void
+  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 const DRAW_HINTS = ['draw', 'tie', 'pareggio']
@@ -50,6 +51,18 @@ export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
   const isLive = event.active && !event.closed
   const marketId = market?.id ?? ''
 
+  function addOutcome(outcome: AuktoraOutcome) {
+    if (!onAddToSlip || !marketId) return
+    onAddToSlip({
+      eventId: event.id,
+      marketId,
+      outcome: outcome.name,
+      priceAtAdd: outcome.price,
+      marketTitle: event.title,
+      outcomeLabel: outcome.name,
+    })
+  }
+
   return (
     <div className="flex flex-col" style={{ flex: 1 }}>
       <EventCardHeader
@@ -83,18 +96,18 @@ export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
         <div style={{ display: 'flex', gap: 6 }}>
           <TeamButton
             outcome={teamA}
-            onClick={onAddToSlip && teamA ? () => onAddToSlip(event.id, marketId) : undefined}
+            onClick={onAddToSlip && teamA ? () => addOutcome(teamA) : undefined}
           />
           {draw && (
             <TeamButton
               outcome={draw}
               variant="muted"
-              onClick={onAddToSlip ? () => onAddToSlip(event.id, marketId) : undefined}
+              onClick={onAddToSlip ? () => addOutcome(draw) : undefined}
             />
           )}
           <TeamButton
             outcome={teamB}
-            onClick={onAddToSlip && teamB ? () => onAddToSlip(event.id, marketId) : undefined}
+            onClick={onAddToSlip && teamB ? () => addOutcome(teamB) : undefined}
           />
         </div>
       </div>
@@ -102,7 +115,7 @@ export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
       <EventCardFooter
         volume={event.totalVolume}
         endDate={event.endDate}
-        onAddToSlip={onAddToSlip ? () => onAddToSlip(event.id, marketId) : undefined}
+        onAddToSlip={onAddToSlip && teamA ? () => addOutcome(teamA) : undefined}
       />
     </div>
   )

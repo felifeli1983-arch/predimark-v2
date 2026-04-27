@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { EventCard } from '@/components/markets/EventCard'
+import { betSlipActions } from '@/lib/stores/useBetSlip'
 
 interface Props {
   initialEvents: AuktoraEvent[]
@@ -14,11 +15,6 @@ interface Props {
 }
 
 type SortKey = 'volume24h' | 'newest' | 'closing-soon'
-
-// TODO MA4: collegare a useBetSlip store
-function handleAddToSlip(eventId: string, outcome: string) {
-  console.warn('[Slip stub]', eventId, outcome)
-}
 
 function sortEvents(events: AuktoraEvent[], sort: SortKey): AuktoraEvent[] {
   const arr = [...events]
@@ -78,7 +74,7 @@ export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: P
         <>
           <div className={gridClass} style={{ gap: 12, padding: '12px 16px' }}>
             {visibleEvents.map((event) => (
-              <EventCard key={event.id} event={event} onAddToSlip={handleAddToSlip} />
+              <EventCard key={event.id} event={event} onAddToSlip={betSlipActions.addLeg} />
             ))}
           </div>
 
