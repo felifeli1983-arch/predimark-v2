@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, Gift, Sun, Moon } from 'lucide-react'
+import { Bell, Gift, Sun, Moon, Wallet } from 'lucide-react'
 import type { AuthUser } from '@/lib/hooks/useAuth'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { useBalance } from '@/lib/stores/useBalance'
@@ -36,39 +36,43 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
       {authenticated && (
         <div
           className="hidden lg:flex"
-          style={{ gap: '10px', marginRight: '6px', alignItems: 'center' }}
+          style={{
+            gap: 6,
+            marginRight: '6px',
+            alignItems: 'center',
+            padding: '6px 10px',
+            borderRadius: 8,
+            background: 'var(--color-bg-tertiary)',
+            border: '1px solid var(--color-border-subtle)',
+          }}
+          aria-label={`Saldo ${isDemo ? 'demo' : 'reale'} ${cashAvailable.toFixed(2)} USDC`}
         >
-          <span
+          <Wallet
+            size={13}
+            style={{ color: isDemo ? 'var(--color-warning)' : 'var(--color-cta)' }}
+          />
+          <strong
             style={{
-              fontSize: '12px',
-              color: 'var(--color-text-secondary)',
-              whiteSpace: 'nowrap',
+              fontSize: 12,
+              color: isDemo ? 'var(--color-warning)' : 'var(--color-text-primary)',
+              fontVariantNumeric: 'tabular-nums',
               fontWeight: 600,
             }}
           >
-            Portfolio{' '}
-            <strong
+            ${cashAvailable.toFixed(2)}
+          </strong>
+          {isDemo && (
+            <span
               style={{
-                color: isDemo ? 'var(--color-warning)' : 'var(--color-text-primary)',
-                fontVariantNumeric: 'tabular-nums',
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.05em',
+                color: 'var(--color-warning)',
               }}
             >
-              ${cashAvailable.toFixed(2)}
-            </strong>
-            {isDemo && (
-              <span
-                style={{
-                  marginLeft: 4,
-                  fontSize: 9,
-                  fontWeight: 700,
-                  letterSpacing: '0.05em',
-                  color: 'var(--color-warning)',
-                }}
-              >
-                DEMO
-              </span>
-            )}
-          </span>
+              DEMO
+            </span>
+          )}
         </div>
       )}
 
