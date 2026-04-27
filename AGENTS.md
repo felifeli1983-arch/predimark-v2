@@ -40,6 +40,28 @@ L'agente PUÒ aggiornare `docs/HANDOFF-LOG.md` quando completa uno sprint,
 documentando cosa è cambiato (file, migration, decisioni). Resta un changelog
 tecnico, non un canale verso Cowork.
 
+### Post-sprint audit obbligatorio
+
+Al termine di OGNI sprint (prima del commit finale e prima di dire "fatto"
+all'utente), eseguire un audit di completezza:
+
+1. Rileggere il prompt sprint stesso (PROMPT-SPRINT-X.X.X.md) o, se l'ho
+   pianificato io, la lista di acceptance criteria che mi sono dato
+2. Rileggere i Doc rilevanti (wireframe Doc 4 per UI, Doc 6 per DB, Doc 8
+   per design system, ecc.)
+3. Per ogni acceptance criterion / requisito Doc, verificare nel codice
+   l'implementazione effettiva (file, riga, evidenza)
+4. Produrre un mini-report a fine sprint con:
+   - ✅ cosa è stato implementato (con link file:riga)
+   - ⚠️ cosa è stato implementato ma in modo parziale o divergente (e perché)
+   - ❌ cosa manca o è stato saltato
+5. Se ci sono ❌ non intenzionali, completarli prima di chiudere lo sprint.
+   Se sono divergenze volute, documentarle in `HANDOFF-LOG.md`.
+
+Razionale: nei sprint precedenti capitava di saltare deliverable minori
+(test specifici, edge case, copertura tab/pagina). L'audit chiude il
+loop e impedisce drift silenziosi tra docs e codice.
+
 ## Comandi utili
 
 ```bash
