@@ -76,9 +76,19 @@ Queste sezioni devono essere **visualmente presenti** con un box placeholder ord
 
 Leggere il wireframe sezione "STRUTTURA COMUNE". In sintesi:
 
-Desktop: griglia `main (75%) | sidebar (25%)`. Sidebar sticky. Breadcrumb sopra la griglia: `Home > [prima tag] > [event.title]`.
+**Breakpoint unico: `md` (768px)** — coerente con home, Sidebar, MobileSidebarRails già esistenti.
 
-Mobile: fullwidth. Back button in alto (`← Indietro`). Niente sidebar — le sezioni sidebar (stub segnale, correlati) appaiono inline nel flow dopo i bottoni trade, prima dei tab info.
+**Da `md` in su (≥ 768px) — desktop + tablet landscape:**
+Griglia `main (75%) | sidebar (25%)`. Sidebar sticky (`position: sticky; top: 0; max-height: 100vh; overflow-y: auto`). Breadcrumb sopra la griglia: `Home > [prima tag] > [event.title]`. Classe Tailwind: `md:grid md:grid-cols-[75%_25%]` (o equivalente con `lg:` se si preferisce spostare il breakpoint a 1024px — decidere guardando come appare su un iPad 768px).
+
+**Sotto `md` (< 768px) — mobile:**
+Fullwidth, nessuna sidebar. Back button in alto (`← Indietro`). Le sezioni sidebar (stub Segnale Predimark, stub Mercati correlati) appaiono inline nel flow della pagina, dopo i bottoni trade e prima dei tab info. Trade Widget è uno stub inline (bottom sheet reale arriva in MA4).
+
+**Pattern da seguire per show/hide:**
+
+- Sidebar desktop: `hidden md:block` (o `hidden md:flex`)
+- Back button / sezioni mobile-only: `md:hidden`
+- Mai `display` inline su elementi che usano classi responsive (lezione BottomNav/MobileSidebarRails)
 
 ---
 

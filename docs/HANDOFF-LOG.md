@@ -2,17 +2,17 @@
 
 > Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
 > Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
-> Ultimo update: 2026-04-27 (sera)
+> Ultimo update: 2026-04-28
 
 ---
 
 ## Stato corrente
 
-- **Sprint corrente**: MA4.2 chiuso → MA4.2.1 fix UX (hover stellina + self-healing API + sidebar reale) → MA4.2.2 fix DB (drop UNIQUE markets.slug)
+- **Sprint corrente**: MA4.5 chiuso (Positions + History + Sell flow DEMO end-to-end)
 - **Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
-- **Macro Area attiva**: MA4 Trading Core — Watchlist functional ✅, prossimo MA4.3 Trade Widget
-- **Blockers attivi**: nessuno
-- **Note speciali**: MA1 ✅. MA2 ✅. MA3 ✅ (incl. 5 fix iterativi). MA4.1 ✅ (Bet Slip foundation, poi rolled back). MA4.1-BIS ✅ (rimosso Bet Slip, Polymarket-style cards, hover effects, StarToggle placeholder). MA4.2 ✅ (Watchlist functional con DB). Migration DB applicata staging+prod il 2026-04-27. Handoff Cowork→VS Code completo dal 2026-04-27 sera (autonomia totale DB).
+- **Macro Area attiva**: MA4 Trading Core — DEMO lifecycle completo (open → view → close). Prossimo MA4.4 Polymarket CLOB V2 real (post stabilizzazione, ~2026-05-05)
+- **Blockers attivi**: nessuno (in attesa stabilizzazione CLOB V2)
+- **Note speciali**: MA1 ✅. MA2 ✅. MA3 ✅. MA4.1 ✅ + rollback. MA4.1-BIS ✅. MA4.2 ✅ Watchlist. MA4.3 ✅ Trade Widget DEMO. MA4.5 ✅ Positions + History + Sell DEMO (anticipato per pivot a CLOB V2). Decisione strategica 2026-04-28: skip CLOB V1 entirely, MA4.4 sarà direttamente integrazione `@polymarket/clob-client-v2` + pUSD + builderCode.
 
 ## Migration DB applicate
 

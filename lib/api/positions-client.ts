@@ -1,0 +1,92 @@
+import type { PositionItem } from '@/lib/positions/queries'
+import type { TradeHistoryItem } from '@/lib/trades/queries'
+
+export type { PositionItem, TradeHistoryItem }
+
+interface PositionsResponse {
+  items: PositionItem[]
+  meta: { total: number; totalValue: number; totalPnl: number }
+}
+
+interface TradesResponse {
+  items: TradeHistoryItem[]
+  meta: { total: number }
+}
+
+async function authedGet<T>(token: string, url: string): Promise<T> {
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+  if (!res.ok) {
+    let detail = ''
+    try {
+      const body = (await res.json()) as { error?: { message?: string } }
+      detail = body?.error?.message ?? ''
+    } catch {
+      /* ignore */
+    }
+    throw new Error(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}`)
+  }
+  return (await res.json()) as T
+}
+
+export async function fetchOpenPositions(
+  token: string,
+  isDemo: boolean
+): Promise<PositionsResponse> {
+  const params = new URLSearchParams({ is_demo: String(isDemo), only_open: 'true' })
+  return authedGet<PositionsResponse>(token, `/api/v1/users/me/positions?${params}`)
+}
+
+interface HistoryFilters {
+  isDemo: boolean
+  type?: 'open' | 'close' | 'resolution'
+  period?: 'today' | '7d' | '30d' | 'all'
+}
+
+export async function fetchTradesHistory(
+  token: string,
+  filters: HistoryFilters
+): Promise<TradesResponse> {
+  const params = new URLSearchParams({ is_demo: String(filters.isDemo) })
+  if (filters.type) params.set('type', filters.type)
+  if (filters.period) params.set('period', filters.period)
+  return authedGet<TradesResponse>(token, `/api/v1/users/me/trades?${params}`)
+}
+
+export interface SellTradePayload {
+  positionId: string
+  sharesToSell: number
+  currentPrice: number
+  isDemo: boolean
+}
+
+export interface SellTradeResponse {
+  tradeId: string
+  newDemoBalance: number
+  pnl: number
+  isWin: boolean
+}
+
+export async function postSellTrade(
+  token: string,
+  payload: SellTradePayload
+): Promise<SellTradeResponse> {
+  const res = await fetch('/api/v1/trades/sell', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) {
+    let detail = ''
+    try {
+      const body = (await res.json()) as { error?: { code?: string; message?: string } }
+      detail = body?.error?.message ?? body?.error?.code ?? ''
+    } catch {
+      /* ignore */
+    }
+    throw new Error(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}`)
+  }
+  return (await res.json()) as SellTradeResponse
+}
