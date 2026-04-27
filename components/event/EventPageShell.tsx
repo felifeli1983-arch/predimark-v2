@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
+import { PageContainer } from '@/components/layout/PageContainer'
 import { EventHero } from './EventHero'
 import { EventProbabilities } from './EventProbabilities'
 import { EventInfoTabs } from './EventInfoTabs'
@@ -22,23 +23,13 @@ export function EventPageShell({ event }: Props) {
   const isResolved = event.closed
 
   return (
-    <div
-      className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_320px]"
-      style={{
-        gap: 12,
-        maxWidth: 1440,
-        margin: '0 auto',
-        padding: '0 0 24px',
-        width: '100%',
-      }}
-    >
-      <main
+    <PageContainer sidebar={<EventSidebarStub event={event} layout="sidebar" />}>
+      <div
         style={{
-          minWidth: 0,
           display: 'flex',
           flexDirection: 'column',
           gap: 16,
-          padding: '12px 16px 0',
+          padding: '12px var(--layout-padding-x) 0',
         }}
       >
         {/* Mobile: back. Desktop: breadcrumb */}
@@ -101,19 +92,8 @@ export function EventPageShell({ event }: Props) {
           <EventSidebarStub event={event} layout="inline" />
         </div>
         <EventInfoTabs event={event} />
-      </main>
-      <aside
-        className="hidden md:block"
-        style={{
-          alignSelf: 'start',
-          position: 'sticky',
-          top: 8,
-          padding: '12px 16px 0 0',
-        }}
-      >
-        <EventSidebarStub event={event} layout="sidebar" />
-      </aside>
-    </div>
+      </div>
+    </PageContainer>
   )
 }
 

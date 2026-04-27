@@ -1,21 +1,12 @@
 export default function EventPageLoading() {
   return (
-    <div
-      className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_320px]"
-      style={{
-        gap: 12,
-        maxWidth: 1440,
-        margin: '0 auto',
-        padding: '0 0 24px',
-        width: '100%',
-      }}
-    >
-      <div
+    <div className="page-grid">
+      <main
         style={{
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
-          padding: '12px 16px 0',
+          padding: '12px var(--layout-padding-x) 0',
           minWidth: 0,
         }}
       >
@@ -24,15 +15,19 @@ export default function EventPageLoading() {
         <Skeleton height={200} />
         <Skeleton height={180} />
         <Skeleton height={240} />
-      </div>
-      <div
+      </main>
+      <aside
         className="hidden md:flex"
-        style={{ flexDirection: 'column', gap: 12, padding: '12px 16px 0 0' }}
+        style={{
+          flexDirection: 'column',
+          gap: 12,
+          padding: '12px var(--layout-padding-x) 0 0',
+        }}
       >
         <Skeleton height={360} />
         <Skeleton height={120} />
         <Skeleton height={120} />
-      </div>
+      </aside>
     </div>
   )
 }

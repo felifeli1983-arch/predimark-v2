@@ -4,6 +4,7 @@ import { HeroZone } from '@/components/home/HeroZone'
 import { MarketsSection } from '@/components/home/MarketsSection'
 import { Sidebar } from '@/components/home/Sidebar'
 import { MobileSidebarRails } from '@/components/home/MobileSidebarRails'
+import { PageContainer } from '@/components/layout/PageContainer'
 
 interface SearchParams {
   category?: string
@@ -28,24 +29,10 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const filtered = filterByCategory(remaining, params.category)
 
   return (
-    <div
-      className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_320px]"
-      style={{
-        gap: 12,
-        maxWidth: 1440,
-        margin: '0 auto',
-        padding: '0 0 24px',
-        width: '100%',
-      }}
-    >
-      <main style={{ minWidth: 0 }}>
-        <HeroZone events={heroEvents} />
-        <MobileSidebarRails />
-        <MarketsSection initialEvents={filtered} />
-      </main>
-      <div style={{ padding: '12px 16px 0 0' }}>
-        <Sidebar />
-      </div>
-    </div>
+    <PageContainer sidebar={<Sidebar />}>
+      <HeroZone events={heroEvents} />
+      <MobileSidebarRails />
+      <MarketsSection initialEvents={filtered} />
+    </PageContainer>
   )
 }

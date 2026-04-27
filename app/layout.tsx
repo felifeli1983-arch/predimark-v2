@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Suspense } from 'react'
 import './globals.css'
 import { PrivyProvider } from '@/providers/PrivyProvider'
 import { ReactQueryProvider } from '@/providers/ReactQueryProvider'
@@ -77,7 +78,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     flexDirection: 'column',
                   }}
                 >
-                  <NavTabs />
+                  <Suspense fallback={null}>
+                    <NavTabs />
+                  </Suspense>
                   {children}
                   <Footer />
                 </main>

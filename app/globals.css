@@ -174,6 +174,38 @@
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
+
+  /* ----------------------------------------------------------
+     LAYOUT — single source of truth per le pagine prod
+     (Home, Event, Sport hub, Profile, Leaderboard, …).
+     Modifica qui per cambiare il rapporto main/sidebar
+     o il cap di larghezza su monitor grandi.
+  ---------------------------------------------------------- */
+
+  --layout-max-width: 1440px;
+  --layout-sidebar-width: 320px;
+  --layout-grid-gap: 12px;
+  --layout-padding-x: 16px;
+  --layout-padding-bottom: 24px;
+  --layout-sidebar-top: 8px;
+}
+
+/* Pattern grid usato da tutte le pagine prod (Home, Event page, …).
+   Mobile: 1 colonna full-width. Tablet+: main 1fr + sidebar fissa. */
+.page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--layout-grid-gap);
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding: 0 0 var(--layout-padding-bottom);
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .page-grid {
+    grid-template-columns: minmax(0, 1fr) var(--layout-sidebar-width);
+  }
 }
 
 /* ----------------------------------------------------------
