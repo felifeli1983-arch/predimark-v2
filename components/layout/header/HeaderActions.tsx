@@ -40,10 +40,13 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
             gap: 6,
             marginRight: '6px',
             alignItems: 'center',
+            justifyContent: 'flex-end',
             padding: '6px 10px',
             borderRadius: 8,
             background: 'var(--color-bg-tertiary)',
             border: '1px solid var(--color-border-subtle)',
+            /* Larghezza fissa: REAL e DEMO non spostano la nav bar */
+            minWidth: 130,
           }}
           aria-label={`Saldo ${isDemo ? 'demo' : 'reale'} ${cashAvailable.toFixed(2)} USDC`}
         >
@@ -61,18 +64,6 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
           >
             ${cashAvailable.toFixed(2)}
           </strong>
-          {isDemo && (
-            <span
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: '0.05em',
-                color: 'var(--color-warning)',
-              }}
-            >
-              DEMO
-            </span>
-          )}
         </div>
       )}
 
