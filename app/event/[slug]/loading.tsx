@@ -17,7 +17,7 @@ export default function EventPageLoading() {
         <Skeleton height={240} />
       </main>
       <aside
-        className="hidden md:flex"
+        className="hidden lg:flex"
         style={{
           flexDirection: 'column',
           gap: 12,

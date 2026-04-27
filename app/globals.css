@@ -191,7 +191,11 @@
 }
 
 /* Pattern grid usato da tutte le pagine prod (Home, Event page, …).
-   Mobile: 1 colonna full-width. Tablet+: main 1fr + sidebar fissa. */
+   Mobile + tablet portrait (<1024px): 1 colonna full-width.
+   Desktop (≥1024px): main 1fr + sidebar fissa.
+   Razionale: a 768px (iPad portrait) un main da ~436px con sidebar
+   320px è troppo stretto. Allineato a Polymarket/Kalshi che mostrano
+   la sidebar solo dal landscape in su. */
 .page-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -202,7 +206,7 @@
   width: 100%;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .page-grid {
     grid-template-columns: minmax(0, 1fr) var(--layout-sidebar-width);
   }

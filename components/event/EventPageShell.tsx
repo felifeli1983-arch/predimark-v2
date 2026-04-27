@@ -87,8 +87,8 @@ export function EventPageShell({ event }: Props) {
         <EventHero event={event} />
         <ChartHistoryStub />
         <EventProbabilities event={event} onTrade={handleTradeStub} />
-        {/* Sidebar inline su mobile */}
-        <div className="md:hidden">
+        {/* Sidebar inline su mobile + tablet portrait (<1024px) */}
+        <div className="lg:hidden">
           <EventSidebarStub event={event} layout="inline" />
         </div>
         <EventInfoTabs event={event} />

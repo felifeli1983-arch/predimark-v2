@@ -15,7 +15,8 @@ import { SidebarNews } from './SidebarNews'
  *  Stato 2 — Logged no $:  Portfolio (deposit-cta) → Signals → Watchlist (empty) → HotNow → Activity
  *  Stato 3 — Logged + $:   Portfolio (active) → Signals → Watchlist → HotNow → Activity
  *
- * Sticky desktop. Hidden mobile (MobileSidebarRails copre quel caso).
+ * Visibilità gestita dal PageContainer parent (hidden lg:block).
+ * MobileSidebarRails copre il caso mobile + tablet portrait (<1024px).
  */
 export function Sidebar() {
   const { authenticated, ready, login } = useAuth()
@@ -31,14 +32,11 @@ export function Sidebar() {
         : 'logged-no-deposit'
 
   return (
-    <aside
-      className="hidden md:flex"
+    <div
       style={{
+        display: 'flex',
         flexDirection: 'column',
         gap: 12,
-        position: 'sticky',
-        top: 12,
-        alignSelf: 'flex-start',
         width: '100%',
       }}
     >
@@ -71,7 +69,7 @@ export function Sidebar() {
           <SidebarActivity />
         </>
       )}
-    </aside>
+    </div>
   )
 }
 

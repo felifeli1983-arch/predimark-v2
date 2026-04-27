@@ -13,7 +13,7 @@ import { SidebarHotNow } from './SidebarHotNow'
  * - Guest: Demo Mode CTA compatta + Hot Now + Recent Activity
  * - Logged: Hot Now + Recent Activity
  *
- * Visibile SOLO mobile (md:hidden). Riusa SidebarHotNow/SidebarActivity
+ * Visibile su mobile + tablet portrait (lg:hidden). Riusa SidebarHotNow/SidebarActivity
  * senza duplicare logica.
  */
 export function MobileSidebarRails() {
@@ -21,7 +21,7 @@ export function MobileSidebarRails() {
 
   return (
     <div
-      className="md:hidden flex flex-col"
+      className="lg:hidden flex flex-col"
       style={{
         gap: 12,
         padding: '12px 16px 4px',

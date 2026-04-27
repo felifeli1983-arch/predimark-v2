@@ -13,9 +13,10 @@ interface Props {
  * `globals.css` come CSS vars `--layout-*` ed sono editabili in un posto solo.
  *
  * Comportamento responsive:
- *  - Mobile (<768px): 1 colonna full-width, sidebar nascosta
- *    (le pagine inseriscono moduli mobile inline tipo MobileSidebarRails)
- *  - Tablet/Desktop (≥768px): main 1fr + sidebar 320px sticky
+ *  - Mobile + tablet portrait (<1024px): 1 colonna full-width, sidebar
+ *    nascosta (le pagine inseriscono moduli mobile inline tipo
+ *    MobileSidebarRails)
+ *  - Desktop (≥1024px): main 1fr + sidebar 320px sticky
  *  - >1440px: contenuto cappato e centrato
  */
 export function PageContainer({ children, sidebar }: Props) {
@@ -24,7 +25,7 @@ export function PageContainer({ children, sidebar }: Props) {
       <main style={{ minWidth: 0 }}>{children}</main>
       {sidebar && (
         <aside
-          className="hidden md:block"
+          className="hidden lg:block"
           style={{
             alignSelf: 'start',
             position: 'sticky',
