@@ -21,10 +21,8 @@ export function MobileSidebarRails() {
 
   return (
     <div
-      className="md:hidden"
+      className="md:hidden flex flex-col"
       style={{
-        display: 'flex',
-        flexDirection: 'column',
         gap: 12,
         padding: '12px 16px 4px',
       }}
