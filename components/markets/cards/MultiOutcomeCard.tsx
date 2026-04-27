@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import type { AuktoraEvent, AuktoraMarket } from '@/lib/polymarket/mappers'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
-import { StarToggle, watchlistStubToggle } from '../StarToggle'
+import { StarToggle } from '../StarToggle'
 
 const TOP_N = 3
 
@@ -46,6 +46,7 @@ export function MultiOutcomeCard({ event, onBookmark }: Props) {
           <OutcomeRow
             key={m.id}
             market={m}
+            event={event}
             onYesClick={() => navigateToEvent(m.id, 'yes')}
             onNoClick={() => navigateToEvent(m.id, 'no')}
           />
@@ -71,11 +72,12 @@ export function MultiOutcomeCard({ event, onBookmark }: Props) {
 
 interface RowProps {
   market: AuktoraMarket
+  event: AuktoraEvent
   onYesClick: () => void
   onNoClick: () => void
 }
 
-function OutcomeRow({ market, onYesClick, onNoClick }: RowProps) {
+function OutcomeRow({ market, event, onYesClick, onNoClick }: RowProps) {
   const pct = Math.round(market.yesPrice * 100)
   const label = outcomeLabel(market)
 
@@ -89,8 +91,16 @@ function OutcomeRow({ market, onYesClick, onNoClick }: RowProps) {
       }}
     >
       <StarToggle
-        isFavorite={false}
-        onToggle={() => watchlistStubToggle(market.id)}
+        payload={{
+          polymarketMarketId: market.id,
+          polymarketEventId: event.id,
+          slug: event.slug,
+          title: `${event.title} — ${label}`,
+          cardKind: event.kind,
+          category: event.tags[0] ?? 'general',
+          image: event.image,
+          currentYesPrice: market.yesPrice,
+        }}
         marketLabel={label}
         size={12}
       />

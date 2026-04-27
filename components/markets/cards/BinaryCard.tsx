@@ -5,7 +5,7 @@ import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { DonutChart } from '../charts/DonutChart'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
-import { StarToggle, watchlistStubToggle } from '../StarToggle'
+import { StarToggle } from '../StarToggle'
 
 interface BinaryCardProps {
   event: AuktoraEvent
@@ -35,8 +35,16 @@ export function BinaryCard({ event, onBookmark }: BinaryCardProps) {
         starSlot={
           market ? (
             <StarToggle
-              isFavorite={false}
-              onToggle={() => watchlistStubToggle(market.id)}
+              payload={{
+                polymarketMarketId: market.id,
+                polymarketEventId: event.id,
+                slug: event.slug,
+                title: event.title,
+                cardKind: event.kind,
+                category: event.tags[0] ?? 'general',
+                image: event.image,
+                currentYesPrice: market.yesPrice,
+              }}
               marketLabel={event.title}
             />
           ) : undefined

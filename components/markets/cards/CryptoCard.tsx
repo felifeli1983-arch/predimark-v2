@@ -11,7 +11,7 @@ import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 import { useLiveActivity } from '@/lib/ws/hooks/useLiveActivity'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
-import { StarToggle, watchlistStubToggle } from '../StarToggle'
+import { StarToggle } from '../StarToggle'
 import { Thermometer } from '../charts/Thermometer'
 
 interface Props {
@@ -116,8 +116,16 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
         starSlot={
           market ? (
             <StarToggle
-              isFavorite={false}
-              onToggle={() => watchlistStubToggle(market.id)}
+              payload={{
+                polymarketMarketId: market.id,
+                polymarketEventId: event.id,
+                slug: event.slug,
+                title: event.title,
+                cardKind: event.kind,
+                category: event.tags[0] ?? 'general',
+                image: event.image,
+                currentYesPrice: market.yesPrice,
+              }}
               marketLabel={event.title}
             />
           ) : undefined

@@ -1,10 +1,13 @@
 'use client'
 
 import { Star } from 'lucide-react'
+import { useWatchlist } from '@/lib/stores/useWatchlist'
+import { useWatchlistActions } from '@/lib/hooks/useWatchlistActions'
+import type { AddWatchlistPayload } from '@/lib/api/watchlist-client'
 
 interface Props {
-  isFavorite: boolean
-  onToggle: () => void
+  /** Payload completo per add/remove sull'API. */
+  payload: AddWatchlistPayload
   size?: number
   /** Per accessibility */
   marketLabel?: string
@@ -13,10 +16,15 @@ interface Props {
 /**
  * Toggle stellina watchlist (Polymarket-style).
  *
- * MA4.1-BIS: solo UI placeholder — onToggle è uno stub `console.warn`.
- * Wiring reale a `useWatchlist` store + tabella DB `watchlist` arriva in MA4.2.
+ * Letture reattive da `useWatchlist` store. Toggle delegato a
+ * `useWatchlistActions` che gestisce Privy token + API + optimistic.
+ *
+ * Se l'utente non è autenticato il click non fa nulla (silently no-op).
  */
-export function StarToggle({ isFavorite, onToggle, size = 14, marketLabel }: Props) {
+export function StarToggle({ payload, size = 14, marketLabel }: Props) {
+  const isFavorite = useWatchlist((s) => s.watched.has(payload.polymarketMarketId))
+  const { toggle } = useWatchlistActions()
+
   return (
     <button
       type="button"
@@ -32,7 +40,7 @@ export function StarToggle({ isFavorite, onToggle, size = 14, marketLabel }: Pro
       onClick={(e) => {
         e.preventDefault()
         e.stopPropagation()
-        onToggle()
+        void toggle(payload)
       }}
       style={{
         background: 'transparent',
@@ -52,12 +60,4 @@ export function StarToggle({ isFavorite, onToggle, size = 14, marketLabel }: Pro
       />
     </button>
   )
-}
-
-/**
- * TODO MA4.2: rimpiazzare con hook reale `useWatchlist().toggle(marketId)`.
- * Esposto qui come placeholder — ogni card lo riusa.
- */
-export function watchlistStubToggle(marketId: string) {
-  console.warn('[Watchlist stub MA4.2]', marketId)
 }

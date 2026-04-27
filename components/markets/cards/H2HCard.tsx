@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import type { AuktoraEvent, AuktoraOutcome } from '@/lib/polymarket/mappers'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
-import { StarToggle, watchlistStubToggle } from '../StarToggle'
+import { StarToggle } from '../StarToggle'
 
 interface Props {
   event: AuktoraEvent
@@ -68,8 +68,16 @@ export function H2HCard({ event, onBookmark }: Props) {
         starSlot={
           marketId ? (
             <StarToggle
-              isFavorite={false}
-              onToggle={() => watchlistStubToggle(marketId)}
+              payload={{
+                polymarketMarketId: marketId,
+                polymarketEventId: event.id,
+                slug: event.slug,
+                title: event.title,
+                cardKind: event.kind,
+                category: event.tags[0] ?? 'general',
+                image: event.image,
+                currentYesPrice: market?.yesPrice,
+              }}
               marketLabel={event.title}
             />
           ) : undefined
