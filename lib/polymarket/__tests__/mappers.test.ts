@@ -186,6 +186,16 @@ describe('mapGammaMarket', () => {
     expect(m.yesPrice).toBeCloseTo(0.55)
     expect(m.noPrice).toBeCloseTo(0.1)
   })
+
+  it('preserva groupItemTitle (label pulito candidato multi-outcome)', () => {
+    const m = mapGammaMarket(makeMarket({ groupItemTitle: 'Finland' }))
+    expect(m.groupItemTitle).toBe('Finland')
+  })
+
+  it('groupItemTitle è stringa vuota se assente (binary standard)', () => {
+    const m = mapGammaMarket(makeMarket({ groupItemTitle: '' }))
+    expect(m.groupItemTitle).toBe('')
+  })
 })
 
 describe('mapGammaEvent', () => {

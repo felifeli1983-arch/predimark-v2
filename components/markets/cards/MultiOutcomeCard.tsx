@@ -22,13 +22,22 @@ function looksLikeDate(label: string): boolean {
   return MONTH_RX.test(label) || ISO_RX.test(label) || YEAR_RX.test(label)
 }
 
+/**
+ * Label da mostrare nella riga outcome:
+ * usa groupItemTitle (es. "Finland") se presente, altrimenti
+ * fallback a market.question per retrocompatibilità.
+ */
+function outcomeLabel(market: AuktoraMarket): string {
+  return market.groupItemTitle || market.question
+}
+
 export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
   const sorted = [...event.markets].sort((a, b) => b.yesPrice - a.yesPrice)
   const top = sorted.slice(0, TOP_N)
   const remaining = sorted.length - top.length
 
   // Variante 2b se la maggioranza dei top sembra date → nascondi endDate nel footer
-  const dateLike = top.filter((m) => looksLikeDate(m.question)).length
+  const dateLike = top.filter((m) => looksLikeDate(outcomeLabel(m))).length
   const isDateOutcomes = top.length > 0 && dateLike >= Math.ceil(top.length / 2)
 
   return (
@@ -103,7 +112,7 @@ function OutcomeRow({ market, withYesNo, onYesClick, onNoClick }: RowProps) {
           minWidth: 0,
         }}
       >
-        {market.question}
+        {outcomeLabel(market)}
       </span>
       <div
         style={{

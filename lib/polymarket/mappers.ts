@@ -34,6 +34,12 @@ export interface AuktoraMarket {
   active: boolean
   closed: boolean
   clobTokenIds: [string, string] | null
+  /**
+   * Label pulito del candidato/outcome per eventi multi-outcome.
+   * Es. "Finland" invece di "Will Finland win Eurovision 2026?".
+   * Stringa vuota se non presente (mercati binary standard).
+   */
+  groupItemTitle: string
 }
 
 export interface AuktoraEvent {
@@ -148,6 +154,7 @@ export function mapGammaMarket(raw: GammaMarket): AuktoraMarket {
     active: raw.active,
     closed: raw.closed,
     clobTokenIds,
+    groupItemTitle: raw.groupItemTitle ?? '',
   }
 }
 
