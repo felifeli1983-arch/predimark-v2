@@ -40,6 +40,28 @@ L'agente PUÒ aggiornare `docs/HANDOFF-LOG.md` quando completa uno sprint,
 documentando cosa è cambiato (file, migration, decisioni). Resta un changelog
 tecnico, non un canale verso Cowork.
 
+### Pre-sprint: lettura Doc obbligatoria
+
+PRIMA di scrivere un PROMPT-SPRINT-X.md o di chiedere decisioni architetturali
+all'utente, leggere TUTTI i Doc rilevanti per lo sprint:
+
+1. Inventario Doc rilevanti (es. Bet Slip → Doc 02 user stories, Doc 03
+   sitemap, Doc 04 wireframe home + evento, Doc 05 tech stack, Doc 06 DB,
+   Doc 08 design system)
+2. Leggerli tutti, non solo le sezioni ovvie. File > 600 righe → delegare a
+   subagent Explore con istruzione di leggere il file intero e tornare un
+   brief sintetico
+3. Il prompt sprint cita esplicitamente le sezioni Doc su cui si basa
+   (numero riga) come riferimento di prova
+4. Se un Doc ha una specifica chiara, applicarla — NON chiedere conferma
+   all'utente per cose già scritte
+5. Chiedere all'utente solo per ambiguità reali, citando quale Doc/sezione
+   lascia il gap
+
+Razionale: i Doc 1-10 sono la fonte di verità del progetto. Saltare la lettura
+significa fare assunzioni che poi l'utente deve correggere — costo alto in
+giri di prompt.
+
 ### Post-sprint audit obbligatorio
 
 Al termine di OGNI sprint (prima del commit finale e prima di dire "fatto"
