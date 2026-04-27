@@ -6,7 +6,12 @@ export function DesktopSearch() {
   return (
     <div
       className="hidden md:flex"
-      style={{ flex: 1, minWidth: 0, maxWidth: '320px', marginLeft: 'auto' }}
+      style={{
+        flex: 1,
+        minWidth: 0,
+        maxWidth: 'var(--layout-sidebar-width)',
+        marginLeft: 'auto',
+      }}
     >
       <div
         style={{

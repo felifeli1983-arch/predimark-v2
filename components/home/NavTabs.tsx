@@ -51,8 +51,8 @@ export function NavTabs() {
           display: 'flex',
           gap: 4,
           overflowX: 'auto',
-          padding: '8px 16px',
-          maxWidth: 1440,
+          padding: '8px var(--layout-padding-x)',
+          maxWidth: 'var(--layout-max-width)',
           margin: '0 auto',
           scrollbarWidth: 'none',
         }}

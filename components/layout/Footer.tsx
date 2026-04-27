@@ -15,6 +15,9 @@ const linkStyle: React.CSSProperties = {
   color: 'var(--color-text-muted)',
   textDecoration: 'none',
   whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  maxWidth: '100%',
   transition: 'color 150ms',
 }
 
@@ -46,7 +49,7 @@ export function Footer() {
     >
       <div
         style={{
-          maxWidth: '1440px',
+          maxWidth: 'var(--layout-max-width)',
           margin: '0 auto',
           padding: '20px 24px 24px',
           display: 'flex',
