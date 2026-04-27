@@ -28,6 +28,7 @@ export function StarToggle({ payload, size = 14, marketLabel }: Props) {
   return (
     <button
       type="button"
+      className="star-toggle"
       aria-label={
         marketLabel
           ? isFavorite
@@ -46,7 +47,6 @@ export function StarToggle({ payload, size = 14, marketLabel }: Props) {
         background: 'transparent',
         border: 'none',
         padding: 4,
-        cursor: 'pointer',
         color: isFavorite ? 'var(--color-warning)' : 'var(--color-text-muted)',
         display: 'inline-flex',
         alignItems: 'center',

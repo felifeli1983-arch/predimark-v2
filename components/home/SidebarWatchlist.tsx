@@ -2,29 +2,53 @@
 
 import Link from 'next/link'
 import { Star } from 'lucide-react'
+import { usePrivy } from '@privy-io/react-auth'
+import { useWatchlist } from '@/lib/stores/useWatchlist'
+import { useEffect, useState } from 'react'
+import { fetchWatchlist } from '@/lib/api/watchlist-client'
+import type { WatchlistItem } from '@/app/api/v1/watchlist/route'
 
-interface WatchlistItem {
-  market: string
-  pct: number
-  delta: number
-}
+const MAX_VISIBLE = 5
 
-interface Props {
-  /**
-   * Quando true mostra una lista di mercati (in MA5 collegata a watchlist reale).
-   * Default false → empty state con CTA "Trending >".
-   */
-  populated?: boolean
-  items?: WatchlistItem[]
-}
+/**
+ * Sidebar Watchlist — Polymarket-style. Mostra:
+ *  - Empty state con CTA Trending se utente non ha mercati seguiti
+ *  - Lista compatta dei top 5 mercati seguiti con titolo + Yes%
+ *
+ * Attinge al `useWatchlist` store per il count, e fa fetch sui dettagli
+ * mercato (title, yes price) on-demand quando lo store è hydrated.
+ */
+export function SidebarWatchlist() {
+  const { authenticated, ready, getAccessToken } = usePrivy()
+  const watched = useWatchlist((s) => s.watched)
+  const hydrated = useWatchlist((s) => s.hydrated)
+  const [items, setItems] = useState<WatchlistItem[]>([])
 
-const DEFAULT_ITEMS: WatchlistItem[] = [
-  { market: 'Trump 2028', pct: 62, delta: 2 },
-  { market: 'BTC 100k', pct: 78, delta: 1 },
-  { market: 'Lakers', pct: 38, delta: -3 },
-]
+  useEffect(() => {
+    if (!ready || !authenticated || !hydrated) return
+    if (watched.size === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setItems([])
+      return
+    }
+    let cancelled = false
+    ;(async () => {
+      try {
+        const token = await getAccessToken()
+        if (!token) return
+        const list = await fetchWatchlist(token)
+        if (!cancelled) setItems(list.slice(0, MAX_VISIBLE))
+      } catch {
+        // silenzioso: la sidebar è solo accessoria, mostra empty state
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [ready, authenticated, hydrated, watched.size, getAccessToken])
 
-export function SidebarWatchlist({ populated = false, items = DEFAULT_ITEMS }: Props) {
+  const isEmpty = !authenticated || items.length === 0
+
   return (
     <section
       style={{
@@ -34,23 +58,46 @@ export function SidebarWatchlist({ populated = false, items = DEFAULT_ITEMS }: P
         padding: '12px 14px',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <Star size={14} style={{ color: 'var(--color-warning)' }} />
-        <h3
-          style={{
-            margin: 0,
-            fontSize: 12,
-            fontWeight: 700,
-            color: 'var(--color-text-primary)',
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Watchlist
-        </h3>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 6,
+          marginBottom: 8,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Star size={14} style={{ color: 'var(--color-warning)' }} fill="var(--color-warning)" />
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'var(--color-text-primary)',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Watchlist
+          </h3>
+        </div>
+        {!isEmpty && (
+          <Link
+            href="/me/watchlist"
+            style={{
+              fontSize: 10,
+              color: 'var(--color-cta)',
+              textDecoration: 'none',
+              fontWeight: 600,
+            }}
+          >
+            Vedi tutti →
+          </Link>
+        )}
       </div>
 
-      {!populated ? (
+      {isEmpty ? (
         <>
           <p
             style={{
@@ -60,7 +107,7 @@ export function SidebarWatchlist({ populated = false, items = DEFAULT_ITEMS }: P
               lineHeight: 1.5,
             }}
           >
-            Click the star on any market to add it.
+            Click sulla stellina ☆ per seguire un mercato.
           </p>
           <Link
             href="/?sort=trending"
@@ -86,9 +133,9 @@ export function SidebarWatchlist({ populated = false, items = DEFAULT_ITEMS }: P
             gap: 6,
           }}
         >
-          {items.map((it, i) => (
+          {items.map((it) => (
             <li
-              key={i}
+              key={it.id}
               style={{
                 display: 'flex',
                 alignItems: 'baseline',
@@ -96,10 +143,12 @@ export function SidebarWatchlist({ populated = false, items = DEFAULT_ITEMS }: P
                 gap: 8,
               }}
             >
-              <span
+              <Link
+                href={it.slug ? `/event/${it.slug}` : '/me/watchlist'}
                 style={{
                   fontSize: 11,
                   color: 'var(--color-text-secondary)',
+                  textDecoration: 'none',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -107,33 +156,21 @@ export function SidebarWatchlist({ populated = false, items = DEFAULT_ITEMS }: P
                   minWidth: 0,
                 }}
               >
-                {it.market}
-              </span>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: 'var(--color-text-primary)',
-                  fontVariantNumeric: 'tabular-nums',
-                  flexShrink: 0,
-                }}
-              >
-                {it.pct}%
-              </span>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: it.delta >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
-                  fontVariantNumeric: 'tabular-nums',
-                  minWidth: 32,
-                  textAlign: 'right',
-                  flexShrink: 0,
-                }}
-              >
-                {it.delta >= 0 ? '+' : ''}
-                {it.delta}%
-              </span>
+                {it.title}
+              </Link>
+              {it.currentYesPrice !== null && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: 'var(--color-text-primary)',
+                    fontVariantNumeric: 'tabular-nums',
+                    flexShrink: 0,
+                  }}
+                >
+                  {Math.round(it.currentYesPrice * 100)}%
+                </span>
+              )}
             </li>
           ))}
         </ul>

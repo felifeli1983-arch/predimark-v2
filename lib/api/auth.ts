@@ -40,22 +40,30 @@ export async function requireUserId(
   }
 
   const supabase = createAdminClient()
-  const { data: user, error: lookupError } = await supabase
+
+  // Self-healing: upsert minimo se user non esiste ancora (race condition con
+  // syncUserToSupabase background, o primo login non ancora propagato).
+  // Sempre ritorna l'id, niente più 403 USER_NOT_FOUND su prima interazione.
+  const { data: user, error: upsertError } = await supabase
     .from('users')
+    .upsert(
+      { privy_did: privyDid, last_login_at: new Date().toISOString() },
+      { onConflict: 'privy_did' }
+    )
     .select('id')
-    .eq('privy_did', privyDid)
     .single()
 
-  if (lookupError || !user) {
+  if (upsertError || !user) {
+    console.error('[requireUserId] upsert user fallito', upsertError)
     return {
       error: NextResponse.json(
         {
           error: {
-            code: 'USER_NOT_FOUND',
-            message: 'Utente non registrato. Chiama POST /api/v1/auth/session prima.',
+            code: 'USER_UPSERT_FAILED',
+            message: 'Errore sync utente — riprova',
           },
         },
-        { status: 403 }
+        { status: 500 }
       ),
     }
   }

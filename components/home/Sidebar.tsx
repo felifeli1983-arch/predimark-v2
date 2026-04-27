@@ -54,7 +54,7 @@ export function Sidebar() {
         <>
           <SidebarPortfolio mode="deposit-cta" />
           <SidebarSignals />
-          <SidebarWatchlist populated={false} />
+          <SidebarWatchlist />
           <SidebarHotNow />
           <SidebarActivity />
         </>
@@ -64,7 +64,7 @@ export function Sidebar() {
         <>
           <SidebarPortfolio mode="active" />
           <SidebarSignals />
-          <SidebarWatchlist populated />
+          <SidebarWatchlist />
           <SidebarHotNow />
           <SidebarActivity />
         </>

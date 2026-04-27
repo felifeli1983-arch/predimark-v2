@@ -466,6 +466,18 @@ html[data-theme='light'] {
   transition-duration: 0ms !important;
 }
 
+/* StarToggle watchlist — hover effect (warning color più acceso) */
+.star-toggle {
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    transform 150ms ease;
+}
+.star-toggle:hover {
+  color: var(--color-warning) !important;
+  transform: scale(1.15);
+}
+
 /* Trade buttons (Yes/No, Sì/No, Up/Down, Team) — Polymarket-style hover.
    Default: bordo + testo colore pieno, sfondo a 15% di opacità.
    Hover: solid fill (sfondo colore pieno + testo bianco). */
