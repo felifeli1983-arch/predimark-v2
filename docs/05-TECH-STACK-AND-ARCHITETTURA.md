@@ -89,12 +89,20 @@ Tutte le decisioni qui sono **confermate da Feliciano** o sono **default di V1**
 
 ### Polymarket integration
 
-| Tecnologia                             | Uso                                                                      |
-| -------------------------------------- | ------------------------------------------------------------------------ |
-| **@polymarket/clob-client**            | SDK ufficiale per CLOB API (book, midpoint, prices-history, POST /order) |
-| **Custom client** in `lib/polymarket/` | Wrapper su Gamma API REST + Data API REST + WebSocket RTDS               |
+> **CLOB V2** (rilasciato 2026-04-28). Auktora salta V1 entirely (siamo
+> ancora DEMO-only al cutover) e integra direttamente V2. Niente
+> `@polymarket/clob-client` legacy, niente HMAC builder headers, niente
+> USDC.e — solo V2 SDK + pUSD + `builderCode` per attribution.
 
-Endpoint utilizzati (da V1, validati):
+| Tecnologia                             | Uso                                                                                                                                                                                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **@polymarket/clob-client-v2**         | SDK V2 per CLOB API (book, midpoint, prices-history, POST /order). Constructor con options object, `chain` (era `chainId`). Order struct V2: `timestamp` ms, `metadata`, `builder` bytes32 — niente più `nonce`, `feeRateBps`, `taker`. |
+| **Custom client** in `lib/polymarket/` | Wrapper su Gamma API REST + Data API REST + WebSocket RTDS                                                                                                                                                                              |
+| **pUSD** (Polymarket USD)              | Collateral token V2 (ERC-20 Polygon backed by USDC). Wrap USDC.e via Collateral Onramp `wrap()` per API users. Frontend polymarket.com gestisce wrap auto.                                                                              |
+| **builderCode** (bytes32)              | Single field per ordine per builder attribution. Da [Builder Profile](https://polymarket.com/settings?tab=builder). Niente più `@polymarket/builder-signing-sdk` o HMAC headers.                                                        |
+| **EIP-712 Exchange domain**            | `version: "2"`, V2 contracts: standard `0xE111180000d2663C0091e4f400237545B87B996B`, neg risk `0xe2222d279d744050d28e00520010520000310F59`. ClobAuthDomain (L1 API auth) resta `version: "1"`.                                          |
+
+Endpoint utilizzati (V2):
 
 - **Gamma API** REST: events, markets, comments, tags, series, search
 - **CLOB** REST + WebSocket: book/midpoint/prices-history + topic book/price_change/last_trade_price

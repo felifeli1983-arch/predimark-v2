@@ -1771,6 +1771,10 @@ Riusiamo il pattern V1: 1 WebSocket connection per source, condivisa via React C
 
 ### 3.1 — Polymarket CLOB WebSocket
 
+> **CLOB V2** (rilasciato 2026-04-28). WebSocket URL e payload restano
+> uguali. Vedi `feedback_polymarket_clob_v2.md` per impatti REST API
+> (order struct, EIP-712 domain v2, pUSD collateral, builderCode field).
+
 **URL**: `wss://ws-subscriptions-clob.polymarket.com/ws/`
 
 **Topics**:
@@ -1910,20 +1914,57 @@ Le Edge Functions girano su Deno runtime e sono usate per logica server critica.
 
 Esegue trade Polymarket lato server (per copy auto + sicurezza).
 
+> **CLOB V2** (rilasciato 2026-04-28): Auktora salta V1 entirely.
+> Implementazione MA4.4 useremo `@polymarket/clob-client-v2`.
+
 **Trigger**: API call da `/api/v1/trades/submit` (per trade copy auto).
 
-**Logic**:
+**Logic V2**:
 
-1. Verifica saldo utente (real o demo)
+1. Verifica saldo utente (real `pUSD` o demo)
 2. Se demo: aggiorna `positions` + `trades` con flag `is_demo=true`
 3. Se real:
    - Verifica geo-block
-   - Build EIP-712 typed data
+   - Wrap USDC.e → pUSD se non già wrapped (Collateral Onramp `wrap()`)
+   - Build EIP-712 typed data — Exchange domain `version: "2"` con
+     V2 `verifyingContract` (`0xE111180000d2663C0091e4f400237545B87B996B`
+     standard / `0xe2222d279d744050d28e00520010520000310F59` neg risk)
+   - Order struct V2: `salt, maker, signer, tokenId, makerAmount,
+takerAmount, side, signatureType, timestamp (ms), metadata, builder`
+     (NO più `nonce`, `feeRateBps`, `taker`, `expiration` nello signed)
    - Sign con session key (per copy) o restituisci typed data al client (per manual)
-   - Submit ordine via CLOB POST /order
-   - Aggiorna `positions` + `trades`
-   - Calcola fee (builder + service)
+   - Submit ordine via CLOB POST /order — body include `builder`
+     (bytes32 builderCode da Builder Profile, attribution + revenue share)
+   - Aggiorna `positions` + `trades` (fees set dal protocol al match-time,
+     query via `getClobMarketInfo()`)
 4. Crea notification per utente
+
+**Build con SDK** (preferito):
+
+```ts
+import { ClobClient } from '@polymarket/clob-client-v2'
+
+const client = new ClobClient({
+  host: 'https://clob.polymarket.com',
+  chain: 137, // (era chainId)
+  signer,
+  creds,
+  signatureType: 1,
+  funderAddress,
+  builderConfig: { builderCode: process.env.POLY_BUILDER_CODE },
+})
+
+await client.createAndPostOrder(
+  { tokenID, price, size, side: Side.BUY }, // niente più feeRateBps/nonce/taker
+  { tickSize: '0.01', negRisk: false }
+)
+```
+
+**Headers API auth invariati** rispetto a V1:
+`POLY_ADDRESS`, `POLY_SIGNATURE`, `POLY_TIMESTAMP`, `POLY_API_KEY`,
+`POLY_PASSPHRASE`. **Removed** in V2: `POLY_BUILDER_API_KEY`,
+`POLY_BUILDER_SECRET`, `POLY_BUILDER_PASSPHRASE`, `POLY_BUILDER_SIGNATURE`
+(builder attribution ora via `builder` field nell'order signed).
 
 ### 4.2 — `process-deposit-webhook`
 
