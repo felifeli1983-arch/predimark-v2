@@ -2,34 +2,37 @@
 
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import type { AuktoraEvent, AuktoraMarket, AuktoraOutcome } from '@/lib/polymarket/mappers'
-import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { OutcomeRowFull } from './OutcomeRowFull'
 
+type TradeHandler = (eventId: string, marketId: string, side: string) => void
+
 interface Props {
   event: AuktoraEvent
-  onAddToSlip: (payload: AddToSlipPayload) => void
+  onTrade: TradeHandler
 }
 
-export function EventProbabilities({ event, onAddToSlip }: Props) {
+export function EventProbabilities({ event, onTrade }: Props) {
+  const trade = (marketId: string, side: string) => onTrade(event.id, marketId, side)
+
   switch (event.kind) {
     case 'binary':
-      return <BinaryView event={event} onAddToSlip={onAddToSlip} />
+      return <BinaryView event={event} onTrade={trade} />
     case 'h2h_sport':
-      return <H2HView event={event} onAddToSlip={onAddToSlip} />
+      return <H2HView event={event} onTrade={trade} />
     case 'crypto_up_down':
-      return <CryptoView event={event} onAddToSlip={onAddToSlip} />
+      return <CryptoView event={event} onTrade={trade} />
     case 'multi_strike':
-      return <StrikeListView event={event} onAddToSlip={onAddToSlip} />
+      return <StrikeListView event={event} onTrade={trade} />
     case 'multi_outcome':
     default:
-      return <OutcomeListView event={event} onAddToSlip={onAddToSlip} />
+      return <OutcomeListView event={event} onTrade={trade} />
   }
 }
 
 interface ViewProps {
   event: AuktoraEvent
-  onAddToSlip: (payload: AddToSlipPayload) => void
+  onTrade: (marketId: string, side: string) => void
 }
 
 function Card({ children }: { children: React.ReactNode }) {
@@ -81,24 +84,11 @@ function BigBtn({
   )
 }
 
-function BinaryView({ event, onAddToSlip }: ViewProps) {
+function BinaryView({ event, onTrade }: ViewProps) {
   const market = event.markets[0]
   if (!market) return <EmptyMarketsHint />
   const yesPct = Math.round(market.yesPrice * 100)
   const noPct = Math.round(market.noPrice * 100)
-
-  function add(side: 'yes' | 'no') {
-    if (!market) return
-    const price = side === 'yes' ? market.yesPrice : market.noPrice
-    onAddToSlip({
-      eventId: event.id,
-      marketId: market.id,
-      outcome: side,
-      priceAtAdd: price,
-      marketTitle: event.title,
-      outcomeLabel: side === 'yes' ? 'Yes' : 'No',
-    })
-  }
 
   return (
     <Card>
@@ -109,35 +99,28 @@ function BinaryView({ event, onAddToSlip }: ViewProps) {
         <Stat label="No" value={`${noPct}%`} color="var(--color-danger)" />
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
-        <BigBtn label={`Buy Yes ${yesPct}¢`} variant="yes" onClick={() => add('yes')} />
-        <BigBtn label={`Buy No ${noPct}¢`} variant="no" onClick={() => add('no')} />
+        <BigBtn
+          label={`Buy Yes ${yesPct}¢`}
+          variant="yes"
+          onClick={() => onTrade(market.id, 'yes')}
+        />
+        <BigBtn label={`Buy No ${noPct}¢`} variant="no" onClick={() => onTrade(market.id, 'no')} />
       </div>
     </Card>
   )
 }
 
-function H2HView({ event, onAddToSlip }: ViewProps) {
+function H2HView({ event, onTrade }: ViewProps) {
   const market = event.markets[0]
   if (!market) return <EmptyMarketsHint />
   const outcomes = market.outcomes
-
-  function add(o: AuktoraOutcome) {
-    onAddToSlip({
-      eventId: event.id,
-      marketId: market!.id,
-      outcome: o.name,
-      priceAtAdd: o.price,
-      marketTitle: event.title,
-      outcomeLabel: o.name,
-    })
-  }
 
   return (
     <Card>
       <div
         style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center', gap: 16 }}
       >
-        {outcomes.map((o) => (
+        {outcomes.map((o: AuktoraOutcome) => (
           <Stat
             key={o.name}
             label={o.name}
@@ -147,11 +130,11 @@ function H2HView({ event, onAddToSlip }: ViewProps) {
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        {outcomes.map((o) => (
+        {outcomes.map((o: AuktoraOutcome) => (
           <button
             key={o.name}
             type="button"
-            onClick={() => add(o)}
+            onClick={() => onTrade(market.id, o.name)}
             style={{
               flex: 1,
               minWidth: 120,
@@ -173,25 +156,12 @@ function H2HView({ event, onAddToSlip }: ViewProps) {
   )
 }
 
-function CryptoView({ event, onAddToSlip }: ViewProps) {
+function CryptoView({ event, onTrade }: ViewProps) {
   const market = event.markets[0]
   const { display: countdown, expired } = useCountdown(event.endDate)
   if (!market) return <EmptyMarketsHint />
   const upPct = Math.round(market.yesPrice * 100)
   const downPct = 100 - upPct
-
-  function add(side: 'up' | 'down') {
-    if (!market) return
-    const isUp = side === 'up'
-    onAddToSlip({
-      eventId: event.id,
-      marketId: market.id,
-      outcome: side,
-      priceAtAdd: isUp ? market.yesPrice : 1 - market.yesPrice,
-      marketTitle: event.title,
-      outcomeLabel: isUp ? 'Up' : 'Down',
-    })
-  }
 
   return (
     <Card>
@@ -233,34 +203,22 @@ function CryptoView({ event, onAddToSlip }: ViewProps) {
           label={`Up ${upPct}%`}
           icon={<TrendingUp size={14} />}
           variant="up"
-          onClick={() => add('up')}
+          onClick={() => onTrade(market.id, 'up')}
         />
         <ActionButton
           label={`Down ${downPct}%`}
           icon={<TrendingDown size={14} />}
           variant="down"
-          onClick={() => add('down')}
+          onClick={() => onTrade(market.id, 'down')}
         />
       </div>
     </Card>
   )
 }
 
-function StrikeListView({ event, onAddToSlip }: ViewProps) {
+function StrikeListView({ event, onTrade }: ViewProps) {
   const sorted = [...event.markets].sort((a, b) => extractStrike(b) - extractStrike(a))
   const currentIdx = sorted.findIndex((m) => m.yesPrice > 0.5)
-
-  function buildAdd(m: AuktoraMarket) {
-    return (side: 'yes' | 'no') =>
-      onAddToSlip({
-        eventId: event.id,
-        marketId: m.id,
-        outcome: side,
-        priceAtAdd: side === 'yes' ? m.yesPrice : m.noPrice,
-        marketTitle: event.title,
-        outcomeLabel: `${m.question} ${side === 'yes' ? 'Sì' : 'No'}`,
-      })
-  }
 
   return (
     <Card>
@@ -273,7 +231,7 @@ function StrikeListView({ event, onAddToSlip }: ViewProps) {
             key={m.id}
             market={m}
             highlighted={i === currentIdx}
-            onTrade={buildAdd(m)}
+            onTrade={(side) => onTrade(m.id, side)}
           />
         ))}
       </div>
@@ -281,22 +239,8 @@ function StrikeListView({ event, onAddToSlip }: ViewProps) {
   )
 }
 
-function OutcomeListView({ event, onAddToSlip }: ViewProps) {
+function OutcomeListView({ event, onTrade }: ViewProps) {
   const sorted = [...event.markets].sort((a, b) => b.yesPrice - a.yesPrice)
-
-  function buildAdd(m: AuktoraMarket) {
-    const label = m.groupItemTitle || m.question
-    return (side: 'yes' | 'no') =>
-      onAddToSlip({
-        eventId: event.id,
-        marketId: m.id,
-        outcome: side,
-        priceAtAdd: side === 'yes' ? m.yesPrice : m.noPrice,
-        marketTitle: event.title,
-        outcomeLabel: `${label} ${side === 'yes' ? 'Sì' : 'No'}`,
-      })
-  }
-
   return (
     <Card>
       <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
@@ -308,7 +252,7 @@ function OutcomeListView({ event, onAddToSlip }: ViewProps) {
             key={m.id}
             market={m}
             label={m.groupItemTitle || m.question}
-            onTrade={buildAdd(m)}
+            onTrade={(side) => onTrade(m.id, side)}
           />
         ))}
       </div>

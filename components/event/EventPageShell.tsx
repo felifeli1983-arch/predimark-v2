@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
-import { betSlipActions } from '@/lib/stores/useBetSlip'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { EventHero } from './EventHero'
 import { EventProbabilities } from './EventProbabilities'
@@ -12,6 +11,11 @@ import { EventSidebarStub } from './EventSidebarStub'
 
 interface Props {
   event: AuktoraEvent
+}
+
+// TODO MA4.3: collegare a TradeWidget single-market (DEMO mode insert in `trades`)
+function handleTradeStub(eventId: string, marketId: string, side: string) {
+  console.warn('[Trade stub MA4.3]', eventId, marketId, side)
 }
 
 export function EventPageShell({ event }: Props) {
@@ -82,7 +86,7 @@ export function EventPageShell({ event }: Props) {
 
         <EventHero event={event} />
         <ChartHistoryStub />
-        <EventProbabilities event={event} onAddToSlip={betSlipActions.addLeg} />
+        <EventProbabilities event={event} onTrade={handleTradeStub} />
         {/* Sidebar inline su mobile + tablet portrait (<1024px) */}
         <div className="lg:hidden">
           <EventSidebarStub event={event} layout="inline" />

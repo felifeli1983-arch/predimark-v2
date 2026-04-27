@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
-import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { BinaryCard } from './cards/BinaryCard'
 import { MultiOutcomeCard } from './cards/MultiOutcomeCard'
 import { MultiStrikeCard } from './cards/MultiStrikeCard'
@@ -12,7 +11,6 @@ import { CryptoCard } from './cards/CryptoCard'
 interface EventCardProps {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 /*
@@ -35,24 +33,14 @@ const cardStyle: React.CSSProperties = {
   cursor: 'pointer',
 }
 
-export function EventCard({ event, onBookmark, onAddToSlip }: EventCardProps) {
+export function EventCard({ event, onBookmark }: EventCardProps) {
   return (
     <Link href={`/event/${event.slug}`} style={cardStyle} className="hover-lift">
-      {event.kind === 'binary' && (
-        <BinaryCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
-      )}
-      {event.kind === 'multi_outcome' && (
-        <MultiOutcomeCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
-      )}
-      {event.kind === 'multi_strike' && (
-        <MultiStrikeCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
-      )}
-      {event.kind === 'h2h_sport' && (
-        <H2HCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
-      )}
-      {event.kind === 'crypto_up_down' && (
-        <CryptoCard event={event} onBookmark={onBookmark} onAddToSlip={onAddToSlip} />
-      )}
+      {event.kind === 'binary' && <BinaryCard event={event} onBookmark={onBookmark} />}
+      {event.kind === 'multi_outcome' && <MultiOutcomeCard event={event} onBookmark={onBookmark} />}
+      {event.kind === 'multi_strike' && <MultiStrikeCard event={event} onBookmark={onBookmark} />}
+      {event.kind === 'h2h_sport' && <H2HCard event={event} onBookmark={onBookmark} />}
+      {event.kind === 'crypto_up_down' && <CryptoCard event={event} onBookmark={onBookmark} />}
     </Link>
   )
 }

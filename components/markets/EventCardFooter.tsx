@@ -1,11 +1,8 @@
 'use client'
 
-import { Plus } from 'lucide-react'
-
 interface EventCardFooterProps {
   volume: number
   endDate: Date | null
-  onAddToSlip?: () => void
   showEndDate?: boolean
 }
 
@@ -34,12 +31,7 @@ export function formatEndDate(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export function EventCardFooter({
-  volume,
-  endDate,
-  onAddToSlip,
-  showEndDate = true,
-}: EventCardFooterProps) {
+export function EventCardFooter({ volume, endDate, showEndDate = true }: EventCardFooterProps) {
   const dateLabel = endDate && showEndDate ? formatEndDate(endDate) : ''
 
   return (
@@ -47,10 +39,9 @@ export function EventCardFooter({
       style={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         padding: '10px 12px',
         borderTop: '1px solid var(--color-border-subtle)',
-        gap: 12,
         marginTop: 'auto', // spinge il footer SEMPRE in fondo nella card flex-col
         flexShrink: 0,
       }}
@@ -72,36 +63,6 @@ export function EventCardFooter({
         Vol
         {dateLabel ? ` · Closes ${dateLabel}` : ''}
       </span>
-
-      {onAddToSlip && (
-        <button
-          type="button"
-          aria-label="Aggiungi a Slip"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            onAddToSlip()
-          }}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            background: 'var(--color-cta-bg)',
-            border: '1px solid var(--color-cta)',
-            color: 'var(--color-cta)',
-            borderRadius: 6,
-            padding: '4px 8px',
-            fontSize: 11,
-            fontWeight: 600,
-            cursor: 'pointer',
-            flexShrink: 0,
-            lineHeight: 1,
-          }}
-        >
-          <Plus size={11} />
-          Slip
-        </button>
-      )}
     </div>
   )
 }

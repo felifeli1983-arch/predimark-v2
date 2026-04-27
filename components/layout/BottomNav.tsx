@@ -6,7 +6,7 @@ import {
   Home,
   Search,
   Zap,
-  Ticket,
+  Star,
   MoreHorizontal,
   User,
   Bookmark,
@@ -15,7 +15,6 @@ import {
   Trophy,
   Settings,
   BarChart2,
-  Star,
   Info,
   CreditCard,
   HelpCircle,
@@ -25,7 +24,6 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/lib/hooks/useAuth'
-import { useBetSlip } from '@/lib/stores/useBetSlip'
 
 /* ──────────────────────────────────────────
    "Altro" bottom sheet — contenuto da Doc 4
@@ -58,15 +56,13 @@ const NAV_ITEMS = [
   { href: '/', icon: Home, label: 'Home' },
   { href: '/search', icon: Search, label: 'Search' },
   { href: '/signals', icon: Zap, label: 'Signals' },
+  { href: '/me/watchlist', icon: Star, label: 'Watchlist' },
 ] as const
 
 export function BottomNav() {
   const pathname = usePathname()
   const { authenticated, login } = useAuth()
   const [moreOpen, setMoreOpen] = useState(false)
-  const slipCount = useBetSlip((s) => s.legs.length)
-  const slipDrawerOpen = useBetSlip((s) => s.drawerOpen)
-  const toggleSlipDrawer = useBetSlip((s) => s.toggleDrawer)
 
   const moreItems = authenticated ? MORE_ITEMS_AUTHENTICATED : MORE_ITEMS_GUEST
 
@@ -86,7 +82,7 @@ export function BottomNav() {
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >
-        {/* Le 3 voci di navigazione (link) */}
+        {/* Le 4 voci di navigazione (Home, Search, Signals, Watchlist) */}
         {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
           const isActive = pathname === href || (href !== '/' && pathname?.startsWith(href))
           return (
@@ -111,58 +107,6 @@ export function BottomNav() {
             </Link>
           )
         })}
-
-        {/* "Slip" — apre/chiude il drawer del Bet Slip + badge counter */}
-        <button
-          type="button"
-          aria-label={`Bet Slip${slipCount > 0 ? ` — ${slipCount} leg` : ''}`}
-          onClick={toggleSlipDrawer}
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '10px 4px 8px',
-            gap: '3px',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: slipDrawerOpen ? 'var(--color-cta)' : 'var(--color-text-muted)',
-            transition: 'color 150ms',
-            position: 'relative',
-          }}
-        >
-          <span style={{ position: 'relative' }}>
-            <Ticket size={20} strokeWidth={slipDrawerOpen ? 2.5 : 1.8} />
-            {slipCount > 0 && (
-              <span
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  top: -6,
-                  right: -8,
-                  minWidth: 16,
-                  height: 16,
-                  padding: '0 4px',
-                  borderRadius: 999,
-                  background: 'var(--color-danger)',
-                  color: '#fff',
-                  fontSize: 9,
-                  fontWeight: 700,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontVariantNumeric: 'tabular-nums',
-                  border: '2px solid var(--color-bg-secondary)',
-                }}
-              >
-                {slipCount}
-              </span>
-            )}
-          </span>
-          <span style={{ fontSize: '10px', fontWeight: slipDrawerOpen ? 600 : 400 }}>Slip</span>
-        </button>
 
         {/* "Altro" — apre bottom sheet */}
         <button

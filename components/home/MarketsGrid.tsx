@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { EventCard } from '@/components/markets/EventCard'
-import { betSlipActions } from '@/lib/stores/useBetSlip'
 
 interface Props {
   initialEvents: AuktoraEvent[]
@@ -74,7 +73,7 @@ export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: P
         <>
           <div className={gridClass} style={{ gap: 12, padding: '12px 16px' }}>
             {visibleEvents.map((event) => (
-              <EventCard key={event.id} event={event} onAddToSlip={betSlipActions.addLeg} />
+              <EventCard key={event.id} event={event} />
             ))}
           </div>
 

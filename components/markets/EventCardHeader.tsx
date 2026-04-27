@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { Bookmark, Flame } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 
 interface EventCardHeaderProps {
   title: string
@@ -13,6 +13,8 @@ interface EventCardHeaderProps {
   isNew?: boolean
   isBookmarked?: boolean
   onBookmark?: () => void
+  /** Slot opzionale per lo StarToggle (Polymarket-style) — appare in alto-destra accanto al bookmark */
+  starSlot?: ReactNode
 }
 
 export function EventCardHeader({
@@ -24,6 +26,7 @@ export function EventCardHeader({
   isNew,
   isBookmarked,
   onBookmark,
+  starSlot,
 }: EventCardHeaderProps) {
   const [imgFailed, setImgFailed] = useState(false)
   const initial = title?.[0]?.toUpperCase() ?? '?'
@@ -186,6 +189,7 @@ export function EventCardHeader({
             NEW
           </span>
         )}
+        {starSlot}
         {onBookmark && (
           <button
             type="button"

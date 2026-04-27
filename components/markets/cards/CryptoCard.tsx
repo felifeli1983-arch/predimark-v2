@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Clock, TrendingUp, TrendingDown } from 'lucide-react'
 import { mapGammaEvent, type AuktoraEvent } from '@/lib/polymarket/mappers'
 import { fetchEventById } from '@/lib/polymarket/queries'
@@ -8,15 +9,14 @@ import { useCountdown } from '@/lib/hooks/useCountdown'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 import { useLiveActivity } from '@/lib/ws/hooks/useLiveActivity'
-import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
+import { StarToggle, watchlistStubToggle } from '../StarToggle'
 import { Thermometer } from '../charts/Thermometer'
 
 interface Props {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 const SHORT_ROUND_MS = 30 * 60 * 1000 // ≤30min → Chainlink, oltre → Binance
@@ -56,8 +56,9 @@ function formatUsd(n: number | null): string {
   return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Props) {
+export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
   const [event, setEvent] = useState(initialEvent)
+  const router = useRouter()
   const market = event.markets[0]
   const symbol = extractSymbol(event.slug, event.title)
   const target = extractTargetPrice(market?.question ?? event.title)
@@ -99,17 +100,9 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
   const lastTrade = activity[0]
   const livePriceDelta = livePrice !== null && target !== null ? livePrice - target : null
 
-  function addSide(side: 'up' | 'down') {
-    if (!onAddToSlip || !market) return
-    const isUp = side === 'up'
-    onAddToSlip({
-      eventId: event.id,
-      marketId: market.id,
-      outcome: isUp ? 'up' : 'down',
-      priceAtAdd: isUp ? upProb : downProb,
-      marketTitle: event.title,
-      outcomeLabel: isUp ? 'Up' : 'Down',
-    })
+  function navigateToEvent(side: 'up' | 'down') {
+    if (!market) return
+    router.push(`/event/${event.slug}?market=${market.id}&side=${side}`)
   }
 
   return (
@@ -120,6 +113,15 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
         tags={event.tags}
         isLive={isLive}
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
+        starSlot={
+          market ? (
+            <StarToggle
+              isFavorite={false}
+              onToggle={() => watchlistStubToggle(market.id)}
+              marketLabel={event.title}
+            />
+          ) : undefined
+        }
       />
 
       <div
@@ -181,7 +183,7 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
                 percent={upPct}
                 variant="up"
                 lastAmount={lastTrade?.side === 'BUY' ? lastTrade.amount : null}
-                onClick={onAddToSlip ? () => addSide('up') : undefined}
+                onClick={() => navigateToEvent('up')}
               />
               <ActionButton
                 label="Down"
@@ -189,7 +191,7 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
                 percent={downPct}
                 variant="down"
                 lastAmount={lastTrade?.side === 'SELL' ? lastTrade.amount : null}
-                onClick={onAddToSlip ? () => addSide('down') : undefined}
+                onClick={() => navigateToEvent('down')}
               />
             </div>
           </div>
@@ -217,11 +219,7 @@ export function CryptoCard({ event: initialEvent, onBookmark, onAddToSlip }: Pro
         </div>
       </div>
 
-      <EventCardFooter
-        volume={event.totalVolume}
-        endDate={event.endDate}
-        onAddToSlip={onAddToSlip ? () => addSide('up') : undefined}
-      />
+      <EventCardFooter volume={event.totalVolume} endDate={event.endDate} />
     </div>
   )
 }

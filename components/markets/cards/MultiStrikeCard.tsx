@@ -1,16 +1,16 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import type { AuktoraEvent, AuktoraMarket } from '@/lib/polymarket/mappers'
-import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
+import { StarToggle, watchlistStubToggle } from '../StarToggle'
 
 const TOP_N = 4
 
 interface Props {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 const STRIKE_RX = /\$?([\d,]+(?:\.\d+)?)\s*([kKmMbB])?/
@@ -39,7 +39,8 @@ function compareStrikes(a: AuktoraMarket, b: AuktoraMarket): number {
   return sb - sa
 }
 
-export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
+export function MultiStrikeCard({ event, onBookmark }: Props) {
+  const router = useRouter()
   const sorted = [...event.markets].sort(compareStrikes)
   const top = sorted.slice(0, TOP_N)
   const remaining = sorted.length - top.length
@@ -47,16 +48,8 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
   // Soglia "corrente": la più alta con prob > 50%
   const currentIndex = top.findIndex((m) => m.yesPrice > 0.5)
 
-  function addStrike(market: AuktoraMarket) {
-    if (!onAddToSlip) return
-    onAddToSlip({
-      eventId: event.id,
-      marketId: market.id,
-      outcome: 'yes',
-      priceAtAdd: market.yesPrice,
-      marketTitle: event.title,
-      outcomeLabel: market.question,
-    })
+  function navigateToEvent(marketId: string, side: 'yes' | 'no') {
+    router.push(`/event/${event.slug}?market=${marketId}&side=${side}`)
   }
 
   return (
@@ -74,7 +67,8 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
             key={m.id}
             market={m}
             highlighted={i === currentIndex}
-            onClick={onAddToSlip ? () => addStrike(m) : undefined}
+            onYesClick={() => navigateToEvent(m.id, 'yes')}
+            onNoClick={() => navigateToEvent(m.id, 'no')}
           />
         ))}
         {remaining > 0 && (
@@ -91,50 +85,37 @@ export function MultiStrikeCard({ event, onBookmark, onAddToSlip }: Props) {
         )}
       </div>
 
-      <EventCardFooter
-        volume={event.totalVolume}
-        endDate={event.endDate}
-        onAddToSlip={onAddToSlip && top[0] ? () => addStrike(top[0]!) : undefined}
-      />
+      <EventCardFooter volume={event.totalVolume} endDate={event.endDate} />
     </div>
   )
 }
 
-function StrikeRow({
-  market,
-  highlighted,
-  onClick,
-}: {
+interface RowProps {
   market: AuktoraMarket
   highlighted: boolean
-  onClick?: () => void
-}) {
+  onYesClick: () => void
+  onNoClick: () => void
+}
+
+function StrikeRow({ market, highlighted, onYesClick, onNoClick }: RowProps) {
   const pct = Math.round(market.yesPrice * 100)
-  const isInteractive = Boolean(onClick)
   const labelColor = highlighted ? 'var(--color-text-primary)' : 'var(--color-text-secondary)'
-  const barColor = highlighted ? 'var(--color-success)' : 'var(--color-cta)'
 
   return (
-    <button
-      type="button"
-      onClick={(e) => {
-        if (!onClick) return
-        e.preventDefault()
-        e.stopPropagation()
-        onClick()
-      }}
+    <div
       style={{
-        width: '100%',
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
+        gap: 6,
         padding: '6px 0',
-        background: 'none',
-        border: 'none',
-        cursor: isInteractive ? 'pointer' : 'default',
-        textAlign: 'left',
       }}
     >
+      <StarToggle
+        isFavorite={false}
+        onToggle={() => watchlistStubToggle(market.id)}
+        marketLabel={market.question}
+        size={12}
+      />
       <span
         style={{
           flex: 1,
@@ -149,24 +130,6 @@ function StrikeRow({
       >
         {market.question}
       </span>
-      <div
-        style={{
-          width: 80,
-          height: 4,
-          background: 'var(--color-bg-tertiary)',
-          borderRadius: 2,
-          overflow: 'hidden',
-          flexShrink: 0,
-        }}
-      >
-        <div
-          style={{
-            width: `${pct}%`,
-            height: '100%',
-            background: barColor,
-          }}
-        />
-      </div>
       <span
         style={{
           fontSize: 12,
@@ -180,6 +143,45 @@ function StrikeRow({
       >
         {pct}%
       </span>
+      <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+        <SideBtn label="Sì" variant="yes" onClick={onYesClick} />
+        <SideBtn label="No" variant="no" onClick={onNoClick} />
+      </div>
+    </div>
+  )
+}
+
+function SideBtn({
+  label,
+  variant,
+  onClick,
+}: {
+  label: string
+  variant: 'yes' | 'no'
+  onClick: () => void
+}) {
+  const isYes = variant === 'yes'
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        onClick()
+      }}
+      style={{
+        padding: '3px 8px',
+        borderRadius: 5,
+        fontSize: 10,
+        fontWeight: 700,
+        cursor: 'pointer',
+        background: isYes ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
+        color: isYes ? 'var(--color-success)' : 'var(--color-danger)',
+        border: `1px solid ${isYes ? 'var(--color-success)' : 'var(--color-danger)'}`,
+        letterSpacing: '0.04em',
+      }}
+    >
+      {label}
     </button>
   )
 }

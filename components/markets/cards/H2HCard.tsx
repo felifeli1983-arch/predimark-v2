@@ -1,14 +1,14 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import type { AuktoraEvent, AuktoraOutcome } from '@/lib/polymarket/mappers'
-import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
+import { StarToggle, watchlistStubToggle } from '../StarToggle'
 
 interface Props {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
 const DRAW_HINTS = ['draw', 'tie', 'pareggio']
@@ -43,7 +43,8 @@ function resolveOutcomes(outcomes: AuktoraOutcome[]): ResolvedOutcomes {
   return { teamA: teams[0], teamB: teams[1], draw }
 }
 
-export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
+export function H2HCard({ event, onBookmark }: Props) {
+  const router = useRouter()
   const market = event.markets[0]
   const outcomes = market?.outcomes ?? []
   const { teamA, teamB, draw } = resolveOutcomes(outcomes)
@@ -51,16 +52,9 @@ export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
   const isLive = event.active && !event.closed
   const marketId = market?.id ?? ''
 
-  function addOutcome(outcome: AuktoraOutcome) {
-    if (!onAddToSlip || !marketId) return
-    onAddToSlip({
-      eventId: event.id,
-      marketId,
-      outcome: outcome.name,
-      priceAtAdd: outcome.price,
-      marketTitle: event.title,
-      outcomeLabel: outcome.name,
-    })
+  function navigateToEvent(outcomeName: string) {
+    if (!marketId) return
+    router.push(`/event/${event.slug}?market=${marketId}&side=${encodeURIComponent(outcomeName)}`)
   }
 
   return (
@@ -71,6 +65,15 @@ export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
         tags={event.tags}
         isLive={isLive}
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
+        starSlot={
+          marketId ? (
+            <StarToggle
+              isFavorite={false}
+              onToggle={() => watchlistStubToggle(marketId)}
+              marketLabel={event.title}
+            />
+          ) : undefined
+        }
       />
 
       <div
@@ -96,27 +99,19 @@ export function H2HCard({ event, onBookmark, onAddToSlip }: Props) {
         <div style={{ display: 'flex', gap: 6 }}>
           <TeamButton
             outcome={teamA}
-            onClick={onAddToSlip && teamA ? () => addOutcome(teamA) : undefined}
+            onClick={teamA ? () => navigateToEvent(teamA.name) : undefined}
           />
           {draw && (
-            <TeamButton
-              outcome={draw}
-              variant="muted"
-              onClick={onAddToSlip ? () => addOutcome(draw) : undefined}
-            />
+            <TeamButton outcome={draw} variant="muted" onClick={() => navigateToEvent(draw.name)} />
           )}
           <TeamButton
             outcome={teamB}
-            onClick={onAddToSlip && teamB ? () => addOutcome(teamB) : undefined}
+            onClick={teamB ? () => navigateToEvent(teamB.name) : undefined}
           />
         </div>
       </div>
 
-      <EventCardFooter
-        volume={event.totalVolume}
-        endDate={event.endDate}
-        onAddToSlip={onAddToSlip && teamA ? () => addOutcome(teamA) : undefined}
-      />
+      <EventCardFooter volume={event.totalVolume} endDate={event.endDate} />
     </div>
   )
 }

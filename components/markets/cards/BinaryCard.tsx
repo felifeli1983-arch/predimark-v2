@@ -1,46 +1,28 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
-import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { DonutChart } from '../charts/DonutChart'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
+import { StarToggle, watchlistStubToggle } from '../StarToggle'
 
 interface BinaryCardProps {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (payload: AddToSlipPayload) => void
 }
 
-export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) {
+export function BinaryCard({ event, onBookmark }: BinaryCardProps) {
+  const router = useRouter()
   const market = event.markets[0]
   const yesPrice = market?.yesPrice ?? 0.5
   const noPrice = market?.noPrice ?? 1 - yesPrice
   const yesPct = Math.round(yesPrice * 100)
   const noPct = Math.round(noPrice * 100)
 
-  function addYes() {
-    if (!market || !onAddToSlip) return
-    onAddToSlip({
-      eventId: event.id,
-      marketId: market.id,
-      outcome: 'yes',
-      priceAtAdd: yesPrice,
-      marketTitle: event.title,
-      outcomeLabel: 'Yes',
-    })
-  }
-
-  function addNo() {
-    if (!market || !onAddToSlip) return
-    onAddToSlip({
-      eventId: event.id,
-      marketId: market.id,
-      outcome: 'no',
-      priceAtAdd: noPrice,
-      marketTitle: event.title,
-      outcomeLabel: 'No',
-    })
+  function navigateToEvent(side: 'yes' | 'no') {
+    if (!market) return
+    router.push(`/event/${event.slug}?market=${market.id}&side=${side}`)
   }
 
   return (
@@ -50,6 +32,15 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
         image={event.image}
         tags={event.tags}
         onBookmark={onBookmark ? () => onBookmark(event.id) : undefined}
+        starSlot={
+          market ? (
+            <StarToggle
+              isFavorite={false}
+              onToggle={() => watchlistStubToggle(market.id)}
+              marketLabel={event.title}
+            />
+          ) : undefined
+        }
       />
 
       <div
@@ -72,7 +63,7 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              addYes()
+              navigateToEvent('yes')
             }}
             style={{
               flex: 1,
@@ -93,7 +84,7 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              addNo()
+              navigateToEvent('no')
             }}
             style={{
               flex: 1,
@@ -112,11 +103,7 @@ export function BinaryCard({ event, onBookmark, onAddToSlip }: BinaryCardProps) 
         </div>
       </div>
 
-      <EventCardFooter
-        volume={event.totalVolume}
-        endDate={event.endDate}
-        onAddToSlip={onAddToSlip ? addYes : undefined}
-      />
+      <EventCardFooter volume={event.totalVolume} endDate={event.endDate} />
     </div>
   )
 }

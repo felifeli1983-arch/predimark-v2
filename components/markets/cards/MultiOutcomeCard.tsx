@@ -1,26 +1,16 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import type { AuktoraEvent, AuktoraMarket } from '@/lib/polymarket/mappers'
-import type { AddToSlipPayload } from '@/lib/stores/useBetSlip'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
+import { StarToggle, watchlistStubToggle } from '../StarToggle'
 
 const TOP_N = 3
 
 interface Props {
   event: AuktoraEvent
   onBookmark?: (eventId: string) => void
-  onAddToSlip?: (payload: AddToSlipPayload) => void
-}
-
-const MONTH_RX = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
-const ISO_RX = /\b(19|20)\d{2}-\d{2}(-\d{2})?\b/
-const YEAR_RX = /\b(19|20)\d{2}\b/
-
-/** Heuristic: true se la label sembra una data (variante 2b) */
-function looksLikeDate(label: string): boolean {
-  if (!label) return false
-  return MONTH_RX.test(label) || ISO_RX.test(label) || YEAR_RX.test(label)
 }
 
 /**
@@ -32,27 +22,14 @@ function outcomeLabel(market: AuktoraMarket): string {
   return market.groupItemTitle || market.question
 }
 
-export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
+export function MultiOutcomeCard({ event, onBookmark }: Props) {
+  const router = useRouter()
   const sorted = [...event.markets].sort((a, b) => b.yesPrice - a.yesPrice)
   const top = sorted.slice(0, TOP_N)
   const remaining = sorted.length - top.length
 
-  // Variante 2b se la maggioranza dei top sembra date → nascondi endDate nel footer
-  const dateLike = top.filter((m) => looksLikeDate(outcomeLabel(m))).length
-  const isDateOutcomes = top.length > 0 && dateLike >= Math.ceil(top.length / 2)
-
-  function addOutcome(market: AuktoraMarket, side: 'yes' | 'no') {
-    if (!onAddToSlip) return
-    const label = outcomeLabel(market)
-    const price = side === 'yes' ? market.yesPrice : market.noPrice
-    onAddToSlip({
-      eventId: event.id,
-      marketId: market.id,
-      outcome: `${market.id}:${side}`,
-      priceAtAdd: price,
-      marketTitle: event.title,
-      outcomeLabel: `${label} ${side === 'yes' ? 'Sì' : 'No'}`,
-    })
+  function navigateToEvent(marketId: string, side: 'yes' | 'no') {
+    router.push(`/event/${event.slug}?market=${marketId}&side=${side}`)
   }
 
   return (
@@ -69,9 +46,8 @@ export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
           <OutcomeRow
             key={m.id}
             market={m}
-            withYesNo={isDateOutcomes}
-            onYesClick={onAddToSlip ? () => addOutcome(m, 'yes') : undefined}
-            onNoClick={onAddToSlip ? () => addOutcome(m, 'no') : undefined}
+            onYesClick={() => navigateToEvent(m.id, 'yes')}
+            onNoClick={() => navigateToEvent(m.id, 'no')}
           />
         ))}
         {remaining > 0 && (
@@ -88,34 +64,36 @@ export function MultiOutcomeCard({ event, onBookmark, onAddToSlip }: Props) {
         )}
       </div>
 
-      <EventCardFooter
-        volume={event.totalVolume}
-        endDate={event.endDate}
-        onAddToSlip={onAddToSlip && top[0] ? () => addOutcome(top[0]!, 'yes') : undefined}
-      />
+      <EventCardFooter volume={event.totalVolume} endDate={event.endDate} />
     </div>
   )
 }
 
 interface RowProps {
   market: AuktoraMarket
-  withYesNo: boolean
-  onYesClick?: () => void
-  onNoClick?: () => void
+  onYesClick: () => void
+  onNoClick: () => void
 }
 
-function OutcomeRow({ market, withYesNo, onYesClick, onNoClick }: RowProps) {
+function OutcomeRow({ market, onYesClick, onNoClick }: RowProps) {
   const pct = Math.round(market.yesPrice * 100)
+  const label = outcomeLabel(market)
 
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
+        gap: 6,
         padding: '6px 0',
       }}
     >
+      <StarToggle
+        isFavorite={false}
+        onToggle={() => watchlistStubToggle(market.id)}
+        marketLabel={label}
+        size={12}
+      />
       <span
         style={{
           flex: 1,
@@ -127,26 +105,8 @@ function OutcomeRow({ market, withYesNo, onYesClick, onNoClick }: RowProps) {
           minWidth: 0,
         }}
       >
-        {outcomeLabel(market)}
+        {label}
       </span>
-      <div
-        style={{
-          width: 70,
-          height: 4,
-          background: 'var(--color-bg-tertiary)',
-          borderRadius: 2,
-          overflow: 'hidden',
-          flexShrink: 0,
-        }}
-      >
-        <div
-          style={{
-            width: `${pct}%`,
-            height: '100%',
-            background: 'var(--color-cta)',
-          }}
-        />
-      </div>
       <span
         style={{
           fontSize: 12,
@@ -160,12 +120,10 @@ function OutcomeRow({ market, withYesNo, onYesClick, onNoClick }: RowProps) {
       >
         {pct}%
       </span>
-      {withYesNo && (
-        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-          <MiniBtn label="Sì" variant="yes" onClick={onYesClick} />
-          <MiniBtn label="No" variant="no" onClick={onNoClick} />
-        </div>
-      )}
+      <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+        <MiniBtn label="Sì" variant="yes" onClick={onYesClick} />
+        <MiniBtn label="No" variant="no" onClick={onNoClick} />
+      </div>
     </div>
   )
 }
@@ -177,14 +135,13 @@ function MiniBtn({
 }: {
   label: string
   variant: 'yes' | 'no'
-  onClick?: () => void
+  onClick: () => void
 }) {
   const isYes = variant === 'yes'
   return (
     <button
       type="button"
       onClick={(e) => {
-        if (!onClick) return
         e.preventDefault()
         e.stopPropagation()
         onClick()
