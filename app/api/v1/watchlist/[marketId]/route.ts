@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUserId } from '@/lib/api/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { findMarketByPolymarketId } from '@/lib/markets/upsert'
+import { removeFromWatchlist } from '@/lib/watchlist/queries'
 
 /**
  * DELETE /api/v1/watchlist/[marketId]
  * `marketId` parametro = polymarket_market_id (stringa Gamma).
- *
- * Rimuove il record dalla watchlist dell'utente. Idempotente:
- * 204 anche se la riga non esisteva.
+ * Idempotente: 204 anche se la riga non esisteva.
  */
 export async function DELETE(
   request: NextRequest,
@@ -25,33 +25,19 @@ export async function DELETE(
   }
 
   const supabase = createAdminClient()
-
-  // 1. Risolvi internal markets.id da polymarket_market_id
-  const { data: market } = await supabase
-    .from('markets')
-    .select('id')
-    .eq('polymarket_market_id', marketId)
-    .maybeSingle()
-
+  const market = await findMarketByPolymarketId(supabase, marketId)
   if (!market) {
-    // Mai stato in watchlist (o markets row non esiste). Idempotente: 204.
+    // Mai stato in watchlist → idempotente.
     return new NextResponse(null, { status: 204 })
   }
 
-  // 2. Delete watchlist row (scope su user_id)
-  const { error: delErr } = await supabase
-    .from('watchlist')
-    .delete()
-    .eq('user_id', auth.userId)
-    .eq('market_id', market.id)
-
-  if (delErr) {
-    console.error('[watchlist DELETE]', delErr)
+  const result = await removeFromWatchlist(supabase, auth.userId, market.id)
+  if (result?.error) {
+    console.error('[watchlist DELETE]', result.error)
     return NextResponse.json(
       { error: { code: 'DELETE_FAILED', message: 'Errore rimozione' } },
       { status: 500 }
     )
   }
-
   return new NextResponse(null, { status: 204 })
 }

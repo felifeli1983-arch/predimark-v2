@@ -129,13 +129,26 @@ TimescaleDB hypertables:
 
 ### Tabella `users`
 
-Profilo utente Predimark. Linkato a `auth.users` di Supabase (gestito da Privy JWT).
+Profilo utente Auktora. Identificazione primaria via Privy JWT (`privy_did`),
+con `auth_id` opzionale per il caso ibrido Supabase Auth.
+
+> **DIVERGENZA Doc-vs-DB (registrata 2026-04-28)**: lo schema implementato in
+> staging+prod differisce dal blocco SQL sotto:
+>
+> 1. `auth_id UUID NULLABLE` (era `NOT NULL`) — l'auth source of truth è
+>    Privy via `privy_did`, `auth_id` resta solo come collegamento opzionale a
+>    `auth.users`
+> 2. `wallet_address TEXT NULLABLE` (era `NOT NULL`) — gli utenti email-only
+>    (Privy embedded wallet non ancora generato) non hanno wallet
+> 3. `privy_did TEXT UNIQUE` aggiunto come colonna principale di lookup
+>    (ON CONFLICT `privy_did` per upsert in `requireUserId` helper)
 
 ```sql
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  auth_id UUID UNIQUE NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  wallet_address TEXT UNIQUE NOT NULL,        -- Polygon address (0x...)
+  auth_id UUID UNIQUE,                         -- nullable: opzionale legame a auth.users
+  privy_did TEXT UNIQUE,                       -- chiave Privy primaria (es. did:privy:...)
+  wallet_address TEXT UNIQUE,                  -- nullable: Polygon (0x...) generato da Privy
 
   -- Profile
   username TEXT UNIQUE,                        -- @username scelto dall'utente, opzionale
@@ -276,6 +289,12 @@ USING (
 
 Cache locale dei mercati Polymarket (per query veloci, evitiamo di sempre hit Polymarket API).
 
+> **DIVERGENZA Doc-vs-DB (registrata 2026-04-28, migration `drop_markets_slug_unique`)**:
+> `slug` NON è più `UNIQUE` ma solo indicizzato. Razionale: nello schema
+> Polymarket-mirror, più market dello stesso evento (es. candidati di un
+> multi-outcome) condividono lo stesso `slug` evento. La vera unicità è su
+> `polymarket_market_id`.
+
 ```sql
 CREATE TABLE markets (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -283,7 +302,7 @@ CREATE TABLE markets (
   -- Polymarket identifiers
   polymarket_market_id TEXT UNIQUE NOT NULL,   -- ID Polymarket
   polymarket_event_id TEXT NOT NULL,           -- ID evento padre
-  slug TEXT UNIQUE NOT NULL,                   -- "trump-2028"
+  slug TEXT NOT NULL,                          -- "trump-2028" — più market possono condividere lo stesso slug evento
 
   -- Content
   title TEXT NOT NULL,
