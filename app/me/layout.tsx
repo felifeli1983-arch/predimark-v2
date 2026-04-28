@@ -15,6 +15,9 @@ export default function MeLayout({ children }: { children: ReactNode }) {
           flexDirection: 'column',
           gap: 12,
           padding: '12px var(--layout-padding-x) 0',
+          minWidth: 0,
+          maxWidth: '100%',
+          overflowX: 'hidden',
         }}
       >
         <MeSubnav />

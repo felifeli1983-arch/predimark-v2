@@ -19,6 +19,9 @@ export default function WatchlistPage() {
           flexDirection: 'column',
           gap: 12,
           padding: '12px var(--layout-padding-x) 0',
+          minWidth: 0,
+          maxWidth: '100%',
+          overflowX: 'hidden',
         }}
       >
         <header style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

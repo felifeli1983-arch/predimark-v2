@@ -145,7 +145,11 @@ export function OnboardCard() {
           <span style={{ fontWeight: 600 }}>Polymarket onboardato</span>
         </div>
         <Row label="Wallet">
-          <code style={mono}>{status.funderAddress}</code>
+          <code style={mono} title={status.funderAddress ?? undefined}>
+            {status.funderAddress
+              ? `${status.funderAddress.slice(0, 6)}…${status.funderAddress.slice(-4)}`
+              : '—'}
+          </code>
         </Row>
         <Row label="Onboard date">
           <span>
