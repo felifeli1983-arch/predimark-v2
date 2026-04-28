@@ -78,8 +78,8 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
 
         <span
           style={{
-            minWidth: 60,
-            fontSize: 28,
+            minWidth: 90,
+            fontSize: 32,
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             fontVariantNumeric: 'tabular-nums',
@@ -176,14 +176,14 @@ function SideBtn({
         onClick(e)
       }}
       style={{
-        padding: '10px 16px',
+        padding: '12px 20px',
         borderRadius: 8,
-        fontSize: 13,
+        fontSize: 14,
         fontWeight: 700,
         letterSpacing: '0.02em',
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
-        minWidth: 80,
+        minWidth: 120,
       }}
     >
       {label}
