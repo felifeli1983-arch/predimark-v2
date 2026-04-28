@@ -6,14 +6,17 @@ import { SidebarPortfolio } from './SidebarPortfolio'
 import { SidebarSignals } from './SidebarSignals'
 import { SidebarActivity } from './SidebarActivity'
 import { SidebarHotNow } from './SidebarHotNow'
-import { SidebarWatchlist } from './SidebarWatchlist'
+import { SidebarPositions } from './SidebarPositions'
 import { SidebarNews } from './SidebarNews'
 
 /**
  * Sidebar adattiva (Doc 4 — 3 stati):
  *  Stato 1 — Guest:        Demo CTA → Signals → HotNow → News → Activity
- *  Stato 2 — Logged no $:  Portfolio (deposit-cta) → Signals → Watchlist (empty) → HotNow → Activity
- *  Stato 3 — Logged + $:   Portfolio (active) → Signals → Watchlist → HotNow → Activity
+ *  Stato 2 — Logged no $:  Portfolio (deposit-cta) → Signals → Posizioni (empty) → HotNow → Activity
+ *  Stato 3 — Logged + $:   Portfolio (active) → Signals → Posizioni → HotNow → Activity
+ *
+ * Watchlist è ora separata su /watchlist (icona ⭐ in header desktop, tab in
+ * BottomNav mobile). La sidebar mostra invece le top 5 posizioni aperte.
  *
  * Visibilità gestita dal PageContainer parent (hidden lg:block).
  * MobileSidebarRails copre il caso mobile + tablet portrait (<1024px).
@@ -54,7 +57,7 @@ export function Sidebar() {
         <>
           <SidebarPortfolio mode="deposit-cta" />
           <SidebarSignals />
-          <SidebarWatchlist />
+          <SidebarPositions />
           <SidebarHotNow />
           <SidebarActivity />
         </>
@@ -64,7 +67,7 @@ export function Sidebar() {
         <>
           <SidebarPortfolio mode="active" />
           <SidebarSignals />
-          <SidebarWatchlist />
+          <SidebarPositions />
           <SidebarHotNow />
           <SidebarActivity />
         </>
