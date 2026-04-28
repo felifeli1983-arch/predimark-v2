@@ -22,6 +22,19 @@ interface Props {
  *
  * MA4.3: solo modalità Mercato funzionante (DEMO).
  */
+/** Hook che ritorna true sotto i 1024px (breakpoint lg). SSR-safe: parte false. */
+function useIsMobile(): boolean {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023.98px)')
+    const update = () => setIsMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+  return isMobile
+}
+
 export function TradeWidget({ layout = 'sidebar' }: Props) {
   const draft = useTradeWidget((s) => s.draft)
   const mode = useTradeWidget((s) => s.mode)
@@ -30,6 +43,7 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
   const close = useTradeWidget((s) => s.close)
   const amountUsdc = useTradeWidget((s) => s.amountUsdc)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   // ESC chiude bottom sheet
   useEffect(() => {
@@ -41,8 +55,9 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [layout, isOpen, close])
 
-  // Mobile bottom sheet: render solo se isOpen
-  if (layout === 'sheet' && !isOpen) return null
+  // Sheet renderizzato solo se: layout=sheet AND isOpen AND mobile
+  // (su desktop il widget vive solo nella sidebar destra)
+  if (layout === 'sheet' && (!isOpen || !isMobile)) return null
 
   const showEmpty = !draft
 
