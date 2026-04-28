@@ -1,24 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { SidebarActivity } from '@/components/home/SidebarActivity'
 
-type TabId = 'comments' | 'news' | 'holders' | 'rules' | 'activity'
+type TabId = 'comments' | 'news' | 'holders' | 'activity'
 
 const TABS: Array<{ id: TabId; label: string }> = [
   { id: 'comments', label: 'Comments' },
   { id: 'news', label: 'News' },
   { id: 'holders', label: 'Holders' },
-  { id: 'rules', label: 'Rules' },
   { id: 'activity', label: 'Activity' },
 ]
 
-interface Props {
-  event: AuktoraEvent
-}
-
-export function EventInfoTabs({ event }: Props) {
+export function EventInfoTabs() {
   const [active, setActive] = useState<TabId>('comments')
 
   return (
@@ -73,7 +67,6 @@ export function EventInfoTabs({ event }: Props) {
         {active === 'comments' && <Placeholder text="Commenti in arrivo" />}
         {active === 'news' && <Placeholder text="News in arrivo" />}
         {active === 'holders' && <Placeholder text="Top holder in arrivo" />}
-        {active === 'rules' && <RulesPanel description={event.description} />}
         {active === 'activity' && <SidebarActivity />}
       </div>
     </section>
@@ -92,25 +85,6 @@ function Placeholder({ text }: { text: string }) {
       }}
     >
       {text}
-    </p>
-  )
-}
-
-function RulesPanel({ description }: { description: string }) {
-  if (!description) {
-    return <Placeholder text="Regole non disponibili per questo mercato." />
-  }
-  return (
-    <p
-      style={{
-        margin: 0,
-        color: 'var(--color-text-secondary)',
-        fontSize: 13,
-        lineHeight: 1.55,
-        whiteSpace: 'pre-wrap',
-      }}
-    >
-      {description}
     </p>
   )
 }

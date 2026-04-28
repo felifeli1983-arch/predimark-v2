@@ -15,7 +15,9 @@ interface Props {
 
 export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
   const [expanded, setExpanded] = useState(false)
-  const pct = Math.round(market.yesPrice * 100)
+  const yesCents = Math.round(market.yesPrice * 100)
+  const noCents = 100 - yesCents
+  const pct = yesCents
   const displayLabel = label || market.groupItemTitle || market.question
 
   return (
@@ -103,7 +105,7 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
 
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
           <SideBtn
-            label="Sì"
+            label={`Sì ${yesCents}¢`}
             variant="yes"
             onClick={(e) => {
               e.stopPropagation()
@@ -111,7 +113,7 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
             }}
           />
           <SideBtn
-            label="No"
+            label={`No ${noCents}¢`}
             variant="no"
             onClick={(e) => {
               e.stopPropagation()
@@ -186,11 +188,14 @@ function SideBtn({
         onClick(e)
       }}
       style={{
-        padding: '5px 12px',
+        padding: '5px 10px',
         borderRadius: 6,
         fontSize: 11,
         fontWeight: 700,
-        letterSpacing: '0.04em',
+        letterSpacing: '0.02em',
+        fontVariantNumeric: 'tabular-nums',
+        whiteSpace: 'nowrap',
+        minWidth: 56,
       }}
     >
       {label}

@@ -10,6 +10,7 @@ import { TradeWidget } from '@/components/trade/TradeWidget'
 import { EventHero } from './EventHero'
 import { EventProbabilities } from './EventProbabilities'
 import { EventInfoTabs } from './EventInfoTabs'
+import { EventRules } from './EventRules'
 import { EventSidebarStub } from './EventSidebarStub'
 import { EventTradeBoot } from './EventTradeBoot'
 
@@ -98,13 +99,14 @@ export function EventPageShell({ event }: Props) {
 
           <EventHero event={event} />
           <ChartHistoryStub />
+          <EventRules description={event.description} />
           <EventProbabilities event={event} onTrade={openTradeWidget} />
           {/* Sidebar inline su mobile + tablet portrait (<1024px) — solo Segnale + Mercati correlati,
             Trade Widget mobile arriva via bottom sheet */}
           <div className="lg:hidden">
             <EventSidebarStub event={event} layout="inline" />
           </div>
-          <EventInfoTabs event={event} />
+          <EventInfoTabs />
         </div>
       </PageContainer>
       {/* Bottom sheet mobile — fuori dalla grid per overlay full-width */}

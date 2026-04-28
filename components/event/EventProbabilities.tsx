@@ -132,6 +132,7 @@ function H2HView({ event, onTrade }: ViewProps) {
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {outcomes.map((o: AuktoraOutcome) => {
           const isFav = o.price >= 0.5
+          const cents = Math.round(o.price * 100)
           return (
             <button
               key={o.name}
@@ -145,9 +146,17 @@ function H2HView({ event, onTrade }: ViewProps) {
                 borderRadius: 10,
                 fontSize: 14,
                 fontWeight: 700,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                lineHeight: 1.15,
               }}
             >
-              {o.name}
+              <span>{o.name}</span>
+              <span style={{ fontSize: 12, opacity: 0.85, fontVariantNumeric: 'tabular-nums' }}>
+                {cents}¢
+              </span>
             </button>
           )
         })}
@@ -160,8 +169,8 @@ function CryptoView({ event, onTrade }: ViewProps) {
   const market = event.markets[0]
   const { display: countdown, expired } = useCountdown(event.endDate)
   if (!market) return <EmptyMarketsHint />
-  const upPct = Math.round(market.yesPrice * 100)
-  const downPct = 100 - upPct
+  const upCents = Math.round(market.yesPrice * 100)
+  const downCents = 100 - upCents
 
   return (
     <Card>
@@ -200,13 +209,13 @@ function CryptoView({ event, onTrade }: ViewProps) {
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
         <ActionButton
-          label={`Up ${upPct}%`}
+          label={`Up ${upCents}¢ (${upCents}%)`}
           icon={<TrendingUp size={14} />}
           variant="up"
           onClick={() => onTrade(market.id, 'up')}
         />
         <ActionButton
-          label={`Down ${downPct}%`}
+          label={`Down ${downCents}¢ (${downCents}%)`}
           icon={<TrendingDown size={14} />}
           variant="down"
           onClick={() => onTrade(market.id, 'down')}
