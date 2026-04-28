@@ -14,6 +14,11 @@ export interface TradeDraft {
   pricePerShare: number
   /** Etichetta human-readable per UI (es. "Yes", "Finland", "Up") */
   outcomeLabel: string
+  /**
+   * Conditional token id (ERC-1155) della specifica side selezionata.
+   * Per binary: clobTokenIds[0]=YES, [1]=NO. Necessario per REAL submit.
+   */
+  tokenId: string | null
 }
 
 export type TradeMode = 'market' | 'limit'

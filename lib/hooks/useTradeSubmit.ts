@@ -1,13 +1,18 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy, useWallets, getEmbeddedConnectedWallet } from '@privy-io/react-auth'
+import { createWalletClient, custom, type WalletClient } from 'viem'
+import { polygon } from 'viem/chains'
+
 import { postTradeSubmit, TradeError, type TradeSubmitPayload } from '@/lib/api/trades-client'
 import type { TradeSubmitResponse } from '@/app/api/v1/trades/submit/route'
 import { useTradeWidget } from '@/lib/stores/useTradeWidget'
 import { balanceActions } from '@/lib/stores/useBalance'
+import { useThemeStore } from '@/lib/stores/themeStore'
+import { buildAndSignOrder } from '@/lib/polymarket/order-create'
 
-export type TradeSubmitStatus = 'idle' | 'submitting' | 'success' | 'error'
+export type TradeSubmitStatus = 'idle' | 'submitting' | 'signing' | 'success' | 'error'
 
 export interface UseTradeSubmitResult {
   status: TradeSubmitStatus
@@ -18,16 +23,18 @@ export interface UseTradeSubmitResult {
 }
 
 /**
- * Hook che orchestra:
- * - Privy token recovery
- * - chiamata POST /api/v1/trades/submit
- * - gestione status (idle/submitting/success/error)
- * - clear del draft + close del widget su successo
+ * Hook che orchestra il submit trade:
+ * - DEMO: POST diretto a /api/v1/trades/submit (paper money)
+ * - REAL: build SignedOrder via Privy embedded wallet → POST con signedOrder
+ *         a /api/v1/trades/submit, server posta a CLOB V2 + insert DB
  *
- * MA4.3: solo modalità Mercato e isDemo=true.
+ * Status `signing` indica che stiamo aspettando firma utente sul popup Privy.
+ * Toggle DEMO/REAL preso da themeStore.isDemo.
  */
 export function useTradeSubmit(): UseTradeSubmitResult {
   const { authenticated, getAccessToken } = usePrivy()
+  const { wallets } = useWallets()
+  const isDemo = useThemeStore((s) => s.isDemo)
   const draft = useTradeWidget((s) => s.draft)
   const amountUsdc = useTradeWidget((s) => s.amountUsdc)
   const closeWidget = useTradeWidget((s) => s.close)
@@ -53,11 +60,9 @@ export function useTradeSubmit(): UseTradeSubmitResult {
 
     try {
       const token = await getAccessToken()
-      if (!token) {
-        throw new TradeError('NO_TOKEN', 'Sessione scaduta — rilogga', 401)
-      }
+      if (!token) throw new TradeError('NO_TOKEN', 'Sessione scaduta — rilogga', 401)
 
-      const payload: TradeSubmitPayload = {
+      const basePayload: TradeSubmitPayload = {
         polymarketMarketId: draft.polymarketMarketId,
         polymarketEventId: draft.polymarketEventId,
         slug: draft.slug,
@@ -67,16 +72,55 @@ export function useTradeSubmit(): UseTradeSubmitResult {
         side: draft.side,
         amountUsdc,
         pricePerShare: draft.pricePerShare,
-        isDemo: true, // MA4.3: solo demo
+        isDemo,
+      }
+
+      let payload: TradeSubmitPayload = basePayload
+
+      if (!isDemo) {
+        if (!draft.tokenId) {
+          throw new TradeError(
+            'NO_TOKEN_ID',
+            'Token ID mancante per questo mercato (REAL non supportato)',
+            400
+          )
+        }
+        const embedded = getEmbeddedConnectedWallet(wallets)
+        if (!embedded) {
+          throw new TradeError(
+            'NO_EMBEDDED_WALLET',
+            'Wallet embedded Privy non trovato. Effettua login con email.',
+            400
+          )
+        }
+        setStatus('signing')
+        const provider = await embedded.getEthereumProvider()
+        const walletClient: WalletClient = createWalletClient({
+          account: embedded.address as `0x${string}`,
+          chain: polygon,
+          transport: custom(provider),
+        })
+        const signedOrder = await buildAndSignOrder({
+          signer: walletClient,
+          funderAddress: embedded.address,
+          tokenId: draft.tokenId,
+          side: draft.side,
+          pricePerShare: draft.pricePerShare,
+          amountUsdc,
+        })
+        payload = {
+          ...basePayload,
+          tokenId: draft.tokenId,
+          signedOrder: signedOrder as unknown as Record<string, unknown>,
+        }
+        setStatus('submitting')
       }
 
       const res = await postTradeSubmit(token, payload)
       setResult(res)
       setStatus('success')
-      // Aggiorna live il saldo nello store globale (Header + TradeBalanceBadge si aggiornano)
-      if (res.newDemoBalance !== null) {
-        balanceActions.setDemoBalance(res.newDemoBalance)
-      }
+      if (res.newDemoBalance !== null) balanceActions.setDemoBalance(res.newDemoBalance)
+      if (res.newRealBalance !== null) balanceActions.setUsdcBalance(res.newRealBalance)
       closeWidget()
       return res
     } catch (err) {
@@ -91,7 +135,7 @@ export function useTradeSubmit(): UseTradeSubmitResult {
       setStatus('error')
       return null
     }
-  }, [authenticated, draft, amountUsdc, getAccessToken, closeWidget])
+  }, [authenticated, draft, amountUsdc, isDemo, wallets, getAccessToken, closeWidget])
 
   const reset = useCallback(() => {
     setStatus('idle')

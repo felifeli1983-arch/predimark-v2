@@ -18,6 +18,8 @@ interface BalanceActions {
   setBalance: (b: Omit<BalanceState, 'hydrated'>) => void
   /** Aggiorna SOLO demo_balance (post-trade DEMO) */
   setDemoBalance: (newBalance: number) => void
+  /** Aggiorna SOLO usdc_balance cached (post-trade REAL) */
+  setUsdcBalance: (newBalance: number) => void
   /** Reset al logout */
   reset: () => void
 }
@@ -47,6 +49,7 @@ export const useBalance = create<BalanceStore>()((set) => ({
       hydrated: true,
     }),
   setDemoBalance: (newBalance) => set({ demoBalance: newBalance }),
+  setUsdcBalance: (newBalance) => set({ usdcBalance: newBalance }),
   reset: () => set({ ...INITIAL_STATE }),
 }))
 
@@ -56,5 +59,7 @@ export const balanceActions = {
     useBalance.getState().setBalance(...args),
   setDemoBalance: (...args: Parameters<BalanceStore['setDemoBalance']>) =>
     useBalance.getState().setDemoBalance(...args),
+  setUsdcBalance: (...args: Parameters<BalanceStore['setUsdcBalance']>) =>
+    useBalance.getState().setUsdcBalance(...args),
   reset: () => useBalance.getState().reset(),
 }

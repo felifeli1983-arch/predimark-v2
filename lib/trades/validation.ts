@@ -1,3 +1,9 @@
+/**
+ * SignedOrder serializzato dal client (post createOrder via SDK).
+ * Forma generica — il server lo passa raw a postSignedOrder().
+ */
+export type SignedOrderJson = Record<string, unknown>
+
 export interface SubmitTradeBody {
   polymarketMarketId: string
   polymarketEventId: string
@@ -9,13 +15,17 @@ export interface SubmitTradeBody {
   amountUsdc: number
   pricePerShare: number
   isDemo: boolean
+  /** REAL: ID del conditional token (clobTokenIds[0] o [1]). */
+  tokenId?: string
+  /** REAL: order signed lato client via Privy. */
+  signedOrder?: SignedOrderJson
 }
 
 export type ValidationError =
   | { code: 'MISSING_FIELD'; status: 400; message: string }
   | { code: 'INVALID_AMOUNT'; status: 400; message: string }
   | { code: 'INVALID_PRICE'; status: 400; message: string }
-  | { code: 'REAL_NOT_SUPPORTED'; status: 501; message: string }
+  | { code: 'REAL_FIELDS_MISSING'; status: 400; message: string }
 
 /**
  * Valida il body POST /api/v1/trades/submit.
@@ -43,12 +53,13 @@ export function validateTradeBody(body: SubmitTradeBody): ValidationError | null
       message: 'pricePerShare deve essere strettamente tra 0 e 1',
     }
   }
-  // MA4.3 supporta SOLO demo (real submit verso Polymarket CLOB → MA4.4)
   if (!body.isDemo) {
-    return {
-      code: 'REAL_NOT_SUPPORTED',
-      status: 501,
-      message: 'Real mode arriverà in MA4.4 (Polymarket CLOB)',
+    if (!body.tokenId || !body.signedOrder) {
+      return {
+        code: 'REAL_FIELDS_MISSING',
+        status: 400,
+        message: 'tokenId + signedOrder richiesti per REAL trade',
+      }
     }
   }
   return null

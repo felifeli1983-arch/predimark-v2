@@ -11,6 +11,7 @@ const mockDraft: TradeDraft = {
   side: 'yes',
   pricePerShare: 0.36,
   outcomeLabel: 'Finland',
+  tokenId: null,
 }
 
 describe('useTradeWidget store', () => {

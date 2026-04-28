@@ -122,13 +122,16 @@ function buildDraft(event: AuktoraEvent, market: AuktoraMarket, side: string): T
   const lower = side.toLowerCase()
   let priceAtAdd: number
   let outcomeLabel: string
+  let tokenId: string | null = null
 
   if (lower === 'yes' || lower === 'up') {
     priceAtAdd = market.yesPrice
     outcomeLabel = lower === 'up' ? 'Up' : 'Yes'
+    tokenId = market.clobTokenIds?.[0] ?? null
   } else if (lower === 'no' || lower === 'down') {
     priceAtAdd = market.noPrice
     outcomeLabel = lower === 'down' ? 'Down' : 'No'
+    tokenId = market.clobTokenIds?.[1] ?? null
   } else {
     const outcome: AuktoraOutcome | undefined = market.outcomes.find(
       (o) => o.name.toLowerCase() === lower
@@ -136,6 +139,8 @@ function buildDraft(event: AuktoraEvent, market: AuktoraMarket, side: string): T
     if (!outcome) return null
     priceAtAdd = outcome.price
     outcomeLabel = outcome.name
+    // Outcome multi-outcome: assumiamo che il primo token id corrisponda al "Yes" del candidato selezionato
+    tokenId = market.clobTokenIds?.[0] ?? null
   }
 
   if (priceAtAdd <= 0 || priceAtAdd >= 1) return null
@@ -150,6 +155,7 @@ function buildDraft(event: AuktoraEvent, market: AuktoraMarket, side: string): T
     side: lower,
     pricePerShare: priceAtAdd,
     outcomeLabel,
+    tokenId,
   }
 }
 

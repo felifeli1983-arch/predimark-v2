@@ -11,6 +11,8 @@ interface InsertParams {
   amountUsdc: number
   isDemo: boolean
   source?: 'manual' | 'copy'
+  /** Polymarket CLOB orderID (solo REAL trades). */
+  polymarketOrderId?: string
 }
 
 /**
@@ -34,6 +36,7 @@ export async function insertOpenTrade(
       total_amount: params.amountUsdc,
       source: params.source ?? 'manual',
       is_demo: params.isDemo,
+      polymarket_order_id: params.polymarketOrderId ?? null,
     })
     .select('id')
     .single()

@@ -83,26 +83,27 @@ function buildDraft(
   market: AuktoraMarket,
   side: string
 ): import('@/lib/stores/useTradeWidget').TradeDraft | null {
-  // Determina pricePerShare e outcomeLabel in base al side
   let priceAtAdd: number
   let outcomeLabel: string
+  let tokenId: string | null = null
   const lower = side.toLowerCase()
 
   if (lower === 'yes' || lower === 'up') {
     priceAtAdd = market.yesPrice
     outcomeLabel = lower === 'up' ? 'Up' : 'Yes'
+    tokenId = market.clobTokenIds?.[0] ?? null
   } else if (lower === 'no' || lower === 'down') {
     priceAtAdd = market.noPrice
     outcomeLabel = lower === 'down' ? 'Down' : 'No'
+    tokenId = market.clobTokenIds?.[1] ?? null
   } else {
-    // Team name (H2H) o altro outcome
     const outcome = market.outcomes.find((o) => o.name.toLowerCase() === lower)
     if (!outcome) return null
     priceAtAdd = outcome.price
     outcomeLabel = outcome.name
+    tokenId = market.clobTokenIds?.[0] ?? null
   }
 
-  // Validazione: prezzo deve essere strict (0,1) per il submit
   if (priceAtAdd <= 0 || priceAtAdd >= 1) return null
 
   return {
@@ -115,5 +116,6 @@ function buildDraft(
     side: lower,
     pricePerShare: priceAtAdd,
     outcomeLabel,
+    tokenId,
   }
 }

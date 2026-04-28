@@ -11,6 +11,10 @@ export interface TradeSubmitPayload {
   amountUsdc: number
   pricePerShare: number
   isDemo: boolean
+  /** REAL: ID del conditional token (clobTokenIds[0] o [1]). */
+  tokenId?: string
+  /** REAL: SignedOrder serializzato (post createOrder via SDK). */
+  signedOrder?: Record<string, unknown>
 }
 
 export class TradeError extends Error {

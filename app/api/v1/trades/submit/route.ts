@@ -3,6 +3,7 @@ import { requireUserId } from '@/lib/api/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { validateTradeBody, type SubmitTradeBody } from '@/lib/trades/validation'
 import { submitDemoTrade } from '@/lib/trades/submit'
+import { submitRealTrade } from '@/lib/trades/submit-real'
 
 export interface TradeSubmitResponse {
   tradeId: string
@@ -10,6 +11,9 @@ export interface TradeSubmitResponse {
   sharesAcquired: number
   newDemoBalance: number | null
   newRealBalance: number | null
+  /** Solo REAL: orderID assegnato dal CLOB Polymarket. */
+  polymarketOrderId?: string
+  status?: string
 }
 
 const ERR = (code: string, message: string, status: number) =>
@@ -18,8 +22,10 @@ const ERR = (code: string, message: string, status: number) =>
 /**
  * POST /api/v1/trades/submit
  *
- * Single-market trade. MA4.3: solo DEMO mode (real → MA4.4 CLOB).
- * Logica orchestrata in `lib/trades/submit.ts`.
+ * Single-market trade. Dispatcher DEMO vs REAL:
+ *   - DEMO (default): submitDemoTrade — paper money su balances.demo_balance
+ *   - REAL: submitRealTrade — Polymarket CLOB V2 con signedOrder pre-firmato
+ *           dal client via Privy. L2 API creds caricate da DB cifrate.
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const auth = await requireUserId(request)
@@ -35,15 +41,31 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const validation = validateTradeBody(body)
   if (validation) return ERR(validation.code, validation.message, validation.status)
 
-  const result = await submitDemoTrade(createAdminClient(), auth.userId, body)
-  if ('code' in result) return ERR(result.code, result.message, result.status)
+  const supabase = createAdminClient()
 
+  if (body.isDemo) {
+    const result = await submitDemoTrade(supabase, auth.userId, body)
+    if ('code' in result) return ERR(result.code, result.message, result.status)
+    const response: TradeSubmitResponse = {
+      tradeId: result.tradeId,
+      positionId: result.positionId,
+      sharesAcquired: result.sharesAcquired,
+      newDemoBalance: result.newDemoBalance,
+      newRealBalance: null,
+    }
+    return NextResponse.json(response, { status: 201 })
+  }
+
+  const result = await submitRealTrade(supabase, auth.userId, body)
+  if ('code' in result) return ERR(result.code, result.message, result.status)
   const response: TradeSubmitResponse = {
     tradeId: result.tradeId,
     positionId: result.positionId,
     sharesAcquired: result.sharesAcquired,
-    newDemoBalance: result.newDemoBalance,
-    newRealBalance: null,
+    newDemoBalance: null,
+    newRealBalance: result.newRealBalance,
+    polymarketOrderId: result.polymarketOrderId,
+    status: result.status,
   }
   return NextResponse.json(response, { status: 201 })
 }
