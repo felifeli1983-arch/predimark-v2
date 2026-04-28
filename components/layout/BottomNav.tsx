@@ -29,7 +29,7 @@ import { useAuth } from '@/lib/hooks/useAuth'
    ────────────────────────────────────────── */
 const MORE_ITEMS_AUTHENTICATED = [
   { href: '/me', icon: User, label: 'Profile' },
-  { href: '/me/watchlist', icon: Star, label: 'Watchlist' },
+  { href: '/watchlist', icon: Star, label: 'Watchlist' },
   { href: '/following', icon: Users, label: 'Following' },
   { href: '/me/positions', icon: Activity, label: 'Sessions' },
   { href: '/me/stats', icon: Trophy, label: 'Achievements' },
@@ -55,7 +55,7 @@ const NAV_ITEMS = [
   { href: '/', icon: Home, label: 'Home' },
   { href: '/search', icon: Search, label: 'Search' },
   { href: '/signals', icon: Zap, label: 'Signals' },
-  { href: '/me/watchlist', icon: Star, label: 'Watchlist' },
+  { href: '/watchlist', icon: Star, label: 'Watchlist' },
 ] as const
 
 export function BottomNav() {

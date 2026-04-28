@@ -84,7 +84,7 @@ export function SidebarWatchlist() {
         </div>
         {!isEmpty && (
           <Link
-            href="/me/watchlist"
+            href="/watchlist"
             style={{
               fontSize: 10,
               color: 'var(--color-cta)',
@@ -144,7 +144,7 @@ export function SidebarWatchlist() {
               }}
             >
               <Link
-                href={it.slug ? `/event/${it.slug}` : '/me/watchlist'}
+                href={it.slug ? `/event/${it.slug}` : '/watchlist'}
                 style={{
                   fontSize: 11,
                   color: 'var(--color-text-secondary)',

@@ -1,6 +1,7 @@
 'use client'
 
-import { Bell, Gift, Sun, Moon, Wallet, TrendingUp } from 'lucide-react'
+import { Bell, Gift, Sun, Moon, Wallet, TrendingUp, Star } from 'lucide-react'
+import Link from 'next/link'
 import type { ReactNode } from 'react'
 import type { AuthUser } from '@/lib/hooks/useAuth'
 import { useThemeStore } from '@/lib/stores/themeStore'
@@ -114,6 +115,27 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
         >
           <Gift size={15} />
         </button>
+      )}
+
+      {authenticated && (
+        <Link
+          href="/watchlist"
+          aria-label="Watchlist"
+          className="hidden md:flex"
+          style={{
+            flexShrink: 0,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'var(--color-text-tertiary)',
+            padding: '6px',
+            borderRadius: '6px',
+            alignItems: 'center',
+            textDecoration: 'none',
+          }}
+        >
+          <Star size={15} />
+        </Link>
       )}
 
       <button

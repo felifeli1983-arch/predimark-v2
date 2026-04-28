@@ -2,10 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Star, Activity, History, Wallet } from 'lucide-react'
+import { Activity, History, Wallet } from 'lucide-react'
 
 const TABS = [
-  { href: '/me/watchlist', icon: Star, label: 'Watchlist' },
   { href: '/me/positions', icon: Activity, label: 'Posizioni' },
   { href: '/me/history', icon: History, label: 'Storico' },
   { href: '/me/wallet', icon: Wallet, label: 'Wallet' },
@@ -14,6 +13,9 @@ const TABS = [
 /**
  * Sub-navigation `/me/*` — link orizzontali con icona + label.
  * La tab attiva ha bordo bottom CTA + colore primario.
+ *
+ * `/me/*` è dedicato all'account di trading. La Watchlist (preferiti) vive
+ * separata su `/watchlist` perché è un "follow list" senza commitment finanziario.
  */
 export function MeSubnav() {
   const pathname = usePathname()
