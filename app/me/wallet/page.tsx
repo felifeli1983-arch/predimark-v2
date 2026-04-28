@@ -7,11 +7,11 @@ export default function WalletPage() {
         <h1
           style={{ margin: 0, fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)' }}
         >
-          Polymarket Onboarding
+          Wallet & Trading REAL
         </h1>
         <p style={{ margin: '6px 0 0', fontSize: 13, color: 'var(--color-text-muted)' }}>
-          Per fare trade REAL su Polymarket V2 devi prima derivare le tue credenziali API firmando
-          un messaggio col tuo wallet, poi convertire USDC.e in pUSD (collateral V2).
+          Auktora usa il tuo wallet (creato al signup oppure connesso esternamente) per tradare REAL
+          su Polymarket V2. Qui colleghi il wallet al CLOB e gestisci il balance pUSD on-chain.
         </p>
       </header>
       <OnboardCard />

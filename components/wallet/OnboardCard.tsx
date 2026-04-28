@@ -127,7 +127,8 @@ export function OnboardCard() {
       <Card>
         <WalletIcon size={28} style={{ color: 'var(--color-text-muted)', opacity: 0.5 }} />
         <p style={{ margin: 0, fontSize: 13, color: 'var(--color-text-secondary)' }}>
-          Effettua il login per gestire il tuo wallet Polymarket.
+          Per fare trade REAL su Polymarket devi prima loggarti. Auktora userà il tuo wallet (creato
+          da te o auto-generato al signup) per piazzare ordini on-chain.
         </p>
         <button type="button" onClick={() => login()} style={primaryBtn}>
           Sign in
@@ -172,8 +173,10 @@ export function OnboardCard() {
         <span style={{ fontWeight: 600 }}>Onboarding Polymarket non completato</span>
       </div>
       <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-        Cliccando qui sotto firmerai un messaggio col tuo wallet (no gas, no spesa). Polymarket
-        emetterà la coppia chiave/segreto API che useremo per inoltrare gli ordini per tuo conto.
+        Per tradare REAL devi associare il tuo wallet al CLOB Polymarket V2. Cliccando firmerai un
+        messaggio (off-chain, no gas, no spesa): Polymarket ti restituirà delle credenziali API
+        legate al tuo wallet, che Auktora salva cifrate per inoltrare ordini per tuo conto. Il
+        wallet resta tuo, le posizioni vanno direttamente on-chain su Polygon.
       </p>
       <button type="button" onClick={handleOnboard} disabled={busy} style={primaryBtn}>
         {busy ? (

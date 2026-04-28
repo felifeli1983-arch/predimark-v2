@@ -47,9 +47,31 @@ export const metadata: Metadata = {
   },
 }
 
+/**
+ * Inline script che legge il theme dallo storage (`auktora-theme`) PRIMA
+ * dell'hydration React e setta `data-theme` sul tag html. Evita il flash
+ * dark→light (o viceversa) tra SSR e client mount.
+ */
+const themeBootstrap = `
+(function(){
+  try {
+    var raw = localStorage.getItem('auktora-theme');
+    if (!raw) return;
+    var state = JSON.parse(raw);
+    var theme = state && state.state && state.state.theme;
+    if (theme === 'dark' || theme === 'light') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+  } catch (_) {}
+})();
+`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning data-theme="dark">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
       <body className={inter.variable}>
         <ReactQueryProvider>
           <PrivyProvider>

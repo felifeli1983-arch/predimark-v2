@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { X, ChevronsUpDown } from 'lucide-react'
 import { useTradeWidget } from '@/lib/stores/useTradeWidget'
 import { TradeMarketTab } from './TradeMarketTab'
@@ -190,7 +191,15 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
   )
 
   if (layout === 'sheet') {
-    return (
+    /*
+     * iOS Safari quirk: `position: fixed` dentro un parent con `overflow: auto`
+     * (il nostro <main>) viene clippato come fosse absolute al parent scrollante.
+     * Per evitarlo renderizziamo il sheet via Portal direttamente in `document.body`,
+     * così il sheet ha viewport come containing block effettivo e bottom: 0 punta
+     * davvero al fondo dello schermo (sopra al BottomNav).
+     */
+    if (typeof document === 'undefined') return null
+    return createPortal(
       <>
         <div
           onClick={close}
@@ -211,7 +220,8 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
           {widgetContent}
         </aside>
         <TradeConfirmModal open={confirmOpen} onClose={() => setConfirmOpen(false)} />
-      </>
+      </>,
+      document.body
     )
   }
 
