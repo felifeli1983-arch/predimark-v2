@@ -6,6 +6,7 @@ import { ClobClient, Chain } from '@polymarket/clob-client-v2'
 import { createWalletClient, custom, type WalletClient } from 'viem'
 import { polygon } from 'viem/chains'
 import { CheckCircle2, AlertCircle, Loader2, Wallet as WalletIcon } from 'lucide-react'
+import { FundActionsRow } from '@/components/funding/FundActionsRow'
 
 interface OnboardStatusResponse {
   onboarded: boolean
@@ -169,6 +170,14 @@ export function OnboardCard() {
             <Loader2 size={14} className="animate-spin" />
           )}
         </Row>
+
+        {status.funderAddress && (
+          <FundActionsRow
+            address={status.funderAddress}
+            pusdBalance={balance?.pusd ?? 0}
+            onSuccess={refresh}
+          />
+        )}
 
         <WrapPusdSection onSuccess={refresh} />
 

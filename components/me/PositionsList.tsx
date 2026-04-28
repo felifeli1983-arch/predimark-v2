@@ -5,6 +5,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import { Activity } from 'lucide-react'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { fetchOpenPositions, type PositionItem } from '@/lib/api/positions-client'
+import { FundActionsRow } from '@/components/funding/FundActionsRow'
 import { PositionRow } from './PositionRow'
 import { SellConfirmModal } from './SellConfirmModal'
 
@@ -87,21 +88,24 @@ export function PositionsList() {
       <header
         style={{
           display: 'flex',
-          flexWrap: 'wrap',
-          gap: 12,
-          padding: '12px 14px',
+          flexDirection: 'column',
+          gap: 'var(--space-3)',
+          padding: 'var(--space-3) var(--space-4)',
           background: 'var(--color-bg-secondary)',
           border: '1px solid var(--color-border-subtle)',
           borderRadius: 'var(--radius-md)',
         }}
       >
-        <Stat label="Valore totale" value={`$${meta.totalValue.toFixed(2)}`} />
-        <Stat
-          label="P&L non realizzato"
-          value={`${meta.totalPnl >= 0 ? '+' : ''}$${meta.totalPnl.toFixed(2)}`}
-          color={meta.totalPnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)'}
-        />
-        <Stat label="Posizioni aperte" value={String(meta.total)} />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+          <Stat label="Valore totale" value={`$${meta.totalValue.toFixed(2)}`} />
+          <Stat
+            label="P&L non realizzato"
+            value={`${meta.totalPnl >= 0 ? '+' : ''}$${meta.totalPnl.toFixed(2)}`}
+            color={meta.totalPnl >= 0 ? 'var(--color-success)' : 'var(--color-danger)'}
+          />
+          <Stat label="Posizioni aperte" value={String(meta.total)} />
+        </div>
+        {!isDemo && <FundActionsRow pusdBalance={meta.totalValue} />}
       </header>
 
       <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 8 }}>

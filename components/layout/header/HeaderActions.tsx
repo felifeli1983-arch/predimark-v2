@@ -3,6 +3,8 @@
 import { Bell, Gift, Sun, Moon, Wallet, TrendingUp, Star } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { useFundWallet, useWallets, getEmbeddedConnectedWallet } from '@privy-io/react-auth'
+import { polygon } from 'viem/chains'
 import type { AuthUser } from '@/lib/hooks/useAuth'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { useBalance } from '@/lib/stores/useBalance'
@@ -28,6 +30,36 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
   const cashAvailable = isDemo ? demoBalance : usdcBalance
   const portfolioValue = isDemo ? demoPortfolioValue : realPortfolioValue
   const accent = isDemo ? 'var(--color-warning)' : 'var(--color-cta)'
+
+  // Privy fund wallet (Apple Pay / Google Pay / Card / MoonPay)
+  const { fundWallet } = useFundWallet({
+    onUserExited: () => {
+      // utente ha chiuso la modale Privy senza completare — niente da fare
+    },
+  })
+  const { wallets } = useWallets()
+
+  async function handleDeposit() {
+    if (!authenticated) {
+      login()
+      return
+    }
+    const embedded = getEmbeddedConnectedWallet(wallets)
+    if (!embedded) return
+    try {
+      await fundWallet({
+        address: embedded.address,
+        options: {
+          chain: polygon,
+          amount: '100', // default suggerito
+          asset: 'USDC',
+        },
+      })
+      // BalanceHydrator si auto-refreshrà al prossimo poll
+    } catch (err) {
+      console.error('[deposit]', err)
+    }
+  }
 
   return (
     <div
@@ -65,6 +97,8 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
 
       {authenticated && (
         <button
+          type="button"
+          onClick={handleDeposit}
           className="hidden md:flex"
           style={{
             flexShrink: 0,
