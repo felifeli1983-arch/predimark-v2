@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect } from 'react'
-import { X, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { X, CheckCircle2, AlertCircle, Loader2, PenLine } from 'lucide-react'
 import { useTradeWidget } from '@/lib/stores/useTradeWidget'
 import { useTradeSubmit } from '@/lib/hooks/useTradeSubmit'
+import { useThemeStore } from '@/lib/stores/themeStore'
 
 interface Props {
   open: boolean
@@ -19,6 +21,7 @@ interface Props {
 export function TradeConfirmModal({ open, onClose }: Props) {
   const draft = useTradeWidget((s) => s.draft)
   const amountUsdc = useTradeWidget((s) => s.amountUsdc)
+  const isDemo = useThemeStore((s) => s.isDemo)
   const { status, error, result, submit, reset } = useTradeSubmit()
 
   // Reset su apertura
@@ -41,7 +44,18 @@ export function TradeConfirmModal({ open, onClose }: Props) {
 
   const payout = draft.pricePerShare > 0 ? amountUsdc / draft.pricePerShare : 0
   const profit = payout - amountUsdc
-  const isSubmitting = status === 'submitting'
+  const isSigning = status === 'signing'
+  const isSubmitting = status === 'submitting' || isSigning
+  const ctaLabel =
+    status === 'error'
+      ? 'Riprova'
+      : isSigning
+        ? 'In firma…'
+        : isSubmitting
+          ? 'Invio…'
+          : isDemo
+            ? 'Conferma'
+            : 'Firma e invia'
 
   return (
     <div
@@ -123,8 +137,8 @@ export function TradeConfirmModal({ open, onClose }: Props) {
           <div
             style={{
               display: 'flex',
-              alignItems: 'flex-start',
-              gap: 10,
+              flexDirection: 'column',
+              gap: 8,
               padding: '10px 12px',
               background: 'var(--color-danger-bg)',
               border: '1px solid var(--color-danger)',
@@ -133,8 +147,25 @@ export function TradeConfirmModal({ open, onClose }: Props) {
               fontSize: 12,
             }}
           >
-            <AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
-            <span>{error.message}</span>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+              <AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
+              <span>{error.message}</span>
+            </div>
+            {error.code === 'NOT_ONBOARDED' && (
+              <Link
+                href="/me/wallet"
+                onClick={onClose}
+                style={{
+                  alignSelf: 'flex-start',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: 'var(--color-danger)',
+                  textDecoration: 'underline',
+                }}
+              >
+                Onboard Polymarket ora →
+              </Link>
+            )}
           </div>
         )}
 
@@ -156,8 +187,35 @@ export function TradeConfirmModal({ open, onClose }: Props) {
             </div>
             <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
               <strong style={{ color: 'var(--color-cta)' }}>{draft.outcomeLabel}</strong> a{' '}
-              {Math.round(draft.pricePerShare * 100)}¢ · DEMO
+              {Math.round(draft.pricePerShare * 100)}¢ ·{' '}
+              <span
+                style={{
+                  fontWeight: 700,
+                  color: isDemo ? 'var(--color-warning)' : 'var(--color-cta)',
+                }}
+              >
+                {isDemo ? 'DEMO' : 'REAL'}
+              </span>
             </div>
+
+            {!isDemo && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 8px',
+                  background: 'color-mix(in srgb, var(--color-cta) 8%, transparent)',
+                  borderRadius: 4,
+                  fontSize: 10,
+                  color: 'var(--color-text-muted)',
+                  marginTop: 4,
+                }}
+              >
+                <PenLine size={11} />
+                Privy ti chiederà di firmare l&apos;ordine (off-chain, no gas).
+              </div>
+            )}
 
             <div style={{ height: 1, background: 'var(--color-border-subtle)', margin: '6px 0' }} />
 
@@ -210,7 +268,7 @@ export function TradeConfirmModal({ open, onClose }: Props) {
               }}
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
-              {status === 'error' ? 'Riprova' : isSubmitting ? 'Trading…' : 'Conferma'}
+              {ctaLabel}
             </button>
           </div>
         )}
