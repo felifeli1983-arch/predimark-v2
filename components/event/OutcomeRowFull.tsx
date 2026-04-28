@@ -39,8 +39,8 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           width: '100%',
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
-          padding: '8px 12px',
+          gap: 14,
+          padding: '12px 16px',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
@@ -54,56 +54,44 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
             minWidth: 0,
             display: 'flex',
             flexDirection: 'column',
-            gap: 1,
+            gap: 2,
           }}
         >
           <span
             style={{
-              fontSize: 13,
-              fontWeight: 600,
+              fontSize: 15,
+              fontWeight: 700,
               color: 'var(--color-text-primary)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              lineHeight: 1.2,
+              lineHeight: 1.25,
             }}
           >
             {displayLabel}
             {highlighted && <CurrentlyBadge />}
           </span>
-          <span style={{ fontSize: 10, color: 'var(--color-text-muted)', lineHeight: 1.2 }}>
+          <span style={{ fontSize: 11, color: 'var(--color-text-muted)', lineHeight: 1.2 }}>
             ${(market.volume / 1_000).toFixed(1)}K Vol
           </span>
         </span>
 
-        <div
-          style={{
-            width: 80,
-            height: 3,
-            background: 'var(--color-bg-tertiary)',
-            borderRadius: 2,
-            overflow: 'hidden',
-            flexShrink: 0,
-          }}
-        >
-          <div style={{ width: `${pct}%`, height: '100%', background: 'var(--color-cta)' }} />
-        </div>
-
         <span
           style={{
-            minWidth: 32,
-            fontSize: 13,
+            minWidth: 60,
+            fontSize: 28,
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             fontVariantNumeric: 'tabular-nums',
-            textAlign: 'right',
+            textAlign: 'center',
             flexShrink: 0,
+            lineHeight: 1,
           }}
         >
           {pct}%
         </span>
 
-        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
           <SideBtn
             label={`Sì ${yesCents}¢`}
             variant="yes"
@@ -188,14 +176,14 @@ function SideBtn({
         onClick(e)
       }}
       style={{
-        padding: '5px 10px',
-        borderRadius: 6,
-        fontSize: 11,
+        padding: '10px 16px',
+        borderRadius: 8,
+        fontSize: 13,
         fontWeight: 700,
         letterSpacing: '0.02em',
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
-        minWidth: 56,
+        minWidth: 80,
       }}
     >
       {label}

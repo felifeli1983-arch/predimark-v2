@@ -99,8 +99,8 @@ export function EventPageShell({ event }: Props) {
 
           <EventHero event={event} />
           <ChartHistoryStub />
-          <EventRules description={event.description} />
           <EventProbabilities event={event} onTrade={openTradeWidget} />
+          <EventRules description={event.description} />
           {/* Sidebar inline su mobile + tablet portrait (<1024px) — solo Segnale + Mercati correlati,
             Trade Widget mobile arriva via bottom sheet */}
           <div className="lg:hidden">
