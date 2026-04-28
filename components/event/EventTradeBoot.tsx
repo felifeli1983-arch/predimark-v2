@@ -26,27 +26,49 @@ export function EventTradeBoot({ event }: Props) {
     if (consumed.current) return
     const marketId = searchParams.get('market')
     const side = searchParams.get('side')
-    if (!marketId || !side) return
 
-    const market = event.markets.find((m) => m.id === marketId)
-    if (!market) return
+    // Caso 1: deeplink esplicito ?market=X&side=Y dalla home → pre-fill + open sheet
+    if (marketId && side) {
+      const market = event.markets.find((m) => m.id === marketId)
+      if (!market) return
+      const draft = buildDraft(event, market, side)
+      if (!draft) return
+      consumed.current = true
+      tradeWidgetActions.setDraft(draft)
+      tradeWidgetActions.open()
+      // Pulisce URL preservando pathname
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('market')
+      params.delete('side')
+      const qs = params.toString()
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+      return
+    }
 
-    const draft = buildDraft(event, market, side)
+    // Caso 2: landing diretto su event page senza query → auto-prefill desktop
+    // con primo market e Yes/Up/primo outcome. Il sheet mobile resta CHIUSO
+    // (l'utente decide quando tradare); su desktop il widget è in sidebar
+    // sempre visibile, quindi vedrà già il draft pre-compilato.
+    const firstMarket = event.markets[0]
+    if (!firstMarket) return
+    const defaultSide = pickDefaultSide(firstMarket)
+    if (!defaultSide) return
+    const draft = buildDraft(event, firstMarket, defaultSide)
     if (!draft) return
-
     consumed.current = true
     tradeWidgetActions.setDraft(draft)
-    tradeWidgetActions.open()
-
-    // Pulisce URL preservando pathname
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('market')
-    params.delete('side')
-    const qs = params.toString()
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+    // Niente .open() qui — non vogliamo aprire il sheet mobile auto
   }, [event, searchParams, router, pathname])
 
   return null
+}
+
+/** Sceglie il side di default per il pre-fill desktop. */
+function pickDefaultSide(market: AuktoraMarket): string | null {
+  if (market.yesPrice > 0 && market.yesPrice < 1) return 'yes'
+  if (market.noPrice > 0 && market.noPrice < 1) return 'no'
+  const firstOutcome = market.outcomes.find((o) => o.price > 0 && o.price < 1)
+  return firstOutcome ? firstOutcome.name.toLowerCase() : null
 }
 
 function buildDraft(

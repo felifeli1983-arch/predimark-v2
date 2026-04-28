@@ -199,6 +199,24 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
             >
               {mode === 'limit' ? 'Limite — disponibile in MA4.4' : 'Trading'}
             </button>
+            <p
+              style={{
+                margin: '8px 0 0',
+                fontSize: 10,
+                color: 'var(--color-text-muted)',
+                lineHeight: 1.4,
+                textAlign: 'center',
+              }}
+            >
+              Operando accetti i{' '}
+              <a
+                href="/legal/terms"
+                style={{ color: 'var(--color-text-secondary)', textDecoration: 'underline' }}
+              >
+                Termini
+              </a>
+              . Servizio non disponibile in alcuni paesi (US/UK/IT/FR/DE).
+            </p>
           </div>
         </>
       )}

@@ -45,10 +45,10 @@ function Card({ children }: { children: React.ReactNode }) {
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
         borderRadius: 12,
-        padding: 16,
+        padding: 14,
         display: 'flex',
         flexDirection: 'column',
-        gap: 14,
+        gap: 10,
       }}
     >
       {children}
@@ -225,7 +225,7 @@ function StrikeListView({ event, onTrade }: ViewProps) {
       <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
         Soglie
       </h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {sorted.map((m, i) => (
           <OutcomeRowFull
             key={m.id}
@@ -246,7 +246,7 @@ function OutcomeListView({ event, onTrade }: ViewProps) {
       <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
         Candidati
       </h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {sorted.map((m) => (
           <OutcomeRowFull
             key={m.id}

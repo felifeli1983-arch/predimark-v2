@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-import { Flame } from 'lucide-react'
+import { Flame, Bookmark, Share2, Code2 } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 
 interface Props {
@@ -58,25 +58,35 @@ export function EventHero({ event }: Props) {
       </div>
 
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {isLive && <LiveBadge />}
-          {visibleTags.map((tag) => (
-            <span
-              key={tag}
-              style={{
-                padding: '2px 8px',
-                borderRadius: 999,
-                fontSize: 10,
-                fontWeight: 600,
-                color: 'var(--color-text-muted)',
-                background: 'var(--color-bg-tertiary)',
-                textTransform: 'capitalize',
-                letterSpacing: '0.04em',
-              }}
-            >
-              {tag}
-            </span>
-          ))}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {isLive && <LiveBadge />}
+            {visibleTags.map((tag) => (
+              <span
+                key={tag}
+                style={{
+                  padding: '2px 8px',
+                  borderRadius: 999,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: 'var(--color-text-muted)',
+                  background: 'var(--color-bg-tertiary)',
+                  textTransform: 'capitalize',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <EventActions event={event} />
         </div>
 
         <h1
@@ -154,4 +164,78 @@ function LiveBadge() {
 function formatLong(date: Date): string {
   if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '—'
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function EventActions({ event }: { event: AuktoraEvent }) {
+  const [bookmarked, setBookmarked] = useState(false)
+  async function handleShare() {
+    const url = typeof window !== 'undefined' ? window.location.href : ''
+    try {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        await navigator.share({ title: event.title, url })
+      } else {
+        await navigator.clipboard?.writeText(url)
+      }
+    } catch {
+      /* utente ha cancellato share o clipboard non disponibile */
+    }
+  }
+  function handleEmbed() {
+    const code = `<iframe src="${typeof window !== 'undefined' ? window.location.origin : ''}/event/${event.slug}" width="600" height="500" frameborder="0"></iframe>`
+    try {
+      navigator.clipboard?.writeText(code)
+    } catch {
+      /* clipboard non disponibile */
+    }
+  }
+  return (
+    <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+      <ActionIcon label="Embed" onClick={handleEmbed} icon={<Code2 size={14} />} />
+      <ActionIcon label="Condividi" onClick={handleShare} icon={<Share2 size={14} />} />
+      <ActionIcon
+        label={bookmarked ? 'Rimuovi bookmark' : 'Salva'}
+        onClick={() => setBookmarked((v) => !v)}
+        icon={
+          <Bookmark
+            size={14}
+            fill={bookmarked ? 'var(--color-warning)' : 'none'}
+            stroke={bookmarked ? 'var(--color-warning)' : 'currentColor'}
+          />
+        }
+      />
+    </div>
+  )
+}
+
+function ActionIcon({
+  label,
+  onClick,
+  icon,
+}: {
+  label: string
+  onClick: () => void
+  icon: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 28,
+        height: 28,
+        background: 'transparent',
+        border: 'none',
+        borderRadius: 6,
+        color: 'var(--color-text-muted)',
+        cursor: 'pointer',
+      }}
+    >
+      {icon}
+    </button>
+  )
 }

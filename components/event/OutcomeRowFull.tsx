@@ -37,8 +37,8 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           width: '100%',
           display: 'flex',
           alignItems: 'center',
-          gap: 12,
-          padding: '12px 14px',
+          gap: 10,
+          padding: '8px 12px',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
@@ -52,7 +52,7 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
             minWidth: 0,
             display: 'flex',
             flexDirection: 'column',
-            gap: 2,
+            gap: 1,
           }}
         >
           <span
@@ -63,20 +63,21 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              lineHeight: 1.2,
             }}
           >
             {displayLabel}
             {highlighted && <CurrentlyBadge />}
           </span>
-          <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
+          <span style={{ fontSize: 10, color: 'var(--color-text-muted)', lineHeight: 1.2 }}>
             ${(market.volume / 1_000).toFixed(1)}K Vol
           </span>
         </span>
 
         <div
           style={{
-            width: 90,
-            height: 4,
+            width: 80,
+            height: 3,
             background: 'var(--color-bg-tertiary)',
             borderRadius: 2,
             overflow: 'hidden',
@@ -88,8 +89,8 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
 
         <span
           style={{
-            minWidth: 36,
-            fontSize: 14,
+            minWidth: 32,
+            fontSize: 13,
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             fontVariantNumeric: 'tabular-nums',
