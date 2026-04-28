@@ -44,18 +44,22 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
           className="hidden lg:flex"
           style={{ gap: 8, marginRight: '6px', alignItems: 'center' }}
         >
-          <BalancePill
-            label="Portfolio"
-            icon={<TrendingUp size={13} style={{ color: accent }} />}
-            value={portfolioValue}
-            isDemo={isDemo}
-          />
-          <BalancePill
-            label="Contanti"
-            icon={<Wallet size={13} style={{ color: accent }} />}
-            value={cashAvailable}
-            isDemo={isDemo}
-          />
+          <Link href="/me/positions" style={{ textDecoration: 'none' }} aria-label="Apri portfolio">
+            <BalancePill
+              label="Portfolio"
+              icon={<TrendingUp size={13} style={{ color: accent }} />}
+              value={portfolioValue}
+              isDemo={isDemo}
+            />
+          </Link>
+          <Link href="/me/wallet" style={{ textDecoration: 'none' }} aria-label="Apri wallet">
+            <BalancePill
+              label="Contanti"
+              icon={<Wallet size={13} style={{ color: accent }} />}
+              value={cashAvailable}
+              isDemo={isDemo}
+            />
+          </Link>
         </div>
       )}
 
