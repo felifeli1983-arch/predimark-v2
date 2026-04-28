@@ -27,7 +27,7 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
         border: highlighted
           ? '1px solid var(--color-success)'
           : '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         overflow: 'hidden',
       }}
     >
@@ -59,7 +59,7 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
         >
           <span
             style={{
-              fontSize: 15,
+              fontSize: 'var(--font-md)',
               fontWeight: 700,
               color: 'var(--color-text-primary)',
               whiteSpace: 'nowrap',
@@ -71,7 +71,13 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
             {displayLabel}
             {highlighted && <CurrentlyBadge />}
           </span>
-          <span style={{ fontSize: 11, color: 'var(--color-text-muted)', lineHeight: 1.2 }}>
+          <span
+            style={{
+              fontSize: 'var(--font-xs)',
+              color: 'var(--color-text-muted)',
+              lineHeight: 1.2,
+            }}
+          >
             ${(market.volume / 1_000).toFixed(1)}K Vol
           </span>
         </span>
@@ -80,7 +86,7 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
         <span
           className="outcome-row__pct"
           style={{
-            fontSize: 32,
+            fontSize: 'var(--font-2xl)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             fontVariantNumeric: 'tabular-nums',
@@ -128,10 +134,10 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
       {expanded && (
         <div
           style={{
-            padding: '12px 14px',
+            padding: 'var(--space-3) var(--space-4)',
             borderTop: '1px solid var(--color-border-subtle)',
             color: 'var(--color-text-muted)',
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
           }}
         >
           Libro ordini — disponibile in MA4
@@ -145,12 +151,12 @@ function CurrentlyBadge() {
   return (
     <span
       style={{
-        marginLeft: 8,
-        padding: '1px 6px',
-        borderRadius: 999,
+        marginLeft: 'var(--space-2)',
+        padding: '1px var(--space-2)',
+        borderRadius: 'var(--radius-full)',
         background: 'var(--color-success-bg)',
         color: 'var(--color-success)',
-        fontSize: 9,
+        fontSize: 'var(--font-xs)',
         fontWeight: 700,
         letterSpacing: '0.05em',
         textTransform: 'uppercase',
@@ -180,9 +186,9 @@ function SideBtn({
         onClick(e)
       }}
       style={{
-        padding: '12px 20px',
-        borderRadius: 8,
-        fontSize: 14,
+        padding: 'var(--space-3) var(--space-5)',
+        borderRadius: 'var(--radius-md)',
+        fontSize: 'var(--font-md)',
         fontWeight: 700,
         letterSpacing: '0.02em',
         fontVariantNumeric: 'tabular-nums',

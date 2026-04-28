@@ -66,7 +66,7 @@ export function HeroCard({ event, size = 'small' }: Props) {
         flexDirection: 'column',
         justifyContent: 'flex-end',
         height: isBig ? 320 : 152,
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
         overflow: 'hidden',
         textDecoration: 'none',
         color: 'inherit',
@@ -120,7 +120,7 @@ export function HeroCard({ event, size = 'small' }: Props) {
           <p
             style={{
               margin: '6px 0 0',
-              fontSize: 13,
+              fontSize: 'var(--font-base)',
               fontWeight: 400,
               color: 'var(--color-text-on-image-muted)',
               lineHeight: 1.4,
@@ -165,13 +165,13 @@ export function HeroCard({ event, size = 'small' }: Props) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 4,
-                fontSize: 12,
+                fontSize: 'var(--font-sm)',
                 fontWeight: 600,
                 color: 'var(--color-text-on-image)',
                 background: 'var(--color-hero-cta-bg)',
                 backdropFilter: 'blur(4px)',
                 padding: '6px 12px',
-                borderRadius: 999,
+                borderRadius: 'var(--radius-full)',
               }}
             >
               {cta}

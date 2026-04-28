@@ -69,13 +69,13 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '14px 16px',
+          padding: 'var(--space-4)',
           borderBottom: '1px solid var(--color-border-subtle)',
           flexShrink: 0,
         }}
       >
-        <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Trade</h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <h2 style={{ margin: 0, fontSize: 'var(--font-md)', fontWeight: 700 }}>Trade</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           <TradeBalanceBadge />
           {layout === 'sheet' && (
             <button
@@ -104,17 +104,17 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
           {/* Identità mercato */}
           <div
             style={{
-              padding: '12px 16px',
+              padding: 'var(--space-3) var(--space-4)',
               borderBottom: '1px solid var(--color-border-subtle)',
               display: 'flex',
               flexDirection: 'column',
-              gap: 4,
+              gap: 'var(--space-1)',
               flexShrink: 0,
             }}
           >
             <div
               style={{
-                fontSize: 13,
+                fontSize: 'var(--font-base)',
                 fontWeight: 600,
                 color: 'var(--color-text-primary)',
                 whiteSpace: 'nowrap',
@@ -124,15 +124,15 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
             >
               {draft.title}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
               <span
                 style={{
-                  fontSize: 10,
+                  fontSize: 'var(--font-xs)',
                   fontWeight: 700,
                   color: 'var(--color-cta)',
                   background: 'var(--color-cta-bg)',
-                  padding: '2px 6px',
-                  borderRadius: 4,
+                  padding: '2px var(--space-2)',
+                  borderRadius: 'var(--radius-sm)',
                   letterSpacing: '0.04em',
                   textTransform: 'uppercase',
                 }}
@@ -141,7 +141,7 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
               </span>
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 'var(--font-xs)',
                   color: 'var(--color-text-muted)',
                   fontVariantNumeric: 'tabular-nums',
                 }}
@@ -156,8 +156,8 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
             role="tablist"
             style={{
               display: 'flex',
-              gap: 4,
-              padding: '8px 12px 0',
+              gap: 'var(--space-1)',
+              padding: 'var(--space-2) var(--space-3) 0',
               borderBottom: '1px solid var(--color-border-subtle)',
               flexShrink: 0,
             }}
@@ -167,14 +167,14 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
           </div>
 
           {/* Body — Mercato o Limite */}
-          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px' }}>
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 'var(--space-4)' }}>
             {mode === 'market' ? <TradeMarketTab /> : <TradeLimitTab />}
           </div>
 
           {/* Footer CTA Trading */}
           <div
             style={{
-              padding: '12px 16px 16px',
+              padding: 'var(--space-3) var(--space-4) var(--space-4)',
               borderTop: '1px solid var(--color-border-subtle)',
               flexShrink: 0,
               background: 'var(--color-bg-secondary)',
@@ -186,12 +186,12 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
               disabled={mode === 'limit' || amountUsdc <= 0}
               style={{
                 width: '100%',
-                padding: '12px',
-                borderRadius: 10,
+                padding: 'var(--space-3)',
+                borderRadius: 'var(--radius-md)',
                 background: mode === 'limit' ? 'var(--color-bg-tertiary)' : 'var(--color-cta)',
                 color: mode === 'limit' ? 'var(--color-text-muted)' : '#fff',
                 border: 'none',
-                fontSize: 14,
+                fontSize: 'var(--font-md)',
                 fontWeight: 700,
                 cursor: mode === 'limit' || amountUsdc <= 0 ? 'not-allowed' : 'pointer',
                 opacity: mode === 'limit' || amountUsdc <= 0 ? 0.6 : 1,
@@ -201,8 +201,8 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
             </button>
             <p
               style={{
-                margin: '8px 0 0',
-                fontSize: 10,
+                margin: 'var(--space-2) 0 0',
+                fontSize: 'var(--font-xs)',
                 color: 'var(--color-text-muted)',
                 lineHeight: 1.4,
                 textAlign: 'center',
@@ -264,7 +264,7 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
         style={{
           background: 'var(--color-bg-secondary)',
           border: '1px solid var(--color-border-subtle)',
-          borderRadius: 12,
+          borderRadius: 'var(--radius-lg)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -294,13 +294,13 @@ function ModeTab({
       aria-selected={active}
       onClick={onClick}
       style={{
-        padding: '8px 14px',
-        borderRadius: '8px 8px 0 0',
+        padding: 'var(--space-2) var(--space-4)',
+        borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
         background: active ? 'var(--color-bg-tertiary)' : 'transparent',
         color: active ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
         border: 'none',
         borderBottom: active ? '2px solid var(--color-cta)' : '2px solid transparent',
-        fontSize: 12,
+        fontSize: 'var(--font-sm)',
         fontWeight: active ? 700 : 500,
         cursor: 'pointer',
       }}
@@ -326,8 +326,10 @@ function EmptyState() {
       }}
     >
       <ChevronsUpDown size={28} style={{ opacity: 0.5 }} />
-      <div style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>Seleziona un outcome</div>
-      <div style={{ fontSize: 11, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 'var(--font-base)', color: 'var(--color-text-secondary)' }}>
+        Seleziona un outcome
+      </div>
+      <div style={{ fontSize: 'var(--font-xs)', lineHeight: 1.5 }}>
         Click su Yes/No, Up/Down, Sì/No o un team per pre-compilare il widget.
       </div>
     </div>

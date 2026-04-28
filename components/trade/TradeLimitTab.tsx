@@ -24,12 +24,12 @@ export function TradeLimitTab() {
         style={{
           background: 'var(--color-warning-bg)',
           border: '1px solid var(--color-warning)',
-          borderRadius: 8,
+          borderRadius: 'var(--radius-md)',
           padding: '8px 10px',
           display: 'flex',
           alignItems: 'flex-start',
           gap: 8,
-          fontSize: 11,
+          fontSize: 'var(--font-xs)',
           color: 'var(--color-warning)',
         }}
       >
@@ -42,7 +42,9 @@ export function TradeLimitTab() {
 
       {/* Prezzo limit */}
       <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Prezzo limit (¢)</span>
+        <span style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
+          Prezzo limit (¢)
+        </span>
         <input
           type="number"
           min={1}
@@ -56,7 +58,7 @@ export function TradeLimitTab() {
 
       {/* Azioni */}
       <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Azioni</span>
+        <span style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>Azioni</span>
         <input
           type="number"
           min={0}
@@ -71,9 +73,9 @@ export function TradeLimitTab() {
         style={{
           background: 'var(--color-bg-tertiary)',
           border: '1px solid var(--color-border-subtle)',
-          borderRadius: 8,
+          borderRadius: 'var(--radius-md)',
           padding: '10px 12px',
-          fontSize: 12,
+          fontSize: 'var(--font-sm)',
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
@@ -105,10 +107,10 @@ export function TradeLimitTab() {
 const inputStyle: React.CSSProperties = {
   background: 'var(--color-bg-tertiary)',
   border: '1px solid var(--color-border-subtle)',
-  borderRadius: 8,
+  borderRadius: 'var(--radius-md)',
   padding: '8px 12px',
   color: 'var(--color-text-primary)',
-  fontSize: 14,
+  fontSize: 'var(--font-md)',
   fontWeight: 600,
   fontVariantNumeric: 'tabular-nums',
   outline: 'none',

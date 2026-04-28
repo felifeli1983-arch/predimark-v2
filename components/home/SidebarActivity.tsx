@@ -30,7 +30,7 @@ export function SidebarActivity() {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         padding: '12px 14px',
       }}
     >
@@ -39,7 +39,7 @@ export function SidebarActivity() {
         <h3
           style={{
             margin: 0,
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             letterSpacing: '0.04em',
@@ -50,7 +50,7 @@ export function SidebarActivity() {
         </h3>
       </div>
       {items.length === 0 ? (
-        <p style={{ margin: 0, fontSize: 11, color: 'var(--color-text-muted)' }}>
+        <p style={{ margin: 0, fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
           In attesa di trade live…
         </p>
       ) : (
@@ -68,7 +68,7 @@ export function SidebarActivity() {
             <li
               key={`${it.timestamp}-${i}`}
               style={{
-                fontSize: 11,
+                fontSize: 'var(--font-xs)',
                 color: 'var(--color-text-secondary)',
                 display: 'flex',
                 justifyContent: 'space-between',

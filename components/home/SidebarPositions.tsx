@@ -54,7 +54,7 @@ export function SidebarPositions() {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         padding: '12px 14px',
       }}
     >
@@ -72,7 +72,7 @@ export function SidebarPositions() {
           <h3
             style={{
               margin: 0,
-              fontSize: 12,
+              fontSize: 'var(--font-sm)',
               fontWeight: 700,
               color: 'var(--color-text-primary)',
               letterSpacing: '0.04em',
@@ -86,7 +86,7 @@ export function SidebarPositions() {
           <Link
             href="/me/positions"
             style={{
-              fontSize: 10,
+              fontSize: 'var(--font-xs)',
               color: 'var(--color-cta)',
               textDecoration: 'none',
               fontWeight: 600,
@@ -104,7 +104,7 @@ export function SidebarPositions() {
           <p
             style={{
               margin: '0 0 8px',
-              fontSize: 11,
+              fontSize: 'var(--font-xs)',
               color: 'var(--color-text-muted)',
               lineHeight: 1.5,
             }}
@@ -117,7 +117,7 @@ export function SidebarPositions() {
             href="/?sort=trending"
             style={{
               display: 'inline-block',
-              fontSize: 11,
+              fontSize: 'var(--font-xs)',
               color: 'var(--color-cta)',
               textDecoration: 'none',
               fontWeight: 600,
@@ -172,10 +172,10 @@ function PositionRow({ position }: { position: PositionItem }) {
       >
         <span
           style={{
-            fontSize: 9,
+            fontSize: 'var(--font-xs)',
             fontWeight: 700,
             padding: '2px 5px',
-            borderRadius: 3,
+            borderRadius: 'var(--radius-sm)',
             background: 'color-mix(in srgb, transparent 80%, currentColor)',
             color: sideColor,
             flexShrink: 0,
@@ -186,7 +186,7 @@ function PositionRow({ position }: { position: PositionItem }) {
         </span>
         <span
           style={{
-            fontSize: 11,
+            fontSize: 'var(--font-xs)',
             color: 'var(--color-text-secondary)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -200,7 +200,7 @@ function PositionRow({ position }: { position: PositionItem }) {
         {pnl !== null && (
           <span
             style={{
-              fontSize: 11,
+              fontSize: 'var(--font-xs)',
               fontWeight: 600,
               color: pnlColor,
               fontVariantNumeric: 'tabular-nums',
@@ -221,7 +221,11 @@ function SkeletonRows() {
       {[0, 1, 2].map((i) => (
         <li
           key={i}
-          style={{ height: 18, background: 'var(--color-bg-tertiary)', borderRadius: 4 }}
+          style={{
+            height: 18,
+            background: 'var(--color-bg-tertiary)',
+            borderRadius: 'var(--radius-sm)',
+          }}
         />
       ))}
     </ul>

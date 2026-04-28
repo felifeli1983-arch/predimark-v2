@@ -117,7 +117,9 @@ export function OnboardCard() {
     return (
       <Card>
         <Loader2 size={20} className="animate-spin" style={{ color: 'var(--color-text-muted)' }} />
-        <span style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>Verifica stato…</span>
+        <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-base)' }}>
+          Verifica stato…
+        </span>
       </Card>
     )
   }
@@ -126,7 +128,9 @@ export function OnboardCard() {
     return (
       <Card>
         <WalletIcon size={28} style={{ color: 'var(--color-text-muted)', opacity: 0.5 }} />
-        <p style={{ margin: 0, fontSize: 13, color: 'var(--color-text-secondary)' }}>
+        <p
+          style={{ margin: 0, fontSize: 'var(--font-base)', color: 'var(--color-text-secondary)' }}
+        >
           Per fare trade REAL su Polymarket devi prima loggarti. Auktora userà il tuo wallet (creato
           da te o auto-generato al signup) per piazzare ordini on-chain.
         </p>
@@ -179,7 +183,14 @@ export function OnboardCard() {
         <AlertCircle size={20} style={{ color: 'var(--color-warning)' }} />
         <span style={{ fontWeight: 600 }}>Onboarding Polymarket non completato</span>
       </div>
-      <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 'var(--font-sm)',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.5,
+        }}
+      >
         Per tradare REAL devi associare il tuo wallet al CLOB Polymarket V2. Cliccando firmerai un
         messaggio (off-chain, no gas, no spesa): Polymarket ti restituirà delle credenziali API
         legate al tuo wallet, che Auktora salva cifrate per inoltrare ordini per tuo conto. Il
@@ -210,7 +221,7 @@ function Card({ children }: { children: React.ReactNode }) {
         padding: 20,
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
       }}
     >
       {children}
@@ -225,7 +236,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        fontSize: 13,
+        fontSize: 'var(--font-base)',
         color: 'var(--color-text-secondary)',
       }}
     >
@@ -288,7 +299,9 @@ function WrapPusdSection({ onSuccess }: { onSuccess: () => void | Promise<void> 
         gap: 8,
       }}
     >
-      <div style={{ fontSize: 11, color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+      <div
+        style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)', lineHeight: 1.5 }}
+      >
         Wrap USDC.e → pUSD per tradare REAL. Richiede MATIC per gas (~$0.02). L&apos;approve è una
         tantum.
       </div>
@@ -306,9 +319,9 @@ function WrapPusdSection({ onSuccess }: { onSuccess: () => void | Promise<void> 
             padding: '8px 10px',
             background: 'var(--color-bg-tertiary)',
             border: '1px solid var(--color-border-subtle)',
-            borderRadius: 6,
+            borderRadius: 'var(--radius-md)',
             color: 'var(--color-text-primary)',
-            fontSize: 13,
+            fontSize: 'var(--font-base)',
             fontVariantNumeric: 'tabular-nums',
           }}
         />
@@ -331,10 +344,10 @@ function WrapPusdSection({ onSuccess }: { onSuccess: () => void | Promise<void> 
           style={{
             margin: 0,
             padding: '8px 10px',
-            borderRadius: 6,
+            borderRadius: 'var(--radius-md)',
             background: 'color-mix(in srgb, var(--color-success) 12%, transparent)',
             border: '1px solid var(--color-success)',
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             color: 'var(--color-success)',
           }}
         >
@@ -351,10 +364,10 @@ function ErrorBanner({ message }: { message: string }) {
       style={{
         margin: 0,
         padding: '8px 10px',
-        borderRadius: 6,
+        borderRadius: 'var(--radius-md)',
         background: 'color-mix(in srgb, var(--color-danger) 12%, transparent)',
         border: '1px solid var(--color-danger)',
-        fontSize: 12,
+        fontSize: 'var(--font-sm)',
         color: 'var(--color-danger)',
       }}
     >
@@ -368,8 +381,8 @@ const primaryBtn: React.CSSProperties = {
   color: '#fff',
   border: 'none',
   padding: '10px 16px',
-  borderRadius: 8,
-  fontSize: 13,
+  borderRadius: 'var(--radius-md)',
+  fontSize: 'var(--font-base)',
   fontWeight: 600,
   cursor: 'pointer',
   display: 'inline-flex',
@@ -379,8 +392,8 @@ const primaryBtn: React.CSSProperties = {
 
 const mono: React.CSSProperties = {
   fontFamily: 'ui-monospace, SFMono-Regular, monospace',
-  fontSize: 11,
+  fontSize: 'var(--font-xs)',
   background: 'var(--color-bg-tertiary)',
   padding: '2px 6px',
-  borderRadius: 4,
+  borderRadius: 'var(--radius-sm)',
 }

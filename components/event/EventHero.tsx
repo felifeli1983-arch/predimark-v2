@@ -20,11 +20,11 @@ export function EventHero({ event }: Props) {
       style={{
         display: 'flex',
         alignItems: 'flex-start',
-        gap: 16,
-        padding: '16px',
+        gap: 'var(--space-4)',
+        padding: 'var(--space-4)',
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
       }}
     >
       <div
@@ -32,7 +32,7 @@ export function EventHero({ event }: Props) {
           width: 64,
           height: 64,
           flexShrink: 0,
-          borderRadius: 12,
+          borderRadius: 'var(--radius-lg)',
           overflow: 'hidden',
           background: 'var(--color-bg-tertiary)',
           display: 'flex',
@@ -40,7 +40,7 @@ export function EventHero({ event }: Props) {
           justifyContent: 'center',
           color: 'var(--color-text-secondary)',
           fontWeight: 700,
-          fontSize: 24,
+          fontSize: 'var(--font-xl)',
         }}
       >
         {!imgFailed && event.image ? (
@@ -57,24 +57,39 @@ export function EventHero({ event }: Props) {
         )}
       </div>
 
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--space-2)',
+        }}
+      >
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: 8,
+            gap: 'var(--space-2)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              flexWrap: 'wrap',
+            }}
+          >
             {isLive && <LiveBadge />}
             {visibleTags.map((tag) => (
               <span
                 key={tag}
                 style={{
-                  padding: '2px 8px',
-                  borderRadius: 999,
-                  fontSize: 10,
+                  padding: '2px var(--space-2)',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: 'var(--font-xs)',
                   fontWeight: 600,
                   color: 'var(--color-text-muted)',
                   background: 'var(--color-bg-tertiary)',
@@ -92,7 +107,7 @@ export function EventHero({ event }: Props) {
         <h1
           style={{
             margin: 0,
-            fontSize: 22,
+            fontSize: 'var(--font-xl)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             lineHeight: 1.25,
@@ -106,8 +121,8 @@ export function EventHero({ event }: Props) {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
-            fontSize: 12,
+            gap: 'var(--space-3)',
+            fontSize: 'var(--font-sm)',
             color: 'var(--color-text-muted)',
             flexWrap: 'wrap',
           }}
@@ -137,12 +152,12 @@ function LiveBadge() {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 4,
-        padding: '2px 8px',
-        borderRadius: 999,
+        gap: 'var(--space-1)',
+        padding: '2px var(--space-2)',
+        borderRadius: 'var(--radius-full)',
         background: 'var(--color-danger-bg)',
         color: 'var(--color-danger)',
-        fontSize: 10,
+        fontSize: 'var(--font-xs)',
         fontWeight: 700,
         letterSpacing: '0.05em',
       }}
@@ -230,7 +245,7 @@ function ActionIcon({
         height: 28,
         background: 'transparent',
         border: 'none',
-        borderRadius: 6,
+        borderRadius: 'var(--radius-sm)',
         color: 'var(--color-text-muted)',
         cursor: 'pointer',
       }}

@@ -147,7 +147,7 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
           {/* Sezione sinistra: prezzi + bottoni */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
             {/* Prezzo target */}
-            <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
+            <div style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
               Battere:{' '}
               <strong
                 style={{ color: 'var(--color-text-primary)', fontVariantNumeric: 'tabular-nums' }}
@@ -159,7 +159,7 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
             {/* Prezzo live + delta */}
             <div
               style={{
-                fontSize: 13,
+                fontSize: 'var(--font-base)',
                 fontWeight: 600,
                 color: 'var(--color-text-primary)',
                 fontVariantNumeric: 'tabular-nums',
@@ -172,7 +172,7 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
               {livePriceDelta !== null && (
                 <span
                   style={{
-                    fontSize: 11,
+                    fontSize: 'var(--font-xs)',
                     fontWeight: 600,
                     color: livePriceDelta >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
                   }}
@@ -216,7 +216,7 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            fontSize: 10,
+            fontSize: 'var(--font-xs)',
             color: expired ? 'var(--color-danger)' : 'var(--color-text-muted)',
             fontVariantNumeric: 'tabular-nums',
             flexShrink: 0,
@@ -265,7 +265,7 @@ function ActionButton({
         alignItems: 'center',
         gap: 2,
         padding: '6px 4px',
-        borderRadius: 6,
+        borderRadius: 'var(--radius-md)',
         cursor: onClick ? 'pointer' : 'default',
       }}
     >
@@ -274,7 +274,7 @@ function ActionButton({
           display: 'inline-flex',
           alignItems: 'center',
           gap: 4,
-          fontSize: 11,
+          fontSize: 'var(--font-xs)',
           fontWeight: 700,
         }}
       >
@@ -286,7 +286,7 @@ function ActionButton({
           key={lastAmount}
           className="live-dot"
           style={{
-            fontSize: 10,
+            fontSize: 'var(--font-xs)',
             fontWeight: 600,
             color: isUp ? 'var(--color-success)' : 'var(--color-danger)',
             opacity: 0.85,

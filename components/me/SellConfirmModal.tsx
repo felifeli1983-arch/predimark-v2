@@ -122,7 +122,7 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
           maxWidth: 420,
           background: 'var(--color-bg-primary)',
           border: '1px solid var(--color-border-subtle)',
-          borderRadius: 12,
+          borderRadius: 'var(--radius-lg)',
           padding: 20,
           display: 'flex',
           flexDirection: 'column',
@@ -131,7 +131,12 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
       >
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h2
-            style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--color-text-primary)' }}
+            style={{
+              margin: 0,
+              fontSize: 'var(--font-lg)',
+              fontWeight: 700,
+              color: 'var(--color-text-primary)',
+            }}
           >
             Vendi posizione
           </h2>
@@ -154,7 +159,7 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
 
         <div
           style={{
-            fontSize: 13,
+            fontSize: 'var(--font-base)',
             color: 'var(--color-text-secondary)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -170,7 +175,7 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
             style={{
               display: 'flex',
               justifyContent: 'space-between',
-              fontSize: 11,
+              fontSize: 'var(--font-xs)',
               color: 'var(--color-text-muted)',
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
@@ -203,8 +208,8 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
                   background: percent === p ? 'var(--color-cta)' : 'var(--color-bg-secondary)',
                   color: percent === p ? '#fff' : 'var(--color-text-secondary)',
                   border: '1px solid var(--color-border-subtle)',
-                  borderRadius: 6,
-                  fontSize: 11,
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--font-xs)',
                   fontWeight: 600,
                   cursor: submitting || success ? 'not-allowed' : 'pointer',
                 }}
@@ -219,11 +224,11 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
           style={{
             background: 'var(--color-bg-secondary)',
             border: '1px solid var(--color-border-subtle)',
-            borderRadius: 8,
+            borderRadius: 'var(--radius-md)',
             padding: 12,
             display: 'grid',
             gap: 6,
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -238,9 +243,13 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
           />
         </div>
 
-        {error && <p style={{ margin: 0, color: 'var(--color-danger)', fontSize: 12 }}>{error}</p>}
+        {error && (
+          <p style={{ margin: 0, color: 'var(--color-danger)', fontSize: 'var(--font-sm)' }}>
+            {error}
+          </p>
+        )}
         {success && (
-          <p style={{ margin: 0, color: 'var(--color-success)', fontSize: 12 }}>
+          <p style={{ margin: 0, color: 'var(--color-success)', fontSize: 'var(--font-sm)' }}>
             Vendita completata.
           </p>
         )}
@@ -256,8 +265,8 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
               background: 'transparent',
               border: '1px solid var(--color-border-subtle)',
               color: 'var(--color-text-secondary)',
-              borderRadius: 8,
-              fontSize: 13,
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--font-base)',
               fontWeight: 600,
               cursor: submitting ? 'not-allowed' : 'pointer',
             }}
@@ -275,8 +284,8 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
                 background: 'var(--color-cta)',
                 border: 'none',
                 color: '#fff',
-                borderRadius: 8,
-                fontSize: 13,
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-base)',
                 fontWeight: 700,
                 cursor: submitting || signing ? 'not-allowed' : 'pointer',
                 opacity: submitting || signing ? 0.7 : 1,

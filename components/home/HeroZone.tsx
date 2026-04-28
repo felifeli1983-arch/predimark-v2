@@ -144,7 +144,7 @@ export function HeroZone({ events }: Props) {
               style={{
                 width: i === safeIndex ? 18 : 6,
                 height: 6,
-                borderRadius: 3,
+                borderRadius: 'var(--radius-sm)',
                 background:
                   i === safeIndex ? 'var(--color-text-secondary)' : 'var(--color-border-default)',
                 border: 'none',

@@ -25,7 +25,7 @@ const cardStyle: React.CSSProperties = {
   height: CARD_HEIGHT,
   background: 'var(--color-bg-secondary)',
   border: '1px solid var(--color-border-subtle)',
-  borderRadius: 12,
+  borderRadius: 'var(--radius-lg)',
   overflow: 'hidden',
   textDecoration: 'none',
   color: 'inherit',

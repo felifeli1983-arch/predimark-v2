@@ -54,7 +54,7 @@ export function EventPageShell({ event }: Props) {
                 alignItems: 'center',
                 gap: 4,
                 color: 'var(--color-text-secondary)',
-                fontSize: 13,
+                fontSize: 'var(--font-base)',
                 textDecoration: 'none',
               }}
             >
@@ -68,7 +68,7 @@ export function EventPageShell({ event }: Props) {
             style={{
               alignItems: 'center',
               gap: 6,
-              fontSize: 12,
+              fontSize: 'var(--font-sm)',
               color: 'var(--color-text-muted)',
             }}
           >
@@ -165,11 +165,11 @@ function ResolvedBanner() {
     <div
       style={{
         padding: '10px 14px',
-        borderRadius: 8,
+        borderRadius: 'var(--radius-md)',
         background: 'var(--color-warning-bg)',
         border: '1px solid var(--color-warning)',
         color: 'var(--color-warning)',
-        fontSize: 12,
+        fontSize: 'var(--font-sm)',
         fontWeight: 700,
         letterSpacing: '0.05em',
         textTransform: 'uppercase',
@@ -187,12 +187,12 @@ function ChartHistoryStub() {
         height: 200,
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: 'var(--color-text-muted)',
-        fontSize: 13,
+        fontSize: 'var(--font-base)',
       }}
     >
       Chart storico — disponibile in Sprint 3.5.2

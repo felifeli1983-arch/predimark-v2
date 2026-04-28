@@ -79,7 +79,7 @@ export function TradeConfirmModal({ open, onClose }: Props) {
         style={{
           background: 'var(--color-bg-secondary)',
           border: '1px solid var(--color-border-subtle)',
-          borderRadius: 12,
+          borderRadius: 'var(--radius-lg)',
           padding: 20,
           maxWidth: 380,
           width: '100%',
@@ -89,7 +89,7 @@ export function TradeConfirmModal({ open, onClose }: Props) {
         }}
       >
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>Conferma trade</h2>
+          <h2 style={{ margin: 0, fontSize: 'var(--font-lg)', fontWeight: 700 }}>Conferma trade</h2>
           {!isSubmitting && (
             <button
               type="button"
@@ -119,9 +119,9 @@ export function TradeConfirmModal({ open, onClose }: Props) {
               padding: '10px 12px',
               background: 'var(--color-success-bg)',
               border: '1px solid var(--color-success)',
-              borderRadius: 8,
+              borderRadius: 'var(--radius-md)',
               color: 'var(--color-success)',
-              fontSize: 13,
+              fontSize: 'var(--font-base)',
             }}
           >
             <CheckCircle2 size={16} />
@@ -142,9 +142,9 @@ export function TradeConfirmModal({ open, onClose }: Props) {
               padding: '10px 12px',
               background: 'var(--color-danger-bg)',
               border: '1px solid var(--color-danger)',
-              borderRadius: 8,
+              borderRadius: 'var(--radius-md)',
               color: 'var(--color-danger)',
-              fontSize: 12,
+              fontSize: 'var(--font-sm)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -157,7 +157,7 @@ export function TradeConfirmModal({ open, onClose }: Props) {
                 onClick={onClose}
                 style={{
                   alignSelf: 'flex-start',
-                  fontSize: 12,
+                  fontSize: 'var(--font-sm)',
                   fontWeight: 700,
                   color: 'var(--color-danger)',
                   textDecoration: 'underline',
@@ -179,13 +179,19 @@ export function TradeConfirmModal({ open, onClose }: Props) {
               padding: '12px 14px',
               background: 'var(--color-bg-tertiary)',
               border: '1px solid var(--color-border-subtle)',
-              borderRadius: 8,
+              borderRadius: 'var(--radius-md)',
             }}
           >
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>
+            <div
+              style={{
+                fontSize: 'var(--font-base)',
+                fontWeight: 600,
+                color: 'var(--color-text-primary)',
+              }}
+            >
               {draft.title}
             </div>
-            <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
+            <div style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
               <strong style={{ color: 'var(--color-cta)' }}>{draft.outcomeLabel}</strong> a{' '}
               {Math.round(draft.pricePerShare * 100)}¢ ·{' '}
               <span
@@ -206,8 +212,8 @@ export function TradeConfirmModal({ open, onClose }: Props) {
                   gap: 6,
                   padding: '6px 8px',
                   background: 'color-mix(in srgb, var(--color-cta) 8%, transparent)',
-                  borderRadius: 4,
-                  fontSize: 10,
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: 'var(--font-xs)',
                   color: 'var(--color-text-muted)',
                   marginTop: 4,
                 }}
@@ -235,11 +241,11 @@ export function TradeConfirmModal({ open, onClose }: Props) {
               style={{
                 flex: 1,
                 padding: '10px 14px',
-                borderRadius: 8,
+                borderRadius: 'var(--radius-md)',
                 background: 'var(--color-bg-tertiary)',
                 border: '1px solid var(--color-border-subtle)',
                 color: 'var(--color-text-secondary)',
-                fontSize: 13,
+                fontSize: 'var(--font-base)',
                 fontWeight: 600,
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 opacity: isSubmitting ? 0.5 : 1,
@@ -254,11 +260,11 @@ export function TradeConfirmModal({ open, onClose }: Props) {
               style={{
                 flex: 2,
                 padding: '10px 14px',
-                borderRadius: 8,
+                borderRadius: 'var(--radius-md)',
                 background: 'var(--color-cta)',
                 border: 'none',
                 color: '#fff',
-                fontSize: 13,
+                fontSize: 'var(--font-base)',
                 fontWeight: 700,
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 display: 'inline-flex',
@@ -280,7 +286,7 @@ export function TradeConfirmModal({ open, onClose }: Props) {
 function Row({ label, value, accent }: { label: string; value: string; accent?: 'success' }) {
   const color = accent === 'success' ? 'var(--color-success)' : 'var(--color-text-primary)'
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-sm)' }}>
       <span style={{ color: 'var(--color-text-muted)' }}>{label}</span>
       <span style={{ color, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{value}</span>
     </div>

@@ -71,9 +71,9 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
             background: 'var(--color-cta)',
             color: '#fff',
             border: 'none',
-            borderRadius: '7px',
-            padding: '6px 12px',
-            fontSize: '12px',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--space-2) var(--space-3)',
+            fontSize: 'var(--font-sm)',
             fontWeight: 600,
             cursor: 'pointer',
             whiteSpace: 'nowrap',
@@ -88,35 +88,13 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
         className="hidden md:flex"
         onClick={toggleTheme}
         aria-label="Toggle tema"
-        style={{
-          flexShrink: 0,
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'var(--color-text-tertiary)',
-          padding: '6px',
-          borderRadius: '6px',
-          alignItems: 'center',
-        }}
+        style={iconBtnStyle}
       >
         {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
       </button>
 
       {authenticated && (
-        <button
-          className="hidden md:flex"
-          aria-label="Referral"
-          style={{
-            flexShrink: 0,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text-tertiary)',
-            padding: '6px',
-            borderRadius: '6px',
-            alignItems: 'center',
-          }}
-        >
+        <button className="hidden md:flex" aria-label="Referral" style={iconBtnStyle}>
           <Gift size={15} />
         </button>
       )}
@@ -126,17 +104,7 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
           href="/watchlist"
           aria-label="Watchlist"
           className="hidden md:flex"
-          style={{
-            flexShrink: 0,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text-tertiary)',
-            padding: '6px',
-            borderRadius: '6px',
-            alignItems: 'center',
-            textDecoration: 'none',
-          }}
+          style={{ ...iconBtnStyle, textDecoration: 'none' }}
         >
           <Star size={15} />
         </Link>
@@ -144,18 +112,7 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
 
       <button
         aria-label="Notifiche"
-        style={{
-          flexShrink: 0,
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'var(--color-text-tertiary)',
-          padding: '6px',
-          borderRadius: '6px',
-          display: 'flex',
-          alignItems: 'center',
-          position: 'relative',
-        }}
+        style={{ ...iconBtnStyle, display: 'flex', position: 'relative' }}
       >
         <Bell size={15} />
       </button>
@@ -168,7 +125,7 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
             flexShrink: 0,
             width: '72px',
             height: '30px',
-            borderRadius: '7px',
+            borderRadius: 'var(--radius-md)',
             background: 'var(--color-bg-tertiary)',
           }}
         />
@@ -182,9 +139,9 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
             background: 'var(--color-cta)',
             color: '#fff',
             border: 'none',
-            borderRadius: '7px',
-            padding: '6px 14px',
-            fontSize: '13px',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--space-2) var(--space-4)',
+            fontSize: 'var(--font-base)',
             fontWeight: 600,
             cursor: 'pointer',
             whiteSpace: 'nowrap',
@@ -195,6 +152,18 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
       )}
     </div>
   )
+}
+
+/** Stile condiviso per icon-button compatti (theme/gift/star/bell). */
+const iconBtnStyle: React.CSSProperties = {
+  flexShrink: 0,
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text-tertiary)',
+  padding: 'var(--space-1)',
+  borderRadius: 'var(--radius-sm)',
+  alignItems: 'center',
 }
 
 /** Pill compatto per Portfolio o Contanti — larghezza fissa, niente shift al toggle DEMO/REAL. */
@@ -214,9 +183,9 @@ function BalancePill({
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 6,
-        padding: '5px 10px',
-        borderRadius: 8,
+        gap: 'var(--space-2)',
+        padding: 'var(--space-1) var(--space-3)',
+        borderRadius: 'var(--radius-md)',
         background: 'var(--color-bg-tertiary)',
         border: '1px solid var(--color-border-subtle)',
         minWidth: 130,
@@ -228,7 +197,7 @@ function BalancePill({
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <span
           style={{
-            fontSize: 9,
+            fontSize: 'var(--font-xs)',
             color: 'var(--color-text-muted)',
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
@@ -240,7 +209,7 @@ function BalancePill({
         </span>
         <strong
           style={{
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             color: isDemo ? 'var(--color-warning)' : 'var(--color-text-primary)',
             fontVariantNumeric: 'tabular-nums',
             fontWeight: 600,

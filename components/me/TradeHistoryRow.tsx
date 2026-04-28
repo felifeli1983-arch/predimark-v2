@@ -50,7 +50,7 @@ export function TradeHistoryRow({ trade }: Props) {
         padding: 12,
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
       }}
     >
       <div
@@ -79,10 +79,10 @@ export function TradeHistoryRow({ trade }: Props) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span
             style={{
-              fontSize: 9,
+              fontSize: 'var(--font-xs)',
               fontWeight: 700,
               padding: '2px 5px',
-              borderRadius: 3,
+              borderRadius: 'var(--radius-sm)',
               background: 'var(--color-bg-tertiary)',
               color: 'var(--color-text-secondary)',
               flexShrink: 0,
@@ -94,10 +94,10 @@ export function TradeHistoryRow({ trade }: Props) {
           </span>
           <span
             style={{
-              fontSize: 9,
+              fontSize: 'var(--font-xs)',
               fontWeight: 700,
               padding: '2px 5px',
-              borderRadius: 3,
+              borderRadius: 'var(--radius-sm)',
               background: 'color-mix(in srgb, transparent 80%, currentColor)',
               color: sideColor,
               flexShrink: 0,
@@ -108,7 +108,7 @@ export function TradeHistoryRow({ trade }: Props) {
           </span>
           <div
             style={{
-              fontSize: 13,
+              fontSize: 'var(--font-base)',
               fontWeight: 600,
               color: 'var(--color-text-primary)',
               whiteSpace: 'nowrap',
@@ -134,7 +134,7 @@ export function TradeHistoryRow({ trade }: Props) {
           style={{
             display: 'flex',
             gap: 12,
-            fontSize: 11,
+            fontSize: 'var(--font-xs)',
             color: 'var(--color-text-muted)',
             fontVariantNumeric: 'tabular-nums',
             flexWrap: 'wrap',
@@ -156,11 +156,17 @@ export function TradeHistoryRow({ trade }: Props) {
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+        <span
+          style={{
+            fontSize: 'var(--font-base)',
+            fontWeight: 700,
+            color: 'var(--color-text-primary)',
+          }}
+        >
           ${trade.totalAmount.toFixed(2)}
         </span>
         {showPnl && trade.pnl !== null && (
-          <span style={{ fontSize: 11, fontWeight: 600, color: pnlColor }}>
+          <span style={{ fontSize: 'var(--font-xs)', fontWeight: 600, color: pnlColor }}>
             {pnlSign}${trade.pnl.toFixed(2)}
             {trade.pnlPct !== null && ` (${pnlSign}${trade.pnlPct.toFixed(1)}%)`}
           </span>

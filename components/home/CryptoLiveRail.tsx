@@ -35,7 +35,7 @@ function CoinTile({ symbol, label }: { symbol: string; label: string }) {
         gap: 2,
         padding: '6px 8px',
         background: 'var(--color-bg-tertiary)',
-        borderRadius: 6,
+        borderRadius: 'var(--radius-md)',
         minWidth: 0,
       }}
     >
@@ -44,7 +44,7 @@ function CoinTile({ symbol, label }: { symbol: string; label: string }) {
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          fontSize: 11,
+          fontSize: 'var(--font-xs)',
           fontWeight: 700,
           color: 'var(--color-text-secondary)',
           letterSpacing: '0.04em',
@@ -54,7 +54,7 @@ function CoinTile({ symbol, label }: { symbol: string; label: string }) {
       </div>
       <div
         style={{
-          fontSize: 13,
+          fontSize: 'var(--font-base)',
           fontWeight: 600,
           color: 'var(--color-text-primary)',
           fontVariantNumeric: 'tabular-nums',
@@ -64,7 +64,7 @@ function CoinTile({ symbol, label }: { symbol: string; label: string }) {
       </div>
       <div
         style={{
-          fontSize: 11,
+          fontSize: 'var(--font-xs)',
           fontWeight: 600,
           color: changeColor,
           fontVariantNumeric: 'tabular-nums',
@@ -82,14 +82,14 @@ export function CryptoLiveRail() {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         padding: '12px 14px',
       }}
     >
       <h3
         style={{
           margin: '0 0 10px',
-          fontSize: 12,
+          fontSize: 'var(--font-sm)',
           fontWeight: 700,
           color: 'var(--color-text-primary)',
           letterSpacing: '0.04em',

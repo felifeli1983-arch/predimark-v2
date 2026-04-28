@@ -20,7 +20,7 @@ export function EventInfoTabs() {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
         overflow: 'hidden',
       }}
     >
@@ -51,7 +51,7 @@ export function EventInfoTabs() {
                 color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
                 border: 'none',
                 borderBottom: isActive ? '2px solid var(--color-cta)' : '2px solid transparent',
-                fontSize: 13,
+                fontSize: 'var(--font-base)',
                 fontWeight: isActive ? 600 : 500,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
@@ -79,7 +79,7 @@ function Placeholder({ text }: { text: string }) {
       style={{
         margin: 0,
         color: 'var(--color-text-muted)',
-        fontSize: 13,
+        fontSize: 'var(--font-base)',
         textAlign: 'center',
         padding: '32px 16px',
       }}

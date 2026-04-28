@@ -33,7 +33,7 @@ export function PositionRow({ position, onSell }: Props) {
         padding: 12,
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
       }}
     >
       <div
@@ -68,10 +68,10 @@ export function PositionRow({ position, onSell }: Props) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span
             style={{
-              fontSize: 10,
+              fontSize: 'var(--font-xs)',
               fontWeight: 700,
               padding: '2px 6px',
-              borderRadius: 4,
+              borderRadius: 'var(--radius-sm)',
               background: 'color-mix(in srgb, transparent 80%, currentColor)',
               color: sideColor,
               flexShrink: 0,
@@ -82,7 +82,7 @@ export function PositionRow({ position, onSell }: Props) {
           </span>
           <div
             style={{
-              fontSize: 13,
+              fontSize: 'var(--font-base)',
               fontWeight: 600,
               color: 'var(--color-text-primary)',
               whiteSpace: 'nowrap',
@@ -108,7 +108,7 @@ export function PositionRow({ position, onSell }: Props) {
           style={{
             display: 'flex',
             gap: 12,
-            fontSize: 11,
+            fontSize: 'var(--font-xs)',
             color: 'var(--color-text-muted)',
             fontVariantNumeric: 'tabular-nums',
             flexWrap: 'wrap',
@@ -130,11 +130,17 @@ export function PositionRow({ position, onSell }: Props) {
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+        <span
+          style={{
+            fontSize: 'var(--font-base)',
+            fontWeight: 700,
+            color: 'var(--color-text-primary)',
+          }}
+        >
           {position.currentValue !== null ? `$${position.currentValue.toFixed(2)}` : '—'}
         </span>
         {pnl !== null && (
-          <span style={{ fontSize: 11, fontWeight: 600, color: pnlColor }}>
+          <span style={{ fontSize: 'var(--font-xs)', fontWeight: 600, color: pnlColor }}>
             {pnlSign}${pnl.toFixed(2)}
             {pnlPct !== null && ` (${pnlSign}${pnlPct.toFixed(1)}%)`}
           </span>
@@ -149,8 +155,8 @@ export function PositionRow({ position, onSell }: Props) {
           color: '#fff',
           border: 'none',
           padding: '8px 14px',
-          borderRadius: 6,
-          fontSize: 12,
+          borderRadius: 'var(--radius-md)',
+          fontSize: 'var(--font-sm)',
           fontWeight: 600,
           cursor: 'pointer',
           flexShrink: 0,

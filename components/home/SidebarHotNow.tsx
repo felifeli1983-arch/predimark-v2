@@ -17,7 +17,7 @@ export function SidebarHotNow() {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         padding: '12px 14px',
       }}
     >
@@ -26,7 +26,7 @@ export function SidebarHotNow() {
         <h3
           style={{
             margin: 0,
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             letterSpacing: '0.04em',
@@ -41,9 +41,9 @@ export function SidebarHotNow() {
           <span
             key={tag}
             style={{
-              fontSize: 11,
+              fontSize: 'var(--font-xs)',
               padding: '3px 8px',
-              borderRadius: 999,
+              borderRadius: 'var(--radius-full)',
               background: 'var(--color-bg-tertiary)',
               color: 'var(--color-text-secondary)',
               border: '1px solid var(--color-border-subtle)',

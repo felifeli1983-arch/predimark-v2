@@ -62,7 +62,7 @@ export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: P
             padding: '40px 16px',
             textAlign: 'center',
             color: 'var(--color-text-muted)',
-            fontSize: 13,
+            fontSize: 'var(--font-base)',
           }}
         >
           {q || activeTag !== 'all'
@@ -86,9 +86,9 @@ export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: P
                   background: 'var(--color-bg-secondary)',
                   color: 'var(--color-text-primary)',
                   border: '1px solid var(--color-border-default)',
-                  borderRadius: 8,
+                  borderRadius: 'var(--radius-md)',
                   padding: '8px 18px',
-                  fontSize: 13,
+                  fontSize: 'var(--font-base)',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}

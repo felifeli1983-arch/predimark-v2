@@ -39,7 +39,7 @@ function SignalStub() {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
         padding: 14,
       }}
     >
@@ -48,7 +48,7 @@ function SignalStub() {
         <h3
           style={{
             margin: 0,
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             letterSpacing: '0.04em',
@@ -58,7 +58,14 @@ function SignalStub() {
           Segnale Auktora
         </h3>
       </div>
-      <p style={{ margin: 0, fontSize: 11, color: 'var(--color-text-muted)', lineHeight: 1.55 }}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 'var(--font-xs)',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.55,
+        }}
+      >
         Segnale algoritmico — disponibile in MA5.
       </p>
     </section>
@@ -71,7 +78,7 @@ function RelatedStub() {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
         padding: 14,
       }}
     >
@@ -80,7 +87,7 @@ function RelatedStub() {
         <h3
           style={{
             margin: 0,
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             letterSpacing: '0.04em',
@@ -90,7 +97,14 @@ function RelatedStub() {
           Mercati correlati
         </h3>
       </div>
-      <p style={{ margin: 0, fontSize: 11, color: 'var(--color-text-muted)', lineHeight: 1.55 }}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 'var(--font-xs)',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.55,
+        }}
+      >
         Mercati correlati — disponibile in MA5.
       </p>
     </section>

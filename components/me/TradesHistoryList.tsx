@@ -80,7 +80,7 @@ export function TradesHistoryList() {
       />
 
       {error ? (
-        <p style={{ color: 'var(--color-danger)', fontSize: 13 }}>{error}</p>
+        <p style={{ color: 'var(--color-danger)', fontSize: 'var(--font-base)' }}>{error}</p>
       ) : loading ? (
         <SkeletonList />
       ) : items.length === 0 ? (
@@ -165,8 +165,8 @@ function Chip({
         background: active ? 'var(--color-cta)' : 'var(--color-bg-secondary)',
         color: active ? '#fff' : 'var(--color-text-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 16,
-        fontSize: 11,
+        borderRadius: 'var(--radius-lg)',
+        fontSize: 'var(--font-xs)',
         fontWeight: 600,
         cursor: 'pointer',
       }}
@@ -186,7 +186,7 @@ function SkeletonList() {
             height: 64,
             background: 'var(--color-bg-secondary)',
             border: '1px solid var(--color-border-subtle)',
-            borderRadius: 10,
+            borderRadius: 'var(--radius-md)',
           }}
         />
       ))}
@@ -202,17 +202,23 @@ function EmptyState() {
         padding: '40px 16px',
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
       }}
     >
       <History
         size={28}
         style={{ color: 'var(--color-text-muted)', marginBottom: 12, opacity: 0.5 }}
       />
-      <div style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 6 }}>
+      <div
+        style={{
+          fontSize: 'var(--font-md)',
+          color: 'var(--color-text-secondary)',
+          marginBottom: 6,
+        }}
+      >
         Nessun trade nel periodo selezionato
       </div>
-      <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+      <div style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
         Cambia i filtri o apri un nuovo trade dalla home.
       </div>
     </div>
@@ -227,14 +233,20 @@ function LoginPrompt({ onLogin }: { onLogin: () => void }) {
         padding: '40px 16px',
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
       }}
     >
       <History
         size={28}
         style={{ color: 'var(--color-text-muted)', marginBottom: 12, opacity: 0.5 }}
       />
-      <div style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 12 }}>
+      <div
+        style={{
+          fontSize: 'var(--font-md)',
+          color: 'var(--color-text-secondary)',
+          marginBottom: 12,
+        }}
+      >
         Effettua login per vedere il tuo storico
       </div>
       <button
@@ -245,8 +257,8 @@ function LoginPrompt({ onLogin }: { onLogin: () => void }) {
           color: '#fff',
           border: 'none',
           padding: '10px 18px',
-          borderRadius: 8,
-          fontSize: 13,
+          borderRadius: 'var(--radius-md)',
+          fontSize: 'var(--font-base)',
           fontWeight: 600,
           cursor: 'pointer',
         }}

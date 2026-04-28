@@ -60,7 +60,7 @@ export function EventCardHeader({
           justifyContent: 'center',
           color: 'var(--color-text-secondary)',
           fontWeight: 700,
-          fontSize: 16,
+          fontSize: 'var(--font-lg)',
         }}
       >
         {!imgFailed && image ? (
@@ -92,7 +92,7 @@ export function EventCardHeader({
           className="line-clamp-2"
           style={{
             margin: 0,
-            fontSize: 14,
+            fontSize: 'var(--font-md)',
             fontWeight: 600,
             lineHeight: 1.3,
             color: 'var(--color-text-primary)',
@@ -106,7 +106,7 @@ export function EventCardHeader({
           <p
             style={{
               margin: 0,
-              fontSize: 11,
+              fontSize: 'var(--font-xs)',
               color: 'var(--color-text-muted)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -135,10 +135,10 @@ export function EventCardHeader({
               alignItems: 'center',
               gap: 4,
               padding: '2px 6px',
-              borderRadius: 999,
+              borderRadius: 'var(--radius-full)',
               background: 'var(--color-danger-bg)',
               color: 'var(--color-danger)',
-              fontSize: 10,
+              fontSize: 'var(--font-xs)',
               fontWeight: 700,
               letterSpacing: '0.05em',
             }}
@@ -163,9 +163,9 @@ export function EventCardHeader({
               alignItems: 'center',
               gap: 3,
               padding: '2px 6px',
-              borderRadius: 999,
+              borderRadius: 'var(--radius-full)',
               color: 'var(--color-hot)',
-              fontSize: 10,
+              fontSize: 'var(--font-xs)',
               fontWeight: 700,
               letterSpacing: '0.05em',
             }}
@@ -178,10 +178,10 @@ export function EventCardHeader({
           <span
             style={{
               padding: '2px 6px',
-              borderRadius: 999,
+              borderRadius: 'var(--radius-full)',
               color: 'var(--color-cta)',
               background: 'var(--color-cta-bg)',
-              fontSize: 10,
+              fontSize: 'var(--font-xs)',
               fontWeight: 700,
               letterSpacing: '0.05em',
             }}

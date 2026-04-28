@@ -56,7 +56,7 @@ export function MultiOutcomeCard({ event, onBookmark }: Props) {
             style={{
               padding: '6px 0 2px',
               textAlign: 'center',
-              fontSize: 11,
+              fontSize: 'var(--font-xs)',
               color: 'var(--color-text-muted)',
             }}
           >
@@ -107,7 +107,7 @@ function OutcomeRow({ market, event, onYesClick, onNoClick }: RowProps) {
       <span
         style={{
           flex: 1,
-          fontSize: 12,
+          fontSize: 'var(--font-sm)',
           color: 'var(--color-text-secondary)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
@@ -119,7 +119,7 @@ function OutcomeRow({ market, event, onYesClick, onNoClick }: RowProps) {
       </span>
       <span
         style={{
-          fontSize: 12,
+          fontSize: 'var(--font-sm)',
           fontWeight: 600,
           color: 'var(--color-text-primary)',
           minWidth: 30,
@@ -159,8 +159,8 @@ function MiniBtn({
       }}
       style={{
         padding: '3px 8px',
-        borderRadius: 5,
-        fontSize: 10,
+        borderRadius: 'var(--radius-sm)',
+        fontSize: 'var(--font-xs)',
         fontWeight: 700,
         letterSpacing: '0.04em',
       }}

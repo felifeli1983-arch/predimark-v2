@@ -18,7 +18,7 @@ export function SidebarPortfolio({ mode = 'deposit-cta' }: Props) {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         padding: '12px 14px',
       }}
     >
@@ -27,7 +27,7 @@ export function SidebarPortfolio({ mode = 'deposit-cta' }: Props) {
         <h3
           style={{
             margin: 0,
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             letterSpacing: '0.04em',
@@ -43,7 +43,7 @@ export function SidebarPortfolio({ mode = 'deposit-cta' }: Props) {
           <p
             style={{
               margin: '0 0 10px',
-              fontSize: 12,
+              fontSize: 'var(--font-sm)',
               color: 'var(--color-text-muted)',
               lineHeight: 1.5,
             }}
@@ -55,11 +55,11 @@ export function SidebarPortfolio({ mode = 'deposit-cta' }: Props) {
             style={{
               width: '100%',
               padding: '7px 12px',
-              borderRadius: 7,
+              borderRadius: 'var(--radius-md)',
               background: 'var(--color-cta)',
               color: '#fff',
               border: 'none',
-              fontSize: 12,
+              fontSize: 'var(--font-sm)',
               fontWeight: 600,
               cursor: 'pointer',
             }}
@@ -81,10 +81,10 @@ export function SidebarPortfolio({ mode = 'deposit-cta' }: Props) {
 function Row({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-      <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>{label}</span>
+      <span style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>{label}</span>
       <strong
         style={{
-          fontSize: 13,
+          fontSize: 'var(--font-base)',
           color: muted ? 'var(--color-text-muted)' : 'var(--color-text-primary)',
           fontVariantNumeric: 'tabular-nums',
         }}

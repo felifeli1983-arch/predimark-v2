@@ -12,7 +12,7 @@ export function SidebarNews() {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         padding: '12px 14px',
       }}
     >
@@ -21,7 +21,7 @@ export function SidebarNews() {
         <h3
           style={{
             margin: 0,
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             letterSpacing: '0.04em',
@@ -53,7 +53,7 @@ export function SidebarNews() {
           >
             <span
               style={{
-                fontSize: 11,
+                fontSize: 'var(--font-xs)',
                 color: 'var(--color-text-secondary)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -65,7 +65,7 @@ export function SidebarNews() {
             </span>
             <span
               style={{
-                fontSize: 11,
+                fontSize: 'var(--font-xs)',
                 fontWeight: 600,
                 color: item.delta.startsWith('+') ? 'var(--color-success)' : 'var(--color-danger)',
                 fontVariantNumeric: 'tabular-nums',

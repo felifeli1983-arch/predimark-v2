@@ -77,8 +77,8 @@ export function BinaryCard({ event, onBookmark }: BinaryCardProps) {
             style={{
               flex: 1,
               padding: '8px 12px',
-              borderRadius: 8,
-              fontSize: 13,
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--font-base)',
               fontWeight: 600,
             }}
           >
@@ -95,8 +95,8 @@ export function BinaryCard({ event, onBookmark }: BinaryCardProps) {
             style={{
               flex: 1,
               padding: '8px 12px',
-              borderRadius: 8,
-              fontSize: 13,
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--font-base)',
               fontWeight: 600,
             }}
           >

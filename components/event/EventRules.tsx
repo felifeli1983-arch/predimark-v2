@@ -25,23 +25,23 @@ export function EventRules({ description }: Props) {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
-        padding: 14,
+        borderRadius: 'var(--radius-lg)',
+        padding: 'var(--space-4)',
       }}
     >
       <header
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          marginBottom: 8,
+          gap: 'var(--space-2)',
+          marginBottom: 'var(--space-2)',
         }}
       >
         <FileText size={14} style={{ color: 'var(--color-text-muted)' }} />
         <h3
           style={{
             margin: 0,
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             letterSpacing: '0.04em',
@@ -57,7 +57,7 @@ export function EventRules({ description }: Props) {
             style={{
               margin: 0,
               color: 'var(--color-text-secondary)',
-              fontSize: 13,
+              fontSize: 'var(--font-base)',
               lineHeight: 1.55,
               whiteSpace: 'pre-wrap',
             }}
@@ -69,16 +69,16 @@ export function EventRules({ description }: Props) {
               type="button"
               onClick={() => setExpanded((v) => !v)}
               style={{
-                marginTop: 6,
+                marginTop: 'var(--space-1)',
                 background: 'none',
                 border: 'none',
                 color: 'var(--color-cta)',
-                fontSize: 12,
+                fontSize: 'var(--font-sm)',
                 fontWeight: 600,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 4,
+                gap: 'var(--space-1)',
                 padding: 0,
               }}
             >
@@ -94,7 +94,7 @@ export function EventRules({ description }: Props) {
           )}
         </>
       ) : (
-        <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: 12 }}>
+        <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: 'var(--font-sm)' }}>
           Regole non disponibili per questo mercato.
         </p>
       )}

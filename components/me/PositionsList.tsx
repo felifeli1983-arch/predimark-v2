@@ -66,7 +66,8 @@ export function PositionsList() {
 
   if (!ready || loading) return <SkeletonList />
   if (!authenticated) return <LoginPrompt onLogin={login} />
-  if (error) return <p style={{ color: 'var(--color-danger)', fontSize: 13 }}>{error}</p>
+  if (error)
+    return <p style={{ color: 'var(--color-danger)', fontSize: 'var(--font-base)' }}>{error}</p>
 
   if (items.length === 0) {
     return (
@@ -91,7 +92,7 @@ export function PositionsList() {
           padding: '12px 14px',
           background: 'var(--color-bg-secondary)',
           border: '1px solid var(--color-border-subtle)',
-          borderRadius: 10,
+          borderRadius: 'var(--radius-md)',
         }}
       >
         <Stat label="Valore totale" value={`$${meta.totalValue.toFixed(2)}`} />
@@ -125,7 +126,7 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <span
         style={{
-          fontSize: 10,
+          fontSize: 'var(--font-xs)',
           color: 'var(--color-text-muted)',
           letterSpacing: '0.04em',
           textTransform: 'uppercase',
@@ -135,7 +136,7 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
       </span>
       <strong
         style={{
-          fontSize: 16,
+          fontSize: 'var(--font-lg)',
           fontWeight: 700,
           color: color ?? 'var(--color-text-primary)',
           fontVariantNumeric: 'tabular-nums',
@@ -157,7 +158,7 @@ function SkeletonList() {
             height: 72,
             background: 'var(--color-bg-secondary)',
             border: '1px solid var(--color-border-subtle)',
-            borderRadius: 10,
+            borderRadius: 'var(--radius-md)',
           }}
         />
       ))}
@@ -178,8 +179,8 @@ function LoginPrompt({ onLogin }: { onLogin: () => void }) {
             color: '#fff',
             border: 'none',
             padding: '10px 18px',
-            borderRadius: 8,
-            fontSize: 13,
+            borderRadius: 'var(--radius-md)',
+            fontSize: 'var(--font-base)',
             fontWeight: 600,
             cursor: 'pointer',
             marginTop: 12,
@@ -208,18 +209,26 @@ function EmptyState({
         padding: '40px 16px',
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
       }}
     >
       <Activity
         size={28}
         style={{ color: 'var(--color-text-muted)', marginBottom: 12, opacity: 0.5 }}
       />
-      <div style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 6 }}>
+      <div
+        style={{
+          fontSize: 'var(--font-md)',
+          color: 'var(--color-text-secondary)',
+          marginBottom: 6,
+        }}
+      >
         {title}
       </div>
       {subtitle && (
-        <div style={{ fontSize: 12, color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+        <div
+          style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)', lineHeight: 1.5 }}
+        >
           {subtitle}
         </div>
       )}

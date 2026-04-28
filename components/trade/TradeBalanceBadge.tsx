@@ -28,10 +28,10 @@ export function TradeBalanceBadge() {
         alignItems: 'center',
         gap: 6,
         padding: '6px 10px',
-        borderRadius: 8,
+        borderRadius: 'var(--radius-md)',
         background: 'var(--color-bg-tertiary)',
         border: '1px solid var(--color-border-subtle)',
-        fontSize: 12,
+        fontSize: 'var(--font-sm)',
         color: 'var(--color-text-secondary)',
       }}
     >
@@ -39,7 +39,9 @@ export function TradeBalanceBadge() {
       <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
         ${value.toFixed(2)}
       </span>
-      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.05em' }}>{label}</span>
+      <span style={{ fontSize: 'var(--font-xs)', fontWeight: 700, letterSpacing: '0.05em' }}>
+        {label}
+      </span>
     </div>
   )
 }

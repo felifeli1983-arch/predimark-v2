@@ -44,11 +44,11 @@ function Card({ children }: { children: React.ReactNode }) {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
-        padding: 14,
+        borderRadius: 'var(--radius-lg)',
+        padding: 'var(--space-4)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
+        gap: 'var(--space-3)',
       }}
     >
       {children}
@@ -73,9 +73,9 @@ function BigBtn({
       onClick={onClick}
       style={{
         flex: 1,
-        padding: '14px 18px',
-        borderRadius: 10,
-        fontSize: 16,
+        padding: 'var(--space-4) var(--space-5)',
+        borderRadius: 'var(--radius-md)',
+        fontSize: 'var(--font-lg)',
         fontWeight: 700,
       }}
     >
@@ -142,9 +142,9 @@ function H2HView({ event, onTrade }: ViewProps) {
               style={{
                 flex: 1,
                 minWidth: 120,
-                padding: '14px 18px',
-                borderRadius: 10,
-                fontSize: 14,
+                padding: 'var(--space-4) var(--space-5)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-md)',
                 fontWeight: 700,
                 display: 'flex',
                 flexDirection: 'column',
@@ -154,7 +154,13 @@ function H2HView({ event, onTrade }: ViewProps) {
               }}
             >
               <span>{o.name}</span>
-              <span style={{ fontSize: 12, opacity: 0.85, fontVariantNumeric: 'tabular-nums' }}>
+              <span
+                style={{
+                  fontSize: 'var(--font-sm)',
+                  opacity: 0.85,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {cents}¢
               </span>
             </button>
@@ -184,10 +190,12 @@ function CryptoView({ event, onTrade }: ViewProps) {
         }}
       >
         <div>
-          <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Battere</div>
+          <div style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
+            Battere
+          </div>
           <div
             style={{
-              fontSize: 22,
+              fontSize: 'var(--font-xl)',
               fontWeight: 700,
               color: 'var(--color-text-primary)',
               fontVariantNumeric: 'tabular-nums',
@@ -198,7 +206,7 @@ function CryptoView({ event, onTrade }: ViewProps) {
         </div>
         <div
           style={{
-            fontSize: 13,
+            fontSize: 'var(--font-base)',
             fontWeight: 600,
             color: expired ? 'var(--color-danger)' : 'var(--color-cta)',
             fontVariantNumeric: 'tabular-nums',
@@ -231,7 +239,14 @@ function StrikeListView({ event, onTrade }: ViewProps) {
 
   return (
     <Card>
-      <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+      <h2
+        style={{
+          margin: 0,
+          fontSize: 'var(--font-md)',
+          fontWeight: 700,
+          color: 'var(--color-text-primary)',
+        }}
+      >
         Soglie
       </h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -252,7 +267,14 @@ function OutcomeListView({ event, onTrade }: ViewProps) {
   const sorted = [...event.markets].sort((a, b) => b.yesPrice - a.yesPrice)
   return (
     <Card>
-      <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+      <h2
+        style={{
+          margin: 0,
+          fontSize: 'var(--font-md)',
+          fontWeight: 700,
+          color: 'var(--color-text-primary)',
+        }}
+      >
         Candidati
       </h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -271,10 +293,10 @@ function OutcomeListView({ event, onTrade }: ViewProps) {
 
 function Stat({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
       <span
         style={{
-          fontSize: 11,
+          fontSize: 'var(--font-xs)',
           color: 'var(--color-text-muted)',
           letterSpacing: '0.04em',
           textTransform: 'uppercase',
@@ -282,7 +304,14 @@ function Stat({ label, value, color }: { label: string; value: string; color: st
       >
         {label}
       </span>
-      <span style={{ fontSize: 32, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums' }}>
+      <span
+        style={{
+          fontSize: 'var(--font-2xl)',
+          fontWeight: 700,
+          color,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
         {value}
       </span>
     </div>
@@ -308,9 +337,9 @@ function ActionButton({
       onClick={onClick}
       style={{
         flex: 1,
-        padding: '14px 18px',
-        borderRadius: 10,
-        fontSize: 14,
+        padding: 'var(--space-4) var(--space-5)',
+        borderRadius: 'var(--radius-md)',
+        fontSize: 'var(--font-md)',
         fontWeight: 700,
         display: 'inline-flex',
         alignItems: 'center',
@@ -327,7 +356,7 @@ function ActionButton({
 function EmptyMarketsHint() {
   return (
     <Card>
-      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: 13 }}>
+      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: 'var(--font-base)' }}>
         Mercato senza outcomes disponibili.
       </p>
     </Card>

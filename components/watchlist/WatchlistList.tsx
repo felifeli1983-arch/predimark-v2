@@ -73,8 +73,8 @@ export function WatchlistList() {
               color: '#fff',
               border: 'none',
               padding: '10px 18px',
-              borderRadius: 8,
-              fontSize: 13,
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--font-base)',
               fontWeight: 600,
               cursor: 'pointer',
             }}
@@ -87,7 +87,7 @@ export function WatchlistList() {
   }
 
   if (error) {
-    return <p style={{ color: 'var(--color-danger)', fontSize: 13 }}>{error}</p>
+    return <p style={{ color: 'var(--color-danger)', fontSize: 'var(--font-base)' }}>{error}</p>
   }
 
   if (!items || items.length === 0) {
@@ -120,7 +120,7 @@ export function WatchlistList() {
             padding: 12,
             background: 'var(--color-bg-secondary)',
             border: '1px solid var(--color-border-subtle)',
-            borderRadius: 10,
+            borderRadius: 'var(--radius-md)',
           }}
         >
           <div
@@ -148,7 +148,7 @@ export function WatchlistList() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
-                fontSize: 13,
+                fontSize: 'var(--font-base)',
                 fontWeight: 600,
                 color: 'var(--color-text-primary)',
                 whiteSpace: 'nowrap',
@@ -170,7 +170,7 @@ export function WatchlistList() {
             {it.currentYesPrice !== null && (
               <div
                 style={{
-                  fontSize: 11,
+                  fontSize: 'var(--font-xs)',
                   color: 'var(--color-text-muted)',
                   fontVariantNumeric: 'tabular-nums',
                 }}
@@ -216,7 +216,7 @@ function SkeletonList() {
             height: 64,
             background: 'var(--color-bg-secondary)',
             border: '1px solid var(--color-border-subtle)',
-            borderRadius: 10,
+            borderRadius: 'var(--radius-md)',
           }}
         />
       ))}
@@ -243,14 +243,22 @@ function EmptyState({
         color: 'var(--color-text-muted)',
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-lg)',
       }}
     >
       <div style={{ display: 'inline-flex', marginBottom: 12, opacity: 0.5 }}>{icon}</div>
-      <div style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 6 }}>
+      <div
+        style={{
+          fontSize: 'var(--font-md)',
+          color: 'var(--color-text-secondary)',
+          marginBottom: 6,
+        }}
+      >
         {title}
       </div>
-      {subtitle && <div style={{ fontSize: 12, marginBottom: action ? 12 : 0 }}>{subtitle}</div>}
+      {subtitle && (
+        <div style={{ fontSize: 'var(--font-sm)', marginBottom: action ? 12 : 0 }}>{subtitle}</div>
+      )}
       {action}
     </div>
   )

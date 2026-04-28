@@ -82,14 +82,14 @@ function GuestDemoCta({ onLogin }: { onLogin: () => void }) {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-cta)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         padding: '14px',
       }}
     >
       <h3
         style={{
           margin: 0,
-          fontSize: 13,
+          fontSize: 'var(--font-base)',
           fontWeight: 700,
           color: 'var(--color-text-primary)',
           marginBottom: 4,
@@ -100,7 +100,7 @@ function GuestDemoCta({ onLogin }: { onLogin: () => void }) {
       <p
         style={{
           margin: 0,
-          fontSize: 11,
+          fontSize: 'var(--font-xs)',
           color: 'var(--color-text-muted)',
           marginBottom: 10,
           lineHeight: 1.5,
@@ -114,11 +114,11 @@ function GuestDemoCta({ onLogin }: { onLogin: () => void }) {
         style={{
           width: '100%',
           padding: '8px 12px',
-          borderRadius: 7,
+          borderRadius: 'var(--radius-md)',
           background: 'var(--color-cta)',
           color: '#fff',
           border: 'none',
-          fontSize: 12,
+          fontSize: 'var(--font-sm)',
           fontWeight: 600,
           cursor: 'pointer',
           marginBottom: 6,
@@ -131,7 +131,7 @@ function GuestDemoCta({ onLogin }: { onLogin: () => void }) {
         style={{
           display: 'block',
           textAlign: 'center',
-          fontSize: 11,
+          fontSize: 'var(--font-xs)',
           color: 'var(--color-text-secondary)',
           textDecoration: 'none',
         }}

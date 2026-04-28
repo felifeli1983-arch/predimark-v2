@@ -77,7 +77,7 @@ export function MultiStrikeCard({ event, onBookmark }: Props) {
             style={{
               padding: '6px 0 2px',
               textAlign: 'center',
-              fontSize: 11,
+              fontSize: 'var(--font-xs)',
               color: 'var(--color-text-muted)',
             }}
           >
@@ -129,7 +129,7 @@ function StrikeRow({ market, event, highlighted, onYesClick, onNoClick }: RowPro
       <span
         style={{
           flex: 1,
-          fontSize: 12,
+          fontSize: 'var(--font-sm)',
           color: labelColor,
           fontWeight: highlighted ? 600 : 400,
           whiteSpace: 'nowrap',
@@ -142,7 +142,7 @@ function StrikeRow({ market, event, highlighted, onYesClick, onNoClick }: RowPro
       </span>
       <span
         style={{
-          fontSize: 12,
+          fontSize: 'var(--font-sm)',
           fontWeight: 600,
           color: 'var(--color-text-primary)',
           minWidth: 32,
@@ -182,8 +182,8 @@ function SideBtn({
       }}
       style={{
         padding: '3px 8px',
-        borderRadius: 5,
-        fontSize: 10,
+        borderRadius: 'var(--radius-sm)',
+        fontSize: 'var(--font-xs)',
         fontWeight: 700,
         letterSpacing: '0.04em',
       }}

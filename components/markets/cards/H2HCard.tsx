@@ -159,7 +159,7 @@ function TeamLabel({
     >
       <span
         style={{
-          fontSize: 13,
+          fontSize: 'var(--font-base)',
           fontWeight: isFavorite ? 600 : 500,
           color: nameColor,
           whiteSpace: 'nowrap',
@@ -172,7 +172,7 @@ function TeamLabel({
       </span>
       <span
         style={{
-          fontSize: 12,
+          fontSize: 'var(--font-sm)',
           fontWeight: 700,
           color: pctColor,
           fontVariantNumeric: 'tabular-nums',
@@ -216,8 +216,8 @@ function TeamButton({
       style={{
         flex: 1,
         padding: '8px 10px',
-        borderRadius: 8,
-        fontSize: 12,
+        borderRadius: 'var(--radius-md)',
+        fontSize: 'var(--font-sm)',
         fontWeight: 600,
         cursor: onClick ? 'pointer' : 'default',
         whiteSpace: 'nowrap',

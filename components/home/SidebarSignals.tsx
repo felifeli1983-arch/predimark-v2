@@ -6,7 +6,7 @@ export function SidebarSignals() {
       style={{
         background: 'var(--color-bg-secondary)',
         border: '1px solid var(--color-border-subtle)',
-        borderRadius: 10,
+        borderRadius: 'var(--radius-md)',
         padding: '12px 14px',
       }}
     >
@@ -15,7 +15,7 @@ export function SidebarSignals() {
         <h3
           style={{
             margin: 0,
-            fontSize: 12,
+            fontSize: 'var(--font-sm)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             letterSpacing: '0.04em',
@@ -25,7 +25,14 @@ export function SidebarSignals() {
           Signals
         </h3>
       </div>
-      <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 'var(--font-sm)',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.5,
+        }}
+      >
         I segnali generati da Auktora arriveranno qui. Disponibili dopo MA4 (Trading Core).
       </p>
     </section>

@@ -41,7 +41,15 @@ export function TradeMarketTab() {
             gap: 6,
           }}
         >
-          <span style={{ fontSize: 18, color: 'var(--color-text-muted)', fontWeight: 600 }}>$</span>
+          <span
+            style={{
+              fontSize: 'var(--font-xl)',
+              color: 'var(--color-text-muted)',
+              fontWeight: 600,
+            }}
+          >
+            $
+          </span>
           <input
             type="number"
             min={1}
@@ -54,7 +62,7 @@ export function TradeMarketTab() {
               background: 'transparent',
               border: 'none',
               outline: 'none',
-              fontSize: 36,
+              fontSize: 'var(--font-3xl)',
               fontWeight: 700,
               color: 'var(--color-text-primary)',
               fontVariantNumeric: 'tabular-nums',
@@ -77,7 +85,7 @@ export function TradeMarketTab() {
         style={{
           background: 'var(--color-bg-tertiary)',
           border: '1px solid var(--color-border-subtle)',
-          borderRadius: 10,
+          borderRadius: 'var(--radius-md)',
           padding: '12px 14px',
           display: 'flex',
           flexDirection: 'column',
@@ -85,10 +93,12 @@ export function TradeMarketTab() {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Per vincere</span>
+          <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
+            Per vincere
+          </span>
           <strong
             style={{
-              fontSize: 18,
+              fontSize: 'var(--font-xl)',
               fontWeight: 700,
               color: 'var(--color-success)',
               fontVariantNumeric: 'tabular-nums',
@@ -101,7 +111,7 @@ export function TradeMarketTab() {
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            fontSize: 11,
+            fontSize: 'var(--font-xs)',
             color: 'var(--color-text-muted)',
           }}
         >
@@ -114,7 +124,7 @@ export function TradeMarketTab() {
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            fontSize: 11,
+            fontSize: 'var(--font-xs)',
             color: 'var(--color-text-muted)',
           }}
         >
@@ -138,7 +148,7 @@ export function TradeMarketTab() {
 const pillBtn: React.CSSProperties = {
   width: 36,
   height: 36,
-  borderRadius: 999,
+  borderRadius: 'var(--radius-full)',
   background: 'var(--color-bg-tertiary)',
   border: '1px solid var(--color-border-subtle)',
   color: 'var(--color-text-primary)',
@@ -151,11 +161,11 @@ const pillBtn: React.CSSProperties = {
 
 const chipBtn: React.CSSProperties = {
   padding: '6px 12px',
-  borderRadius: 999,
+  borderRadius: 'var(--radius-full)',
   background: 'var(--color-bg-tertiary)',
   border: '1px solid var(--color-border-subtle)',
   color: 'var(--color-text-secondary)',
-  fontSize: 12,
+  fontSize: 'var(--font-sm)',
   fontWeight: 600,
   cursor: 'pointer',
   fontVariantNumeric: 'tabular-nums',

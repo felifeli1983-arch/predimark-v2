@@ -36,13 +36,13 @@ export function MobileSidebarRails() {
             gap: 12,
             background: 'var(--color-bg-secondary)',
             border: '1px solid var(--color-cta)',
-            borderRadius: 10,
+            borderRadius: 'var(--radius-md)',
             padding: '10px 12px',
           }}
         >
           <span
             style={{
-              fontSize: 12,
+              fontSize: 'var(--font-sm)',
               color: 'var(--color-text-secondary)',
               flex: 1,
               minWidth: 0,
@@ -57,11 +57,11 @@ export function MobileSidebarRails() {
               onClick={login}
               style={{
                 padding: '6px 10px',
-                borderRadius: 6,
+                borderRadius: 'var(--radius-md)',
                 background: 'var(--color-cta)',
                 color: '#fff',
                 border: 'none',
-                fontSize: 11,
+                fontSize: 'var(--font-xs)',
                 fontWeight: 600,
                 cursor: 'pointer',
               }}
@@ -72,11 +72,11 @@ export function MobileSidebarRails() {
               href="/?demo=1"
               style={{
                 padding: '6px 10px',
-                borderRadius: 6,
+                borderRadius: 'var(--radius-md)',
                 background: 'transparent',
                 color: 'var(--color-text-secondary)',
                 border: '1px solid var(--color-border-subtle)',
-                fontSize: 11,
+                fontSize: 'var(--font-xs)',
                 fontWeight: 600,
                 textDecoration: 'none',
               }}

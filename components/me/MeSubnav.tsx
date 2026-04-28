@@ -41,7 +41,7 @@ export function MeSubnav() {
               alignItems: 'center',
               gap: 6,
               padding: '10px 14px',
-              fontSize: 13,
+              fontSize: 'var(--font-base)',
               fontWeight: active ? 700 : 500,
               color: active ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
               textDecoration: 'none',

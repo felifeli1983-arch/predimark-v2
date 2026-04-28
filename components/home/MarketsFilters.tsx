@@ -90,7 +90,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
         <h2
           style={{
             margin: 0,
-            fontSize: 14,
+            fontSize: 'var(--font-md)',
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             textTransform: 'capitalize',
@@ -111,9 +111,9 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
               background: 'var(--color-bg-secondary)',
               border: '1px solid var(--color-border-subtle)',
               color: 'var(--color-text-secondary)',
-              borderRadius: 6,
+              borderRadius: 'var(--radius-md)',
               padding: '4px 10px',
-              fontSize: 12,
+              fontSize: 'var(--font-sm)',
               cursor: 'pointer',
             }}
           >
@@ -128,7 +128,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
               gap: 6,
               background: 'var(--color-bg-secondary)',
               border: '1px solid var(--color-border-subtle)',
-              borderRadius: 6,
+              borderRadius: 'var(--radius-md)',
               padding: '4px 8px',
               minWidth: 180,
             }}
@@ -144,7 +144,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
                 border: 'none',
                 outline: 'none',
                 color: 'var(--color-text-primary)',
-                fontSize: 12,
+                fontSize: 'var(--font-sm)',
                 width: '100%',
                 minWidth: 0,
               }}
@@ -160,9 +160,9 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
               background: 'var(--color-bg-secondary)',
               border: '1px solid var(--color-border-subtle)',
               color: animationsEnabled ? 'var(--color-cta)' : 'var(--color-text-muted)',
-              borderRadius: 6,
+              borderRadius: 'var(--radius-md)',
               padding: '4px 8px',
-              fontSize: 12,
+              fontSize: 'var(--font-sm)',
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
@@ -171,7 +171,9 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             {animationsEnabled ? <Zap size={12} /> : <ZapOff size={12} />}
           </button>
 
-          <label style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Sort</label>
+          <label style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
+            Sort
+          </label>
           <select
             value={sort}
             onChange={(e) => setParam('sort', e.target.value, 'volume24h')}
@@ -179,9 +181,9 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
               background: 'var(--color-bg-secondary)',
               color: 'var(--color-text-primary)',
               border: '1px solid var(--color-border-subtle)',
-              borderRadius: 6,
+              borderRadius: 'var(--radius-md)',
               padding: '4px 8px',
-              fontSize: 12,
+              fontSize: 'var(--font-sm)',
               cursor: 'pointer',
             }}
           >
@@ -197,7 +199,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
               display: 'flex',
               background: 'var(--color-bg-secondary)',
               border: '1px solid var(--color-border-subtle)',
-              borderRadius: 6,
+              borderRadius: 'var(--radius-md)',
               padding: 2,
             }}
           >
@@ -207,7 +209,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
               aria-label="Grid layout"
               style={{
                 padding: '4px 8px',
-                borderRadius: 4,
+                borderRadius: 'var(--radius-sm)',
                 background: layout === 'grid' ? 'var(--color-bg-tertiary)' : 'transparent',
                 border: 'none',
                 color: layout === 'grid' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
@@ -224,7 +226,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
               aria-label="List layout"
               style={{
                 padding: '4px 8px',
-                borderRadius: 4,
+                borderRadius: 'var(--radius-sm)',
                 background: layout === 'list' ? 'var(--color-bg-tertiary)' : 'transparent',
                 border: 'none',
                 color: layout === 'list' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
@@ -258,8 +260,8 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
               onClick={() => setParam('tag', tag.slug, 'all')}
               style={{
                 padding: '4px 10px',
-                borderRadius: 999,
-                fontSize: 12,
+                borderRadius: 'var(--radius-full)',
+                fontSize: 'var(--font-sm)',
                 fontWeight: isActive ? 600 : 500,
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',

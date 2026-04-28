@@ -50,7 +50,7 @@ export function EventCardFooter({ volume, endDate, showEndDate = true }: EventCa
         style={{
           flex: 1,
           minWidth: 0,
-          fontSize: 11,
+          fontSize: 'var(--font-xs)',
           color: 'var(--color-text-muted)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
