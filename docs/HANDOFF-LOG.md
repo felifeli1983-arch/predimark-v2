@@ -2,7 +2,37 @@
 
 > Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
 > Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
-> Ultimo update: 2026-04-28
+> Ultimo update: 2026-04-28 (sera) — MA4.4 chiuso + Design Tokens sprint chiuso
+
+---
+
+## Stato corrente (2026-04-28 sera)
+
+**Sprint completati oggi**:
+
+- MA4.4 Phase A — CLOB V2 SDK + read-only client + health endpoint
+- MA4.4 Phase B — onboarding L2 API + pUSD balance + /me/wallet UI + crypto AES-256-GCM
+- MA4.4 Phase C-1+2+3 — REAL trading lifecycle (sign client → CLOB post → DB → UI)
+- MA4.4 Phase C-4 — Sell REAL + Wrap USDC.e→pUSD + clob_token_ids migration + geo-block 33 paesi
+- Design Polish — event page Polymarket-style proportions (% centrale grid, prezzi su buttons)
+- Design Tokens Sprint (Doc 13) — 244 inline values → CSS vars in 45 file
+
+**Decisioni strategiche di oggi**:
+
+- Drop Italia. Target: UAE primario + SG/HK + Brasile/Argentina/Turchia + Romania/Polonia (Doc 11)
+- Skip CLOB V1 entirely, V2 direct integration con `@polymarket/clob-client-v2@1.0.2`
+- Builder fee Y1 = 0 bps (matchare Betmoar zero-fee), Y2 = 30 bps post-KYC builder profile
+- Bot Telegram (MA7) prima di Discord (MA8) — UAE/Asia preferisce Telegram
+- Phase D rinviato post-utenti reali (WS price stream, limit orders, chart prezzi)
+
+**Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
+
+**Blockers attivi**: nessuno tecnicamente. Builder profile KYC per monetizzare fee
+da fare manualmente su polymarket.com/settings → 1-time setup utente.
+
+---
+
+## Stato precedente
 
 ---
 
@@ -16,9 +46,13 @@
 
 ## Migration DB applicate
 
-| Migration                  | Staging       | Prod          | Razionale                                                                                                                                               |
-| -------------------------- | ------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `drop_markets_slug_unique` | ✅ 2026-04-27 | ✅ 2026-04-27 | UNIQUE su `markets.slug` impediva di salvare più mercati dello stesso evento Polymarket (es. candidati multi-outcome). Sostituito con INDEX non-unique. |
+| Migration                        | Staging       | Prod          | Razionale                                                                                                                                                  |
+| -------------------------------- | ------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `drop_markets_slug_unique`       | ✅ 2026-04-27 | ✅ 2026-04-27 | UNIQUE su `markets.slug` impediva multi-outcome (più markets stesso evento). Sostituito con INDEX non-unique.                                              |
+| `fix_audit_log_partitions_rls`   | ✅ 2026-04-28 | ✅ 2026-04-28 | Prod aveva 13 audit_log_YYYY_MM partitions con RLS DISABLED (ERROR advisor). Replicato `rls_auto_enable()` event trigger da staging + backfill RLS ON.     |
+| `add_polymarket_api_creds_users` | ✅ 2026-04-28 | ✅ 2026-04-28 | 5 colonne cifrate AES-256-GCM su `users` per onboarding L2 Polymarket: api_key/secret/passphrase + funder_address + onboarded_at.                          |
+| `add_clob_token_ids_markets`     | ✅ 2026-04-28 | ✅ 2026-04-28 | `markets.clob_token_ids text[]` — necessario per sell REAL (recupera tokenId del side della posizione da DB).                                              |
+| `tighten_security_advisors`      | ✅ 2026-04-28 | ✅ 2026-04-28 | SET search_path immutable su 3 funzioni + REVOKE EXECUTE da anon/authenticated su 4 SECURITY DEFINER + policy "service_role only" su audit_log. Zero lint. |
 
 ---
 
