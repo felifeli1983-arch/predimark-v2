@@ -2,11 +2,11 @@
 
 > Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
 > Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
-> Ultimo update: 2026-04-28 (sera) — MA4.4 chiuso + Design Tokens sprint chiuso
+> Ultimo update: 2026-04-28 (notte) — MA4.4 + MA4.6 chiusi + Design Tokens
 
 ---
 
-## Stato corrente (2026-04-28 sera)
+## Stato corrente (2026-04-28 notte)
 
 **Sprint completati oggi**:
 
@@ -16,6 +16,7 @@
 - MA4.4 Phase C-4 — Sell REAL + Wrap USDC.e→pUSD + clob_token_ids migration + geo-block 33 paesi
 - Design Polish — event page Polymarket-style proportions (% centrale grid, prezzi su buttons)
 - Design Tokens Sprint (Doc 13) — 244 inline values → CSS vars in 45 file
+- **MA4.6 Funding flow** — Deposit via Privy useFundWallet (Apple Pay/Card/Google/MoonPay) + Withdraw 2-step (unwrap pUSD on-chain + link MoonPay sell-to-bank) + FundActionsRow shared in OnboardCard/PositionsList
 
 **Decisioni strategiche di oggi**:
 
