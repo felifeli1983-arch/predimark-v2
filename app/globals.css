@@ -494,6 +494,49 @@ html[data-theme='light'] {
   }
 }
 
+/* OutcomeRow event page — grid 4-col desktop, stack su mobile */
+.outcome-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+}
+@media (max-width: 640px) {
+  .outcome-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-rows: auto auto;
+    column-gap: 10px;
+    row-gap: 8px;
+    padding: 10px 12px;
+  }
+  /* Mobile rows: label col 1 row 1, % col 2 row 1, chevron col 3 row 1, buttons span row 2 */
+  .outcome-row__label {
+    grid-column: 1 / 2;
+    grid-row: 1;
+  }
+  .outcome-row__pct {
+    grid-column: 2 / 3;
+    grid-row: 1;
+    font-size: 22px !important;
+  }
+  .outcome-row__chevron {
+    grid-column: 3 / 4;
+    grid-row: 1;
+  }
+  .outcome-row__btns {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+  }
+  .outcome-row__btns > button {
+    flex: 1;
+    min-width: 0 !important;
+    padding: 10px 8px !important;
+    font-size: 13px !important;
+  }
+}
+
 /* Loader2 lucide spin */
 .animate-spin {
   animation: spin 1s linear infinite;

@@ -35,13 +35,9 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
         type="button"
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
+        className="outcome-row"
         style={{
           width: '100%',
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr) auto',
-          alignItems: 'center',
-          gap: 14,
-          padding: '12px 16px',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
@@ -49,8 +45,9 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           textAlign: 'left',
         }}
       >
-        {/* Col 1: label + volume (sinistra) */}
+        {/* Col 1 desktop / row 1 col 1 mobile: label + volume */}
         <span
+          className="outcome-row__label"
           style={{
             minWidth: 0,
             display: 'flex',
@@ -79,8 +76,9 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           </span>
         </span>
 
-        {/* Col 2: percentuale (centro vero) */}
+        {/* Col 2 desktop / row 1 col 2 mobile: percentuale */}
         <span
+          className="outcome-row__pct"
           style={{
             fontSize: 32,
             fontWeight: 700,
@@ -94,8 +92,8 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           {pct}%
         </span>
 
-        {/* Col 3: buttons Sì/No (destra del centro) */}
-        <div style={{ display: 'flex', gap: 8, justifySelf: 'end' }}>
+        {/* Col 3 desktop / row 2 spans full mobile: buttons Sì/No */}
+        <div className="outcome-row__btns" style={{ display: 'flex', gap: 8, justifySelf: 'end' }}>
           <SideBtn
             label={`Sì ${yesCents}¢`}
             variant="yes"
@@ -114,8 +112,9 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           />
         </div>
 
-        {/* Col 4: chevron expand */}
+        {/* Col 4 desktop / row 1 col 3 mobile: chevron expand */}
         <ChevronDown
+          className="outcome-row__chevron"
           size={16}
           style={{
             color: 'var(--color-text-muted)',
