@@ -15,12 +15,14 @@ export default function WatchlistPage() {
     <PageContainer>
       <div
         style={{
+          width: '100%',
+          maxWidth: 720,
+          margin: '0 auto',
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
           padding: '12px var(--layout-padding-x) 0',
           minWidth: 0,
-          maxWidth: '100%',
           overflowX: 'hidden',
         }}
       >
