@@ -60,7 +60,10 @@ export async function submitRealTrade(
     }
   }
 
-  const marketResult = await resolveOrUpsertMarket(supabase, body)
+  const marketResult = await resolveOrUpsertMarket(supabase, {
+    ...body,
+    clobTokenIds: body.clobTokenIds,
+  })
   if ('error' in marketResult) {
     console.error('[trade/submit-real] markets', marketResult.error)
     return { code: 'MARKET_UPSERT_FAILED', message: 'Errore sync mercato', status: 500 }

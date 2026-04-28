@@ -1514,6 +1514,7 @@ export type Database = {
         Row: {
           card_kind: string
           category: string
+          clob_token_ids: string[] | null
           created_at: string | null
           current_no_price: number | null
           current_yes_price: number | null
@@ -1542,6 +1543,7 @@ export type Database = {
         Insert: {
           card_kind: string
           category: string
+          clob_token_ids?: string[] | null
           created_at?: string | null
           current_no_price?: number | null
           current_yes_price?: number | null
@@ -1570,6 +1572,7 @@ export type Database = {
         Update: {
           card_kind?: string
           category?: string
+          clob_token_ids?: string[] | null
           created_at?: string | null
           current_no_price?: number | null
           current_yes_price?: number | null

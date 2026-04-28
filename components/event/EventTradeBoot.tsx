@@ -117,5 +117,6 @@ function buildDraft(
     pricePerShare: priceAtAdd,
     outcomeLabel,
     tokenId,
+    clobTokenIds: market.clobTokenIds,
   }
 }

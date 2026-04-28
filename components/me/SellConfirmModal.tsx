@@ -2,9 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
+import { useWallets, getEmbeddedConnectedWallet } from '@privy-io/react-auth'
+import { createWalletClient, custom, type WalletClient } from 'viem'
+import { polygon } from 'viem/chains'
+
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { computeSellPnL } from '@/lib/trades/pnl'
 import { useSellTrade } from '@/lib/hooks/useSellTrade'
+import { buildAndSignSellOrder } from '@/lib/polymarket/order-create'
 import type { PositionItem } from '@/lib/api/positions-client'
 
 interface Props {
@@ -15,8 +20,10 @@ interface Props {
 
 export function SellConfirmModal({ position, onClose, onSold }: Props) {
   const isDemo = useThemeStore((s) => s.isDemo)
+  const { wallets } = useWallets()
   const { status, error, submit, reset } = useSellTrade()
   const [percent, setPercent] = useState(100)
+  const [signing, setSigning] = useState(false)
 
   useEffect(() => {
     if (position) {
@@ -37,13 +44,59 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
   async function handleConfirm() {
     if (!position) return
     if (sharesToSell <= 0) return
-    const res = await submit({
-      positionId: position.id,
-      sharesToSell,
-      currentPrice,
-      isDemo,
-    })
-    if (res) onSold(position.id, sharesToSell)
+
+    if (isDemo) {
+      const res = await submit({
+        positionId: position.id,
+        sharesToSell,
+        currentPrice,
+        isDemo: true,
+      })
+      if (res) onSold(position.id, sharesToSell)
+      return
+    }
+
+    // REAL: serve build + sign sell order client-side via Privy
+    if (!position.tokenId) {
+      // SellTrade reset+error tramite hook se non disponibile
+      console.error('[sell-real] tokenId mancante per posizione', position.id)
+      return
+    }
+    const embedded = getEmbeddedConnectedWallet(wallets)
+    if (!embedded) {
+      console.error('[sell-real] wallet embedded Privy non trovato')
+      return
+    }
+
+    setSigning(true)
+    try {
+      const provider = await embedded.getEthereumProvider()
+      const walletClient: WalletClient = createWalletClient({
+        account: embedded.address as `0x${string}`,
+        chain: polygon,
+        transport: custom(provider),
+      })
+      const signedOrder = await buildAndSignSellOrder({
+        signer: walletClient,
+        funderAddress: embedded.address,
+        tokenId: position.tokenId,
+        pricePerShare: currentPrice,
+        sharesToSell,
+      })
+      setSigning(false)
+      const res = await submit({
+        positionId: position.id,
+        sharesToSell,
+        currentPrice,
+        isDemo: false,
+        tokenId: position.tokenId,
+        signedOrder: signedOrder as unknown as Record<string, unknown>,
+      })
+      if (res) onSold(position.id, sharesToSell)
+    } catch (err) {
+      setSigning(false)
+      console.error('[sell-real] signing or submit failed', err)
+    }
   }
 
   return (
@@ -215,7 +268,7 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
             <button
               type="button"
               onClick={handleConfirm}
-              disabled={submitting || sharesToSell <= 0}
+              disabled={submitting || signing || sharesToSell <= 0}
               style={{
                 flex: 1,
                 padding: '10px 14px',
@@ -225,11 +278,17 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
                 borderRadius: 8,
                 fontSize: 13,
                 fontWeight: 700,
-                cursor: submitting ? 'not-allowed' : 'pointer',
-                opacity: submitting ? 0.7 : 1,
+                cursor: submitting || signing ? 'not-allowed' : 'pointer',
+                opacity: submitting || signing ? 0.7 : 1,
               }}
             >
-              {submitting ? 'Vendita…' : 'Conferma'}
+              {signing
+                ? 'In firma…'
+                : submitting
+                  ? 'Vendita…'
+                  : isDemo
+                    ? 'Conferma'
+                    : 'Firma e vendi'}
             </button>
           )}
         </div>

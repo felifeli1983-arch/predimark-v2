@@ -73,6 +73,7 @@ export function useTradeSubmit(): UseTradeSubmitResult {
         amountUsdc,
         pricePerShare: draft.pricePerShare,
         isDemo,
+        clobTokenIds: draft.clobTokenIds ?? undefined,
       }
 
       let payload: TradeSubmitPayload = basePayload

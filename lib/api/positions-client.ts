@@ -69,13 +69,23 @@ export interface SellTradePayload {
   sharesToSell: number
   currentPrice: number
   isDemo: boolean
+  /** REAL: token id usato nel sell order. */
+  tokenId?: string
+  /** REAL: SignedOrder pre-firmato dal client (Side.SELL). */
+  signedOrder?: Record<string, unknown>
 }
 
 export interface SellTradeResponse {
   tradeId: string
-  newDemoBalance: number
+  /** DEMO only */
+  newDemoBalance?: number
+  /** REAL only */
+  newRealBalance?: number
   pnl: number
   isWin: boolean
+  /** REAL only */
+  polymarketOrderId?: string
+  status?: string
 }
 
 export async function postSellTrade(

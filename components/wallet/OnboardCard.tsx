@@ -165,6 +165,9 @@ export function OnboardCard() {
             <Loader2 size={14} className="animate-spin" />
           )}
         </Row>
+
+        <WrapPusdSection onSuccess={refresh} />
+
         {error && <ErrorBanner message={error} />}
       </Card>
     )
@@ -228,6 +231,116 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
     >
       <span style={{ color: 'var(--color-text-muted)' }}>{label}</span>
       {children}
+    </div>
+  )
+}
+
+function WrapPusdSection({ onSuccess }: { onSuccess: () => void | Promise<void> }) {
+  const { wallets } = useWallets()
+  const [amount, setAmount] = useState('100')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+
+  async function handleWrap() {
+    setError(null)
+    setSuccess(null)
+    setBusy(true)
+    try {
+      const num = Number(amount)
+      if (!Number.isFinite(num) || num <= 0) throw new Error('Importo non valido')
+
+      const embedded = getEmbeddedConnectedWallet(wallets)
+      if (!embedded) throw new Error('Wallet embedded non trovato')
+
+      const provider = await embedded.getEthereumProvider()
+      const walletClient = createWalletClient({
+        account: embedded.address as `0x${string}`,
+        chain: polygon,
+        transport: custom(provider),
+      })
+
+      const { wrapPusdHelper } = await import('@/lib/polymarket/pusd-wrap').then((m) => ({
+        wrapPusdHelper: m.wrapUsdcToPusd,
+      }))
+      const res = await wrapPusdHelper({
+        signer: walletClient,
+        funderAddress: embedded.address as `0x${string}`,
+        amountUsdc: num,
+      })
+      setSuccess(`Wrap completato — tx ${res.wrapTxHash.slice(0, 10)}…`)
+      await onSuccess()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Errore wrap')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div
+      style={{
+        marginTop: 4,
+        paddingTop: 12,
+        borderTop: '1px solid var(--color-border-subtle)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+      }}
+    >
+      <div style={{ fontSize: 11, color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+        Wrap USDC.e → pUSD per tradare REAL. Richiede MATIC per gas (~$0.02). L&apos;approve è una
+        tantum.
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input
+          type="number"
+          min={1}
+          step={1}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          disabled={busy}
+          placeholder="USDC.e da wrappare"
+          style={{
+            flex: 1,
+            padding: '8px 10px',
+            background: 'var(--color-bg-tertiary)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: 6,
+            color: 'var(--color-text-primary)',
+            fontSize: 13,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        />
+        <button
+          type="button"
+          onClick={handleWrap}
+          disabled={busy}
+          style={{
+            ...primaryBtn,
+            padding: '8px 14px',
+            opacity: busy ? 0.6 : 1,
+          }}
+        >
+          {busy ? <Loader2 size={14} className="animate-spin" /> : 'Wrap'}
+        </button>
+      </div>
+      {error && <ErrorBanner message={error} />}
+      {success && (
+        <p
+          style={{
+            margin: 0,
+            padding: '8px 10px',
+            borderRadius: 6,
+            background: 'color-mix(in srgb, var(--color-success) 12%, transparent)',
+            border: '1px solid var(--color-success)',
+            fontSize: 12,
+            color: 'var(--color-success)',
+          }}
+        >
+          {success}
+        </p>
+      )}
     </div>
   )
 }

@@ -156,6 +156,7 @@ function buildDraft(event: AuktoraEvent, market: AuktoraMarket, side: string): T
     pricePerShare: priceAtAdd,
     outcomeLabel,
     tokenId,
+    clobTokenIds: market.clobTokenIds,
   }
 }
 

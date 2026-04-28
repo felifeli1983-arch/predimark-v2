@@ -11,7 +11,9 @@ export interface TradeSubmitPayload {
   amountUsdc: number
   pricePerShare: number
   isDemo: boolean
-  /** REAL: ID del conditional token (clobTokenIds[0] o [1]). */
+  /** Token IDs del market (necessario per persistere in markets table). */
+  clobTokenIds?: [string, string]
+  /** REAL: ID del conditional token specifico (clobTokenIds[0] o [1] per side). */
   tokenId?: string
   /** REAL: SignedOrder serializzato (post createOrder via SDK). */
   signedOrder?: Record<string, unknown>

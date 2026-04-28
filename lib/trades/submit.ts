@@ -37,7 +37,10 @@ export async function submitDemoTrade(
   userId: string,
   body: SubmitTradeBody
 ): Promise<SubmitTradeResult | SubmitTradeError> {
-  const marketResult = await resolveOrUpsertMarket(supabase, body)
+  const marketResult = await resolveOrUpsertMarket(supabase, {
+    ...body,
+    clobTokenIds: body.clobTokenIds,
+  })
   if ('error' in marketResult) {
     console.error('[trade/submit] markets', marketResult.error)
     return { code: 'MARKET_UPSERT_FAILED', message: 'Errore sync mercato', status: 500 }

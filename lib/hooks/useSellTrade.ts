@@ -43,7 +43,12 @@ export function useSellTrade(): UseSellTradeResult {
         const res = await postSellTrade(token, payload)
         setResult(res)
         setStatus('success')
-        if (payload.isDemo) balanceActions.setDemoBalance(res.newDemoBalance)
+        if (payload.isDemo && typeof res.newDemoBalance === 'number') {
+          balanceActions.setDemoBalance(res.newDemoBalance)
+        }
+        if (!payload.isDemo && typeof res.newRealBalance === 'number') {
+          balanceActions.setUsdcBalance(res.newRealBalance)
+        }
         return res
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Errore sconosciuto')

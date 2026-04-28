@@ -10,6 +10,8 @@ export interface MarketUpsertPayload {
   category: string
   image?: string
   currentYesPrice?: number
+  /** [yesTokenId, noTokenId] — Polymarket conditional token IDs. */
+  clobTokenIds?: [string, string] | null
 }
 
 /**
@@ -31,6 +33,7 @@ export async function resolveOrUpsertMarket(
     category: payload.category,
     image_url: payload.image ?? null,
     current_yes_price: payload.currentYesPrice ?? null,
+    clob_token_ids: payload.clobTokenIds ?? null,
     last_synced_at: new Date().toISOString(),
   }
 

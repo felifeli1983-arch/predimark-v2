@@ -15,7 +15,9 @@ export interface SubmitTradeBody {
   amountUsdc: number
   pricePerShare: number
   isDemo: boolean
-  /** REAL: ID del conditional token (clobTokenIds[0] o [1]). */
+  /** Token IDs del market — persistiti in markets.clob_token_ids per sell REAL. */
+  clobTokenIds?: [string, string]
+  /** REAL: ID del conditional token specifico (clobTokenIds[0] o [1] per side). */
   tokenId?: string
   /** REAL: order signed lato client via Privy. */
   signedOrder?: SignedOrderJson

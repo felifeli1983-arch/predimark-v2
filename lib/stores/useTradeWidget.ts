@@ -19,6 +19,12 @@ export interface TradeDraft {
    * Per binary: clobTokenIds[0]=YES, [1]=NO. Necessario per REAL submit.
    */
   tokenId: string | null
+  /**
+   * Coppia completa [yesTokenId, noTokenId] del market — persistiti in DB
+   * per supportare sell REAL (che ha bisogno del tokenId del side della
+   * posizione, anche se diverso dal side aperto).
+   */
+  clobTokenIds: [string, string] | null
 }
 
 export type TradeMode = 'market' | 'limit'

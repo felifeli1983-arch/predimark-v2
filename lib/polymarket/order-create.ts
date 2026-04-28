@@ -16,7 +16,7 @@ export interface BuildOrderInput {
   funderAddress: string
   /** ERC-1155 conditional token id (Polymarket clobTokenIds[0] or [1] per outcome). */
   tokenId: string
-  /** Compra Sì → BUY, Compra No → ... in Polymarket il NO si mappa a BUY del token NO. */
+  /** Per buy: 'yes'/'no'/etc. Solo informativo. */
   side: 'yes' | 'no' | string
   /** Prezzo cents come decimal (es. 0.27 per 27¢). */
   pricePerShare: number
@@ -28,8 +28,21 @@ export interface BuildOrderInput {
   negRisk?: boolean
 }
 
+export interface BuildSellOrderInput {
+  signer: WalletClient
+  funderAddress: string
+  /** Token id che si sta vendendo. */
+  tokenId: string
+  /** Prezzo a cui si vende (decimal 0-1). */
+  pricePerShare: number
+  /** Quante shares si stanno vendendo. */
+  sharesToSell: number
+  tickSize?: TickSize
+  negRisk?: boolean
+}
+
 /**
- * Build + sign an order V2 client-side via Privy embedded wallet.
+ * Build + sign un BUY order V2 client-side via Privy embedded wallet.
  * Il SignedOrder ritornato va poi inviato al server per il post a CLOB
  * (server ha le L2 API creds dell'utente).
  */
@@ -47,7 +60,49 @@ export async function buildAndSignOrder(input: BuildOrderInput): Promise<SignedO
     tokenID: input.tokenId,
     price: input.pricePerShare,
     size,
-    side: Side.BUY, // Both 'yes' e 'no' su Polymarket sono BUY del token corrispondente
+    side: Side.BUY,
+    builderCode: BUILDER_CODE,
+  }
+
+  const options: CreateOrderOptions = { tickSize, negRisk }
+
+  const client = new ClobClient({
+    host: CLOB_URL,
+    chain: Chain.POLYGON,
+    signer: input.signer,
+    funderAddress: input.funderAddress,
+    throwOnError: true,
+  })
+
+  return await client.createOrder(userOrder, options)
+}
+
+/**
+ * Build + sign un SELL order V2 (chiusura posizione esistente).
+ *
+ * Polymarket V2: per chiudere una posizione si crea un SELL order sullo
+ * stesso tokenID del side che si possiede, dimensionato sulle shares da
+ * vendere. Il post va al CLOB con stesso flow del buy.
+ */
+export async function buildAndSignSellOrder(input: BuildSellOrderInput): Promise<SignedOrder> {
+  const tickSize: TickSize = input.tickSize ?? '0.01'
+  const negRisk = input.negRisk ?? false
+
+  if (
+    !Number.isFinite(input.sharesToSell) ||
+    input.sharesToSell <= 0 ||
+    !Number.isFinite(input.pricePerShare) ||
+    input.pricePerShare <= 0 ||
+    input.pricePerShare >= 1
+  ) {
+    throw new Error('sharesToSell o pricePerShare non validi')
+  }
+
+  const userOrder: UserOrderV2 = {
+    tokenID: input.tokenId,
+    price: input.pricePerShare,
+    size: input.sharesToSell,
+    side: Side.SELL,
     builderCode: BUILDER_CODE,
   }
 

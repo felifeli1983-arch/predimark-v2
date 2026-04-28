@@ -21,6 +21,8 @@ export interface PositionItem {
   isOpen: boolean
   openedAt: string | null
   closedAt: string | null
+  /** Token id specifico del side della posizione (per sell REAL via CLOB). */
+  tokenId: string | null
 }
 
 interface ListOptions {
@@ -43,7 +45,7 @@ export async function listUserPositions(
         id, market_id, side, shares, avg_price, total_cost,
         current_price, current_value, unrealized_pnl, unrealized_pnl_pct,
         is_demo, is_open, opened_at, closed_at,
-        markets ( id, polymarket_market_id, slug, title, image_url, category )
+        markets ( id, polymarket_market_id, slug, title, image_url, category, clob_token_ids )
       `,
       { count: 'exact' }
     )
@@ -61,27 +63,38 @@ export async function listUserPositions(
   const { data, error, count } = await query
   if (error) return { error: error.message }
 
-  const items = (data ?? []).map((row) => ({
-    id: row.id,
-    marketId: row.market_id,
-    polymarketMarketId: row.markets?.polymarket_market_id ?? '',
-    slug: row.markets?.slug ?? null,
-    title: row.markets?.title ?? '',
-    image: row.markets?.image_url ?? null,
-    category: row.markets?.category ?? null,
-    side: row.side,
-    shares: Number(row.shares),
-    avgPrice: Number(row.avg_price),
-    totalCost: Number(row.total_cost),
-    currentPrice: row.current_price !== null ? Number(row.current_price) : null,
-    currentValue: row.current_value !== null ? Number(row.current_value) : null,
-    unrealizedPnl: row.unrealized_pnl !== null ? Number(row.unrealized_pnl) : null,
-    unrealizedPnlPct: row.unrealized_pnl_pct !== null ? Number(row.unrealized_pnl_pct) : null,
-    isDemo: row.is_demo,
-    isOpen: row.is_open ?? false,
-    openedAt: row.opened_at,
-    closedAt: row.closed_at,
-  }))
+  const items = (data ?? []).map((row) => {
+    const tokenIds = (row.markets?.clob_token_ids ?? null) as [string, string] | null
+    const sideLower = row.side.toLowerCase()
+    const tokenId =
+      tokenIds && (sideLower === 'yes' || sideLower === 'up')
+        ? tokenIds[0]
+        : tokenIds && (sideLower === 'no' || sideLower === 'down')
+          ? tokenIds[1]
+          : (tokenIds?.[0] ?? null)
+    return {
+      id: row.id,
+      marketId: row.market_id,
+      polymarketMarketId: row.markets?.polymarket_market_id ?? '',
+      slug: row.markets?.slug ?? null,
+      title: row.markets?.title ?? '',
+      image: row.markets?.image_url ?? null,
+      category: row.markets?.category ?? null,
+      side: row.side,
+      shares: Number(row.shares),
+      avgPrice: Number(row.avg_price),
+      totalCost: Number(row.total_cost),
+      currentPrice: row.current_price !== null ? Number(row.current_price) : null,
+      currentValue: row.current_value !== null ? Number(row.current_value) : null,
+      unrealizedPnl: row.unrealized_pnl !== null ? Number(row.unrealized_pnl) : null,
+      unrealizedPnlPct: row.unrealized_pnl_pct !== null ? Number(row.unrealized_pnl_pct) : null,
+      isDemo: row.is_demo,
+      isOpen: row.is_open ?? false,
+      openedAt: row.opened_at,
+      closedAt: row.closed_at,
+      tokenId,
+    }
+  })
 
   return { items, total: count ?? items.length }
 }

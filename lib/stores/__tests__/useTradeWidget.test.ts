@@ -12,6 +12,7 @@ const mockDraft: TradeDraft = {
   pricePerShare: 0.36,
   outcomeLabel: 'Finland',
   tokenId: null,
+  clobTokenIds: null,
 }
 
 describe('useTradeWidget store', () => {
