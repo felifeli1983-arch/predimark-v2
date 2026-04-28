@@ -37,7 +37,8 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
         aria-expanded={expanded}
         style={{
           width: '100%',
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr) auto',
           alignItems: 'center',
           gap: 14,
           padding: '12px 16px',
@@ -48,13 +49,15 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           textAlign: 'left',
         }}
       >
+        {/* Col 1: label + volume (sinistra) */}
         <span
           style={{
-            flex: 1,
             minWidth: 0,
             display: 'flex',
             flexDirection: 'column',
             gap: 2,
+            justifySelf: 'start',
+            width: '100%',
           }}
         >
           <span
@@ -76,22 +79,23 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           </span>
         </span>
 
+        {/* Col 2: percentuale (centro vero) */}
         <span
           style={{
-            minWidth: 90,
             fontSize: 32,
             fontWeight: 700,
             color: 'var(--color-text-primary)',
             fontVariantNumeric: 'tabular-nums',
             textAlign: 'center',
-            flexShrink: 0,
             lineHeight: 1,
+            justifySelf: 'center',
           }}
         >
           {pct}%
         </span>
 
-        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+        {/* Col 3: buttons Sì/No (destra del centro) */}
+        <div style={{ display: 'flex', gap: 8, justifySelf: 'end' }}>
           <SideBtn
             label={`Sì ${yesCents}¢`}
             variant="yes"
@@ -110,13 +114,14 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           />
         </div>
 
+        {/* Col 4: chevron expand */}
         <ChevronDown
           size={16}
           style={{
             color: 'var(--color-text-muted)',
             transform: expanded ? 'rotate(180deg)' : 'none',
             transition: 'transform 150ms',
-            flexShrink: 0,
+            justifySelf: 'end',
           }}
         />
       </button>
