@@ -2,7 +2,38 @@
 
 > Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
 > Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
-> Ultimo update: 2026-04-28 (notte) — MA4.4 + MA4.6 chiusi + Design Tokens
+> Ultimo update: 2026-04-29 — Privy dashboard verificato live + Doc 14 + 2 sprint plan + audit pre-MA4.7
+
+---
+
+## Stato corrente (2026-04-29 sera)
+
+**Allineamento + planning produced oggi (no codice toccato)**:
+
+- **Privy dashboard configurato e verificato live**: Funding > Settings = Polygon + USDC + amount $100; Methods = MoonPay enabled (Coinbase Onramp skipped — manca config keys); Deposit button funziona — modal mostra 3 path (Pay with card MoonPay / Transfer from wallet / Receive funds 100 USDC QR). Bug fix `ebd29e5` applicato in MA4.6 (error banner + diagnostic logs).
+- **Doc 14 — Monetization Strategy** creato: builder code 0.01% trade normali, builder code 1% copy trades (admin-configurable), split 30% Creator opt-in / 70% Auktora, External Traders no opt-in con 100% fee → Auktora, Auktora Pro €9.99/mese gated da Signal AI track record (>55% win rate dopo 6+ mesi)
+- **PROMPT-SPRINT-MA4.7.md** creato: Polymarket Account Import (Privy external wallet + `clobClient.deriveApiKey()` + welcome banner). UX wording obbligatorio "Collega il tuo account Polymarket". Effort revisionato 2-3h (Privy `loginMethods: ['email', 'wallet']` già esistente al 70%)
+- **PROMPT-SPRINT-MA6.md** creato + ESTESO con audit DB schema reale: `creators`/`creator_payouts`/`follows`/`copy_trading_sessions`/`external_traders` tutti già esistenti — solo ALTER mirate (fee_share_override_bps, slippage_cap_bps, copy_active) + 2 tabelle nuove (`app_settings`, `copy_trades`)
+- **Doc 04 wireframe admin** esteso: sezione `/admin/fees` ora include per-Creator override + External Traders 0% (read-only)
+- **Audit pre-MA4.7**: 39 tabelle production già RLS-attive, 22 migrations applicate, ENV completo (Polymarket V2 + Privy + builder/relayer keys), CLOB V2 integration shipped (auth, clob, contracts, geoblock, order-create, order-post, pusd-wrap, pusd-unwrap, queries, types, mappers)
+
+**Decisioni strategiche di oggi**:
+
+- **External Traders strategy** (NEW): copy trading anche senza opt-in via tabella `external_traders` (esiste già). Su questi trade 100% fee va ad Auktora. Doppia inventory copy-tradabile day 1 senza aspettare Creator opt-in
+- **MA4.7 inserito prima di MA5**: utenti Polymarket esistenti = acquisition multiplier critico, prerequisito per Creator program
+- **Markets home = LIVE da Gamma API** (non mock): `fetchFeaturedEvents(40)` da `https://gamma-api.polymarket.com/events`, cache 30s. Tabella `markets` Supabase locale solo per features locali (watchlist, trades, featured admin override). Decisione: nessuna modifica per ora, da rivalutare post-MA8
+- **Fee Creator % è admin-configurable** runtime via `/admin/fees` + `app_settings` table (NO hardcode)
+
+**Memorie persistite oggi**:
+
+- `project_polymarket_account_import.md` — MA4.7 + UX wording obbligatorio
+- `project_copy_trading_monetization.md` — fee 1% / 30/70 split / Layer 1-2-3
+- `project_external_traders_strategy.md` — External Traders senza opt-in, 100% fee Auktora
+- `reference_markets_live_gamma.md` — markets non sono mock, live Gamma
+
+**Live URLs**: `https://auktora.com` / `https://predimark-v2.vercel.app`
+
+**Blockers**: nessuno. Pronti a iniziare MA4.7 implementazione (effort 2-3h).
 
 ---
 

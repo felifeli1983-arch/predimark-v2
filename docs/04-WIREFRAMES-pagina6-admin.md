@@ -604,9 +604,17 @@ Service fee on profits (External Trader copy trading):
 [1.0%]  (range 0% - 5%)
 Helper: Fee aggiuntiva su profitti realizzati da copy di trader esterni.
 
-Creator revenue share:
+Creator revenue share (DEFAULT globale):
 [30%]  (range 0% - 50%)
-Helper: % della builder fee che va al Verified Creator copiato.
+Helper: % della builder fee che va al Verified Creator copiato. Default applicato se Creator non ha override personalizzato.
+
+Per-Creator override (super-admin only):
+[Manage individual Creator overrides →]  (apre `/admin/creators/[id]` con campo `fee_share_override_bps`)
+Helper: alcuni Creator strategici possono ricevere % diverso (es. partnership, top performer bonus). NULL = usa default globale.
+
+External Traders revenue share:
+[0%]  (read-only, fixed)
+Helper: External Traders (no opt-in Auktora) NON ricevono fee — il 100% va ad Auktora. Per modificare lo split su External Traders, contattare team product (cambio strategico, non runtime).
 
 Referral revenue share:
 [20%]  (range 0% - 30%)
