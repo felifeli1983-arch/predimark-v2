@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Star, Activity, History } from 'lucide-react'
+import { Star, Activity, History, Wallet } from 'lucide-react'
 
 const TABS = [
   { href: '/me/watchlist', icon: Star, label: 'Watchlist' },
   { href: '/me/positions', icon: Activity, label: 'Posizioni' },
   { href: '/me/history', icon: History, label: 'Storico' },
+  { href: '/me/wallet', icon: Wallet, label: 'Wallet' },
 ] as const
 
 /**

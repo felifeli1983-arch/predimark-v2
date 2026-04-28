@@ -1,16 +1,10 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: '14.5'
   }
   public: {
     Tables: {
@@ -38,18 +32,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "ab_test_assignments_test_id_fkey"
-            columns: ["test_id"]
+            foreignKeyName: 'ab_test_assignments_test_id_fkey'
+            columns: ['test_id']
             isOneToOne: false
-            referencedRelation: "ab_tests"
-            referencedColumns: ["id"]
+            referencedRelation: 'ab_tests'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "ab_test_assignments_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'ab_test_assignments_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -101,11 +95,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "ab_tests_created_by_fkey"
-            columns: ["created_by"]
+            foreignKeyName: 'ab_tests_created_by_fkey'
+            columns: ['created_by']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -187,18 +181,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "admin_users_added_by_fkey"
-            columns: ["added_by"]
+            foreignKeyName: 'admin_users_added_by_fkey'
+            columns: ['added_by']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "admin_users_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'admin_users_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -244,11 +238,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "audit_log_actor_user_id_fkey"
-            columns: ["actor_user_id"]
+            foreignKeyName: 'audit_log_actor_user_id_fkey'
+            columns: ['actor_user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -843,11 +837,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "balances_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'balances_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -926,25 +920,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "copy_trading_sessions_target_creator_id_fkey"
-            columns: ["target_creator_id"]
+            foreignKeyName: 'copy_trading_sessions_target_creator_id_fkey'
+            columns: ['target_creator_id']
             isOneToOne: false
-            referencedRelation: "creators"
-            referencedColumns: ["id"]
+            referencedRelation: 'creators'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "copy_trading_sessions_target_external_id_fkey"
-            columns: ["target_external_id"]
+            foreignKeyName: 'copy_trading_sessions_target_external_id_fkey'
+            columns: ['target_external_id']
             isOneToOne: false
-            referencedRelation: "external_traders"
-            referencedColumns: ["id"]
+            referencedRelation: 'external_traders'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "copy_trading_sessions_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'copy_trading_sessions_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -999,11 +993,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "creator_payouts_creator_id_fkey"
-            columns: ["creator_id"]
+            foreignKeyName: 'creator_payouts_creator_id_fkey'
+            columns: ['creator_id']
             isOneToOne: false
-            referencedRelation: "creators"
-            referencedColumns: ["id"]
+            referencedRelation: 'creators'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1097,18 +1091,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "creators_reviewed_by_fkey"
-            columns: ["reviewed_by"]
+            foreignKeyName: 'creators_reviewed_by_fkey'
+            columns: ['reviewed_by']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "creators_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'creators_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1139,11 +1133,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "equity_curve_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'equity_curve_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1243,18 +1237,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "feature_flags_created_by_fkey"
-            columns: ["created_by"]
+            foreignKeyName: 'feature_flags_created_by_fkey'
+            columns: ['created_by']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "feature_flags_updated_by_fkey"
-            columns: ["updated_by"]
+            foreignKeyName: 'feature_flags_updated_by_fkey'
+            columns: ['updated_by']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1294,25 +1288,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "follows_followed_creator_id_fkey"
-            columns: ["followed_creator_id"]
+            foreignKeyName: 'follows_followed_creator_id_fkey'
+            columns: ['followed_creator_id']
             isOneToOne: false
-            referencedRelation: "creators"
-            referencedColumns: ["id"]
+            referencedRelation: 'creators'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "follows_followed_external_id_fkey"
-            columns: ["followed_external_id"]
+            foreignKeyName: 'follows_followed_external_id_fkey'
+            columns: ['followed_external_id']
             isOneToOne: false
-            referencedRelation: "external_traders"
-            referencedColumns: ["id"]
+            referencedRelation: 'external_traders'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "follows_follower_user_id_fkey"
-            columns: ["follower_user_id"]
+            foreignKeyName: 'follows_follower_user_id_fkey'
+            columns: ['follower_user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1355,18 +1349,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "geo_blocks_created_by_fkey"
-            columns: ["created_by"]
+            foreignKeyName: 'geo_blocks_created_by_fkey'
+            columns: ['created_by']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "geo_blocks_updated_by_fkey"
-            columns: ["updated_by"]
+            foreignKeyName: 'geo_blocks_updated_by_fkey'
+            columns: ['updated_by']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1424,18 +1418,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "kyc_submissions_reviewed_by_fkey"
-            columns: ["reviewed_by"]
+            foreignKeyName: 'kyc_submissions_reviewed_by_fkey'
+            columns: ['reviewed_by']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "kyc_submissions_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'kyc_submissions_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1487,32 +1481,32 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "market_comments_internal_hidden_by_fkey"
-            columns: ["hidden_by"]
+            foreignKeyName: 'market_comments_internal_hidden_by_fkey'
+            columns: ['hidden_by']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "market_comments_internal_market_id_fkey"
-            columns: ["market_id"]
+            foreignKeyName: 'market_comments_internal_market_id_fkey'
+            columns: ['market_id']
             isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
+            referencedRelation: 'markets'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "market_comments_internal_parent_comment_id_fkey"
-            columns: ["parent_comment_id"]
+            foreignKeyName: 'market_comments_internal_parent_comment_id_fkey'
+            columns: ['parent_comment_id']
             isOneToOne: false
-            referencedRelation: "market_comments_internal"
-            referencedColumns: ["id"]
+            referencedRelation: 'market_comments_internal'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "market_comments_internal_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'market_comments_internal_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1669,39 +1663,39 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "notifications_related_creator_id_fkey"
-            columns: ["related_creator_id"]
+            foreignKeyName: 'notifications_related_creator_id_fkey'
+            columns: ['related_creator_id']
             isOneToOne: false
-            referencedRelation: "creators"
-            referencedColumns: ["id"]
+            referencedRelation: 'creators'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "notifications_related_market_id_fkey"
-            columns: ["related_market_id"]
+            foreignKeyName: 'notifications_related_market_id_fkey'
+            columns: ['related_market_id']
             isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
+            referencedRelation: 'markets'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "notifications_related_signal_id_fkey"
-            columns: ["related_signal_id"]
+            foreignKeyName: 'notifications_related_signal_id_fkey'
+            columns: ['related_signal_id']
             isOneToOne: false
-            referencedRelation: "signals"
-            referencedColumns: ["id"]
+            referencedRelation: 'signals'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "notifications_related_trade_id_fkey"
-            columns: ["related_trade_id"]
+            foreignKeyName: 'notifications_related_trade_id_fkey'
+            columns: ['related_trade_id']
             isOneToOne: false
-            referencedRelation: "trades"
-            referencedColumns: ["id"]
+            referencedRelation: 'trades'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "notifications_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'notifications_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1762,18 +1756,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "positions_market_id_fkey"
-            columns: ["market_id"]
+            foreignKeyName: 'positions_market_id_fkey'
+            columns: ['market_id']
             isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
+            referencedRelation: 'markets'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "positions_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'positions_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1801,11 +1795,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "price_history_market_id_fkey"
-            columns: ["market_id"]
+            foreignKeyName: 'price_history_market_id_fkey'
+            columns: ['market_id']
             isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
+            referencedRelation: 'markets'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1851,18 +1845,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "referrals_referred_user_id_fkey"
-            columns: ["referred_user_id"]
+            foreignKeyName: 'referrals_referred_user_id_fkey'
+            columns: ['referred_user_id']
             isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "referrals_referrer_user_id_fkey"
-            columns: ["referrer_user_id"]
+            foreignKeyName: 'referrals_referrer_user_id_fkey'
+            columns: ['referrer_user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -1923,11 +1917,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "signals_market_id_fkey"
-            columns: ["market_id"]
+            foreignKeyName: 'signals_market_id_fkey'
+            columns: ['market_id']
             isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
+            referencedRelation: 'markets'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -2003,39 +1997,39 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "trades_copied_from_creator_id_fkey"
-            columns: ["copied_from_creator_id"]
+            foreignKeyName: 'trades_copied_from_creator_id_fkey'
+            columns: ['copied_from_creator_id']
             isOneToOne: false
-            referencedRelation: "creators"
-            referencedColumns: ["id"]
+            referencedRelation: 'creators'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "trades_copied_from_external_id_fkey"
-            columns: ["copied_from_external_id"]
+            foreignKeyName: 'trades_copied_from_external_id_fkey'
+            columns: ['copied_from_external_id']
             isOneToOne: false
-            referencedRelation: "external_traders"
-            referencedColumns: ["id"]
+            referencedRelation: 'external_traders'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "trades_market_id_fkey"
-            columns: ["market_id"]
+            foreignKeyName: 'trades_market_id_fkey'
+            columns: ['market_id']
             isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
+            referencedRelation: 'markets'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "trades_position_id_fkey"
-            columns: ["position_id"]
+            foreignKeyName: 'trades_position_id_fkey'
+            columns: ['position_id']
             isOneToOne: false
-            referencedRelation: "positions"
-            referencedColumns: ["id"]
+            referencedRelation: 'positions'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "trades_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'trades_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -2060,18 +2054,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "user_achievements_achievement_id_fkey"
-            columns: ["achievement_id"]
+            foreignKeyName: 'user_achievements_achievement_id_fkey'
+            columns: ['achievement_id']
             isOneToOne: false
-            referencedRelation: "achievements"
-            referencedColumns: ["id"]
+            referencedRelation: 'achievements'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "user_achievements_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'user_achievements_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -2138,11 +2132,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "user_preferences_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'user_preferences_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -2165,6 +2159,11 @@ export type Database = {
           onboarding_completed: boolean | null
           phone: string | null
           phone_verified: boolean | null
+          polymarket_api_key: string | null
+          polymarket_api_passphrase: string | null
+          polymarket_api_secret: string | null
+          polymarket_funder_address: string | null
+          polymarket_onboarded_at: string | null
           privy_did: string | null
           suspended_at: string | null
           suspended_reason: string | null
@@ -2191,6 +2190,11 @@ export type Database = {
           onboarding_completed?: boolean | null
           phone?: string | null
           phone_verified?: boolean | null
+          polymarket_api_key?: string | null
+          polymarket_api_passphrase?: string | null
+          polymarket_api_secret?: string | null
+          polymarket_funder_address?: string | null
+          polymarket_onboarded_at?: string | null
           privy_did?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
@@ -2217,6 +2221,11 @@ export type Database = {
           onboarding_completed?: boolean | null
           phone?: string | null
           phone_verified?: boolean | null
+          polymarket_api_key?: string | null
+          polymarket_api_passphrase?: string | null
+          polymarket_api_secret?: string | null
+          polymarket_funder_address?: string | null
+          polymarket_onboarded_at?: string | null
           privy_did?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
@@ -2257,18 +2266,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "watchlist_market_id_fkey"
-            columns: ["market_id"]
+            foreignKeyName: 'watchlist_market_id_fkey'
+            columns: ['market_id']
             isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
+            referencedRelation: 'markets'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "watchlist_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'watchlist_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -2299,8 +2308,8 @@ export type Database = {
           user_id: string
         }[]
         SetofOptions: {
-          from: "*"
-          to: "positions"
+          from: '*'
+          to: 'positions'
           isOneToOne: false
           isSetofReturn: true
         }
@@ -2315,33 +2324,31 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -2350,23 +2357,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
+    | keyof DefaultSchema['Tables']
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -2375,23 +2382,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
+    | keyof DefaultSchema['Tables']
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -2400,36 +2407,36 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
+    | keyof DefaultSchema['Enums']
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
+    | keyof DefaultSchema['CompositeTypes']
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
