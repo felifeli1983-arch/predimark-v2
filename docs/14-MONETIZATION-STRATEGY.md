@@ -77,12 +77,6 @@ buildAndSignOrder({
 - API code Auktora: `019db1bc-...` (vedi env)
 - **Builder profile KYC**: prerequisito per Y2 — bloccante che Feliciano deve eseguire manualmente su polymarket.com/settings (vedi blockers HANDOFF)
 
-### Caveat
-
-- Polymarket può modificare unilateralmente la builder fee policy → tenere monitorato changelog Polymarket
-- Builder code Auktora: `0xc520127a2cf8777bd6f063c252f42aeb04fbaebcace2382b06fbecae0db92475`
-- API code Auktora: `019db1bc-...` (vedi env)
-
 ---
 
 ## 2. Copy trading fee — Creator Program (MA6)
