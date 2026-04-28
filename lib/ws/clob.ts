@@ -4,6 +4,11 @@
  * Endpoint: wss://ws-subscriptions-clob.polymarket.com/ws/market
  * Topic: `book` (orderbook) | `price_change` (last trade) | `last_trade_price`
  *
+ * V2 compatibility: per docs Polymarket "WebSocket URLs are unchanged. Most
+ * message payloads are unchanged." → questo wrapper è valido sia V1 che V2.
+ * L'unico campo che cambia semantica in V2 è `fee_rate_bps` su last_trade_price
+ * (ora riflette la fee effettiva applicata al trade) — non lo usiamo ancora.
+ *
  * Read-only: nessuna firma necessaria per dati pubblici.
  */
 
