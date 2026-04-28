@@ -20,33 +20,62 @@ Tre pilastri di revenue, in ordine di priorità di rollout:
 
 ## 1. Builder code Polymarket — baseline revenue
 
-### Tariffa
+### Strategia 2-fase (allineata HANDOFF 2026-04-28)
 
-- **Trade normali (utente trade da solo)**: builder fee **0.01%** (default Polymarket)
-- **Trade copy trading**: builder fee **1%** (cap soft, sotto threshold Polymarket flag)
+**Y1 (acquisition phase, ~prime 12 mesi)**: builder fee = **0 bps** (zero) sui trade normali. Strategia: matchare Betmoar zero-fee per attrarre utenti senza barriera psicologica. La revenue arriva esclusivamente dal copy trading 1% (vedi sezione 2).
+
+**Y2 (post-KYC builder profile, ~mese 12+)**: builder fee = **30 bps** (0.3%) sui trade normali, attivata solo dopo:
+
+- KYC builder profile completato manualmente su `polymarket.com/settings` (1-time setup utente, vedi blockers HANDOFF)
+- Validation che il prodotto è preferito da utenti per feature uniche (signal AI + copy trading + community), NON per fee zero
+
+### Tariffe finali
+
+- **Trade normali Y1**: builder fee **0 bps** (zero)
+- **Trade normali Y2**: builder fee **30 bps** (0.3%)
+- **Trade copy trading**: builder fee **100 bps** (1%) sempre (sia Y1 che Y2)
 
 ### Implementazione
 
-Configurato in `lib/polymarket/order-create.ts` quando si firma l'ordine EIP-712:
+Configurato in `lib/polymarket/order-create.ts` quando si firma l'ordine EIP-712. Letto runtime da `app_settings`:
 
 ```typescript
 buildAndSignOrder({
   // ...
   builderCode: AUKTORA_BUILDER_CODE, // 0xc520...e0db92475
-  builderFeeBps: isCopyTrade ? 100 : 1, // 1% vs 0.01%
+  builderFeeBps: isCopyTrade ? 100 : await getAppSetting('builder_fee_default_bps'), // 100 vs 0/30
 })
 ```
 
+`app_settings.builder_fee_default_bps`:
+
+- Y1: `0`
+- Y2: `30` (admin lo cambia post-KYC)
+
 ### Revenue stimato
 
-| Stadio                  | Volume mensile | Builder fee 0.01% (trade normali) |
-| ----------------------- | -------------- | --------------------------------- |
-| MVP (100 utenti attivi) | $50k           | $5/mese                           |
-| Crescita (1.000 utenti) | $500k          | $50/mese                          |
-| Scale (10.000 utenti)   | $5M            | $500/mese                         |
-| Mass (100k utenti)      | $50M           | $5.000/mese                       |
+#### Y1 — solo copy trading + nessuna fee su trade normali
 
-Il builder code 0.01% è **trascurabile** in termini assoluti — copre solo i costi infra. La vera revenue arriva da copy trading.
+| Stadio                  | Volume normali | Volume copy | Revenue (solo copy 1%) |
+| ----------------------- | -------------- | ----------- | ---------------------- |
+| MVP (100 utenti)        | $50k           | $0          | $0                     |
+| Crescita (1.000 utenti) | $500k          | $20k        | $200/mese              |
+| Scale (10.000 utenti)   | $5M            | $1M         | $7-10k/mese (split)    |
+| Mass (100k utenti)      | $50M           | $10M        | $70-100k/mese (split)  |
+
+#### Y2 — fee 30 bps su trade normali ATTIVA
+
+| Stadio             | Volume normali | Builder fee 0.3% | Volume copy | Revenue copy (split) | Revenue totale Auktora |
+| ------------------ | -------------- | ---------------- | ----------- | -------------------- | ---------------------- |
+| Mass (100k utenti) | $50M           | $150k/mese       | $10M        | ~$70k/mese           | **$220k/mese**         |
+
+### Caveat
+
+- **Y1 acquisition strategy**: 0 bps è scelta strategica (matching Betmoar) — NON limitazione tecnica. Possibile invertire a 30 bps dal giorno 1 se il traffic non risponde alla "zero fee" come differenziatore
+- Polymarket può modificare unilateralmente la builder fee policy → tenere monitorato changelog Polymarket
+- Builder code Auktora: `0xc520127a2cf8777bd6f063c252f42aeb04fbaebcace2382b06fbecae0db92475`
+- API code Auktora: `019db1bc-...` (vedi env)
+- **Builder profile KYC**: prerequisito per Y2 — bloccante che Feliciano deve eseguire manualmente su polymarket.com/settings (vedi blockers HANDOFF)
 
 ### Caveat
 

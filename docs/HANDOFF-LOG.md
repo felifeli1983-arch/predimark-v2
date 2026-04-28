@@ -23,6 +23,13 @@
 - **MA4.7 inserito prima di MA5**: utenti Polymarket esistenti = acquisition multiplier critico, prerequisito per Creator program
 - **Markets home = LIVE da Gamma API** (non mock): `fetchFeaturedEvents(40)` da `https://gamma-api.polymarket.com/events`, cache 30s. Tabella `markets` Supabase locale solo per features locali (watchlist, trades, featured admin override). Decisione: nessuna modifica per ora, da rivalutare post-MA8
 - **Fee Creator % è admin-configurable** runtime via `/admin/fees` + `app_settings` table (NO hardcode)
+- **Builder fee allineato strategia 2-fase**: Y1 = 0 bps trade normali (acquisition matching Betmoar), Y2 = 30 bps post-KYC builder profile. Copy trading sempre 100 bps (1%). Doc 14 sezione 1 aggiornato per riflettere questo (era 0.01% — corretto)
+
+**Blockers attivi**:
+
+- ❗ **Builder profile KYC** su `polymarket.com/settings` — manuale 1-time setup utente. Senza KYC, trade fees Y2 (30 bps) NON vengono incassate. Da fare PRIMA di switch Y1→Y2 (~mese 12 da launch)
+- ⚠️ **Smoke test E2E reale** mai eseguito completo: deposit $5 → wrap pUSD → trade REAL → sell → withdraw. Da eseguire prima del marketing launch pubblico
+- ⚠️ **Geo-block middleware deploy**: `lib/polymarket/geoblock.ts` shipped MA4.4 ma NON verificato se attivo nel middleware Next.js. Da verificare in audit MA4.7
 
 **Memorie persistite oggi**:
 

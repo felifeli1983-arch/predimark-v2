@@ -8,6 +8,18 @@
 > Audience: Cowork (per preparare prompt operativi) + Feliciano (per orientarsi)
 >
 > **Note v2 rispetto a v1.1**: aggiunto dettaglio degli sprint (Parte 8). Le parti 1-7 rimangono identiche a v1.1.
+>
+> **Update v2.1 (2026-04-29)**: roadmap MA4 e MA6 ridefinita post-pivot CLOB V2:
+>
+> - **MA4.4** ✅ chiuso — CLOB V2 SDK + onboard L2 + sell REAL + wrap USDC.e→pUSD + geo-block 33 paesi (vedi HANDOFF-LOG)
+> - **MA4.5** ✅ chiuso — Positions + History + Sell flow DEMO end-to-end
+> - **MA4.6** ✅ chiuso — Funding flow (Deposit Privy useFundWallet + Withdraw 2-step pUSD→USDC.e + MoonPay)
+> - **MA4.7** 📋 NEW (inserito 2026-04-29) — Polymarket Account Import via Privy external wallet + `clobClient.deriveApiKey()`. Effort 2-3h. UX wording obbligatorio "Collega il tuo account Polymarket". Acquisition multiplier per utenti Polymarket esistenti, prerequisito Creator program MA6. Vedi `PROMPT-SPRINT-MA4.7.md`
+> - **MA5** — Signal AI (gratis fino a track record validato >55% win rate, 6+ mesi). NO sub iniziale
+> - **MA6** — Copy trading: Creator opt-in 30/70 split + External Traders no-opt-in 100% Auktora (vedi `PROMPT-SPRINT-MA6.md` + Doc 14 Monetization). Schema DB già pronto al 80% (creators/follows/copy_trading_sessions/external_traders esistenti)
+> - **MA6.1** — Auto-copy con session keys (schema `copy_trading_sessions` già esistente)
+> - **MA7** — Telegram bot @AuktoraBot (vedi Doc 11)
+> - **MA8** — Discord bot + design polish + Auktora Pro €9.99 SE Signal AI valida
 
 ---
 
