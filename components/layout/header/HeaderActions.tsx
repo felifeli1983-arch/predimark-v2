@@ -2,7 +2,7 @@
 
 import { Bell, Gift, Sun, Moon, Wallet, TrendingUp, Star } from 'lucide-react'
 import Link from 'next/link'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useFundWallet, useWallets, getEmbeddedConnectedWallet } from '@privy-io/react-auth'
 import { polygon } from 'viem/chains'
 import type { AuthUser } from '@/lib/hooks/useAuth'
@@ -32,32 +32,47 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
   const accent = isDemo ? 'var(--color-warning)' : 'var(--color-cta)'
 
   // Privy fund wallet (Apple Pay / Google Pay / Card / MoonPay)
-  const { fundWallet } = useFundWallet({
-    onUserExited: () => {
-      // utente ha chiuso la modale Privy senza completare — niente da fare
-    },
-  })
+  const { fundWallet } = useFundWallet()
   const { wallets } = useWallets()
+  const [depositError, setDepositError] = useState<string | null>(null)
 
   async function handleDeposit() {
+    setDepositError(null)
     if (!authenticated) {
       login()
       return
     }
-    const embedded = getEmbeddedConnectedWallet(wallets)
-    if (!embedded) return
+    // Privy useFundWallet supporta sia embedded sia external wallet
+    const embedded = getEmbeddedConnectedWallet(wallets) ?? wallets[0]
+    if (!embedded) {
+      setDepositError('Nessun wallet rilevato — riprova dopo il login')
+      console.error('[deposit] no wallet found', { walletsCount: wallets.length })
+      return
+    }
+    console.info('[deposit] starting fundWallet', { address: embedded.address })
     try {
       await fundWallet({
         address: embedded.address,
         options: {
           chain: polygon,
-          amount: '100', // default suggerito
+          amount: '100',
           asset: 'USDC',
         },
       })
+      console.info('[deposit] fundWallet completed')
       // BalanceHydrator si auto-refreshrà al prossimo poll
     } catch (err) {
-      console.error('[deposit]', err)
+      const msg = err instanceof Error ? err.message : 'Errore deposito'
+      console.error('[deposit] fundWallet error', err)
+      setDepositError(msg)
+      // Fallback: se Privy fundWallet non è configurato nel dashboard,
+      // la chiamata può fallire con messaggio specifico
+      if (
+        msg.toLowerCase().includes('not enabled') ||
+        msg.toLowerCase().includes('not configured')
+      ) {
+        setDepositError('Funding non configurato nel dashboard Privy. Contatta admin.')
+      }
     }
   }
 
@@ -96,26 +111,66 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
       )}
 
       {authenticated && (
-        <button
-          type="button"
-          onClick={handleDeposit}
-          className="hidden md:flex"
+        <div
           style={{
-            flexShrink: 0,
-            background: 'var(--color-cta)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-2) var(--space-3)',
-            fontSize: 'var(--font-sm)',
-            fontWeight: 600,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
+            position: 'relative',
+            display: 'flex',
             alignItems: 'center',
+            flexShrink: 0,
           }}
         >
-          Deposit
-        </button>
+          <button
+            type="button"
+            onClick={handleDeposit}
+            className="hidden md:flex"
+            style={{
+              flexShrink: 0,
+              background: 'var(--color-cta)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-2) var(--space-3)',
+              fontSize: 'var(--font-sm)',
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              alignItems: 'center',
+            }}
+          >
+            Deposit
+          </button>
+          {depositError && (
+            <div
+              role="alert"
+              onClick={() => setDepositError(null)}
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + var(--space-2))',
+                right: 0,
+                minWidth: 280,
+                maxWidth: 360,
+                padding: 'var(--space-3)',
+                background: 'var(--color-bg-elevated)',
+                border: '1px solid var(--color-danger)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--color-danger)',
+                fontSize: 'var(--font-sm)',
+                lineHeight: 1.4,
+                cursor: 'pointer',
+                zIndex: 100,
+                boxShadow: 'var(--shadow-lg)',
+              }}
+            >
+              <strong style={{ display: 'block', marginBottom: 4 }}>
+                Deposito non disponibile
+              </strong>
+              {depositError}
+              <div style={{ marginTop: 6, fontSize: 'var(--font-xs)', opacity: 0.7 }}>
+                (Click per chiudere)
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       <button
