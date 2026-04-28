@@ -1,6 +1,7 @@
 'use client'
 
 import { PrivyProvider as BasePrivyProvider } from '@privy-io/react-auth'
+import { polygon } from 'viem/chains'
 
 interface Props {
   children: React.ReactNode
@@ -18,6 +19,8 @@ export function PrivyProvider({ children }: Props) {
       appId={appId}
       config={{
         loginMethods: ['email', 'wallet'],
+        defaultChain: polygon,
+        supportedChains: [polygon],
         appearance: {
           theme: 'dark',
           accentColor: '#00E5FF',
