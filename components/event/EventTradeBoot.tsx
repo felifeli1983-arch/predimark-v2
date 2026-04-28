@@ -45,15 +45,13 @@ export function EventTradeBoot({ event }: Props) {
       return
     }
 
-    // Caso 2: landing diretto su event page senza query → auto-prefill desktop
-    // con primo market e Yes/Up/primo outcome. Il sheet mobile resta CHIUSO
-    // (l'utente decide quando tradare); su desktop il widget è in sidebar
-    // sempre visibile, quindi vedrà già il draft pre-compilato.
-    const firstMarket = event.markets[0]
-    if (!firstMarket) return
-    const defaultSide = pickDefaultSide(firstMarket)
-    if (!defaultSide) return
-    const draft = buildDraft(event, firstMarket, defaultSide)
+    // Caso 2: landing diretto su event page senza query → auto-prefill desktop.
+    // Itera la lista markets per trovare il primo con prezzo NON degenere
+    // (yesPrice strict in (0,1)). Salta market già risolti / scaduti che
+    // avrebbero yesPrice=0 o =1, dove il trade è impossibile.
+    const pair = findDefaultPair(event.markets)
+    if (!pair) return
+    const draft = buildDraft(event, pair.market, pair.side)
     if (!draft) return
     consumed.current = true
     tradeWidgetActions.setDraft(draft)
@@ -63,7 +61,16 @@ export function EventTradeBoot({ event }: Props) {
   return null
 }
 
-/** Sceglie il side di default per il pre-fill desktop. */
+/** Trova il primo market con almeno un side valido per pre-fill widget. */
+function findDefaultPair(markets: AuktoraMarket[]): { market: AuktoraMarket; side: string } | null {
+  for (const market of markets) {
+    const side = pickDefaultSide(market)
+    if (side) return { market, side }
+  }
+  return null
+}
+
+/** Sceglie il side di default per il pre-fill desktop (prezzo strict in (0,1)). */
 function pickDefaultSide(market: AuktoraMarket): string | null {
   if (market.yesPrice > 0 && market.yesPrice < 1) return 'yes'
   if (market.noPrice > 0 && market.noPrice < 1) return 'no'
