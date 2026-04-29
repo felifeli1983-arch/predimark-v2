@@ -1,8 +1,16 @@
-# PROMPT — Sprint MA4.7 — Polymarket Account Import
+# PROMPT — Sprint MA4.7 ESTESO — Onboarding & Compliance
 
 > **Quando eseguire**: post-MA4.6 (funding flow chiuso) e PRIMA di MA5
-> **Priorità**: ALTA — acquisition multiplier per utenti Polymarket esistenti, prerequisito Creator program MA6
-> **Effort**: **2-3h totali** (revisionato 2026-04-29 dopo audit codice — Privy already supports `loginMethods: ['email', 'wallet']`, configurazione esiste già al 70%)
+> **Priorità**: CRITICA — geo-block compliance + signup UX + Polymarket import + Real/Demo toggle. Audit 2026-04-29 ha rivelato 4 gap critici che vanno chiusi insieme
+> **Effort**: **6-8h totali** in 4 fasi (revisionato 2026-04-29 post-audit, era 2-3h originale)
+>
+> **Scope ESTESO (post-audit)**: il sprint originale era solo Polymarket account import. Audit ha aggiunto 3 fasi che toccano stesso scope (onboarding/UX entry-point):
+>
+> - **Fase 1** — Geoblock middleware deploy (~1h, CRITICAL compliance)
+> - **Fase 2** — Polymarket account import (~2h, originale MA4.7)
+> - **Fase 3** — Signup flow dedicato `/signup/*` (~2h, NEW)
+> - **Fase 4** — Real/Demo toggle UI (~1h, NEW)
+> - QA cross-fase + audit (~1h)
 
 ---
 
@@ -72,7 +80,35 @@ Quando rilevamo creds Polymarket esistenti dopo login external wallet:
 
 ## Fasi sprint
 
-### Phase A — Privy config + custom labels (~30 min)
+### Fase 1 — Geoblock middleware deploy (~1h, CRITICAL compliance)
+
+**Goal**: utenti da paesi bloccati NON possono navigare il sito né accedere alle API trading.
+
+**Problema attuale (audit 2026-04-29)**: `lib/polymarket/geoblock.ts` esiste con 31 BLOCKED_COUNTRIES + 4 CLOSE_ONLY + 4 RESTRICTED_REGIONS. Ma NO file `/middleware.ts` al root → check solo spot a 2 API routes. Utenti da USA possono navigare home + posizioni, sono bloccati solo al submit trade.
+
+- [ ] Creare `middleware.ts` al root del progetto Next.js
+  - Intercept routes: `/`, `/event/*`, `/me/*`, `/api/v1/trades/*`, `/api/v1/polymarket/*`, `/me/deposit`, `/me/withdraw`
+  - Estrarre IP da `x-vercel-ip-country` header (Vercel auto-injects)
+  - Fallback: chiamare Polymarket `/api/geoblock` se header manca
+  - Se BLOCKED → redirect a `/geo-blocked` page
+  - Se CLOSE_ONLY → consenti solo close-position routes (no new trades)
+  - Se RESTRICTED_REGION → check sub-region (Crimea, Donetsk, Luhansk, Ontario)
+- [ ] Creare `app/geo-blocked/page.tsx`:
+  - Layout: hero "Auktora non è disponibile nel tuo paese"
+  - Link a Polymarket per utenti USA (loro hanno KYC bypass)
+  - Logo branded, nessun CTA trade
+- [ ] Logging audit: ogni geo-block loggato in `audit_log` con IP, country, action, route
+- [ ] Test:
+  - Simulare con `curl -H "x-vercel-ip-country: US" auktora.com` → 307 redirect a `/geo-blocked`
+  - Da UAE/IT (allowed) → home accessibile
+  - Da Ontario (CA but restricted region) → close-only mode
+  - Da Crimea (geo-region) → blocked
+
+**Acceptance**: utente USA visitando auktora.com viene redirectato istantaneamente a `/geo-blocked`. Audit log popolato. Tutti i 35 paesi/regioni testati.
+
+### Fase 2 — Polymarket account import (~2h, ORIGINALE MA4.7)
+
+#### Phase 2A — Privy config + custom labels (~30 min)
 
 **Goal**: Privy modal mostra opzione "Collega il tuo account Polymarket" come label dedicata.
 
@@ -103,7 +139,7 @@ embeddedWallets: { ethereum: { createOnLogin: 'users-without-wallets' } }
 
 **Acceptance**: utente con MetaMask installato può fare login via wallet. Branding wording include "account Polymarket" (modal Privy o callout esterno).
 
-### Phase B — Auto-detect Polymarket creds esistenti (~1.5h)
+#### Phase 2B — Auto-detect Polymarket creds esistenti (~1.5h)
 
 **Goal**: dopo login con external wallet, controlliamo se ha già creds Polymarket → carichiamo o creiamo.
 
@@ -132,7 +168,7 @@ embeddedWallets: { ethereum: { createOnLogin: 'users-without-wallets' } }
 
 **Acceptance**: utente con account Polymarket esistente fa login con MetaMask → backend riconosce creds esistenti, le salva, ritorna flag `isExistingPolymarketUser: true`.
 
-### Phase C — Welcome banner + onboarding skip (~1h)
+#### Phase 2C — Welcome banner + onboarding skip (~1h)
 
 **Goal**: utente Polymarket esistente vede banner + skippa step "wrap pUSD" (probabilmente ha già pUSD).
 
@@ -148,7 +184,7 @@ embeddedWallets: { ethereum: { createOnLogin: 'users-without-wallets' } }
 
 **Acceptance**: utente Polymarket esistente vede banner con dati reali (balance + posizioni), può chiuderlo, non riappare al refresh.
 
-### Phase D — Posizioni unified view + testing (~1h)
+#### Phase 2D — Posizioni unified view + testing (~1h)
 
 **Goal**: `/me/positions` mostra correttamente posizioni di wallet esterno (non solo embedded).
 
@@ -163,6 +199,71 @@ embeddedWallets: { ethereum: { createOnLogin: 'users-without-wallets' } }
   - Wallet con creds malformate (improbabile ma possibile) → fallback a "ricrea creds" con conferma utente
 
 **Acceptance**: utente Polymarket esistente trade su Auktora con il proprio wallet, vede le sue posizioni reali, può vendere senza problemi.
+
+### Fase 3 — Signup flow dedicato (~2h, NEW post-audit)
+
+**Goal**: dropare la modal Privy inline nel Header, sostituire con flow dedicato `/signup` 3-step.
+
+**Problema attuale (audit 2026-04-29)**: Doc 04-7 specifica 3-phase flow `/signup` → `/signup/welcome` → `/signup/choose-mode`. Solo `/test-signup` (test page) implementato. Privy modal inline nel Header → friction acquisition + nessun onboarding.
+
+- [ ] `app/(auth)/signup/page.tsx` (nuovo):
+  - Hero "Inizia a tradare predizioni in 30 secondi"
+  - 3 CTA grandi: "Continua con email" / "Continua con Google" / "Collega account Polymarket"
+  - Click → apre modal Privy con `loginMethods` filtrato per la scelta
+  - Footer: link a `/login` per utenti tornanti
+- [ ] `app/(auth)/signup/welcome/page.tsx` (nuovo):
+  - Mostrato dopo signup riuscito (utente nuovo)
+  - 4-step tutorial onboarding: cosa è Auktora, come tradare, segnali AI, copy trading
+  - Skip button visibile (soft onboarding non obbligatorio)
+- [ ] `app/(auth)/signup/choose-mode/page.tsx` (nuovo):
+  - Mostrato post-welcome
+  - 2 card grandi: "REAL" (con MetaMask/Privy + USDC) vs "DEMO" ($10k virtuali)
+  - Set `useThemeStore.isDemo` in base alla scelta
+  - Redirect a `/me/positions` (Real) o home (Demo)
+- [ ] `app/(auth)/login/page.tsx` (nuovo):
+  - Per utenti tornanti
+  - Form email + Google + wallet (no Polymarket import label, è già onboarded)
+- [ ] `components/layout/Header.tsx` — modifica:
+  - Bottone "Sign in" → redirect a `/signup` (NO modal Privy inline)
+  - Bottone "Login" → redirect a `/login`
+
+**Acceptance**: utente clicca "Sign in" header → naviga a `/signup` → completa email signup → vede welcome tutorial → sceglie REAL/DEMO → atterra in /me/positions o home.
+
+### Fase 4 — Real/Demo toggle UI (~1h, NEW post-audit)
+
+**Goal**: utente può switchare REAL/DEMO mode dal header, vede chiaramente quale modalità è attiva.
+
+**Problema attuale (audit 2026-04-29)**: flag `is_demo` esiste in DB (`trades`, `positions`) ma NO switch UI in Header. Utenti possono perdere soldi REAL credendo di essere in DEMO o viceversa.
+
+- [ ] `components/layout/header/RealDemoToggle.tsx` (nuovo):
+  - Toggle pill in header (post-login only)
+  - 2 stati: REAL (accent CTA blu, `var(--color-cta)`) / DEMO (giallo warning, `var(--color-warning)`)
+  - Click → switcha + persist in `useThemeStore` (Zustand già esiste)
+  - Visual prominente: "● DEMO" badge giallo lampeggiante quando attivo
+- [ ] `lib/stores/themeStore.ts` (estendi):
+  - Aggiungere `isDemo: boolean` (già esiste, vedi conversation summary)
+  - Action `toggleDemoMode()` con persist localStorage
+- [ ] Wire ovunque mostriamo balance/positions/trades:
+  - `/me/positions` → filter `is_demo = useThemeStore.isDemo`
+  - `/me/wallet` → mostra demo balance vs real USDC
+  - `/me/history` → filter `is_demo`
+  - Trade submit endpoint → invia `is_demo` flag
+- [ ] Banner top-page quando DEMO attivo: "🎮 Modalità DEMO — stai usando $10k virtuali, no soldi reali"
+
+**Acceptance**: utente toggle REAL → DEMO → balance e positions cambiano istantaneamente, banner DEMO visibile, no trade real possibile finché DEMO attivo.
+
+### Fase QA — Test cross-fase + audit (~1h)
+
+- [ ] Smoke test E2E completo:
+  1. Da USA → redirect /geo-blocked ✅ (Fase 1)
+  2. Da UAE → home accessibile, click Sign in → /signup ✅ (Fase 1+3)
+  3. Signup con email → welcome tutorial → scelta DEMO ✅ (Fase 3)
+  4. Toggle DEMO → REAL → balance switch ✅ (Fase 4)
+  5. Login wallet MetaMask → welcome banner Polymarket ✅ (Fase 2)
+- [ ] Test 3 breakpoint responsive (mobile/tablet/desktop)
+- [ ] `npm run validate` verde
+- [ ] Update HANDOFF-LOG con MA4.7 ESTESO chiuso
+- [ ] Commit unico finale + push (chiedere conferma utente)
 
 ---
 
