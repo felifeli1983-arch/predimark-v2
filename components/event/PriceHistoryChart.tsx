@@ -177,7 +177,7 @@ export function PriceHistoryChart({ marketId }: Props) {
             padding: 'var(--space-2)',
           }}
         >
-          Storia in raccolta. Cron daily sync popola price_history table — chart visibile dopo 24h.
+          Storia non ancora disponibile. Verrà popolata dal sync daily Polymarket (MA5+).
         </div>
       ) : (
         <svg

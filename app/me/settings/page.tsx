@@ -1,8 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { usePrivy } from '@privy-io/react-auth'
-import { Loader2, Save } from 'lucide-react'
+import {
+  Loader2,
+  Save,
+  Shield,
+  Send,
+  CreditCard,
+  Database,
+  Sliders,
+  ChevronRight,
+} from 'lucide-react'
 
 interface Profile {
   id: string
@@ -147,6 +157,8 @@ export default function MeSettingsPage() {
       {error && <p style={{ color: 'var(--color-danger)' }}>{error}</p>}
       {success && <p style={{ color: 'var(--color-success)' }}>{success}</p>}
 
+      <SubpagesNav />
+
       <Section title="Profilo pubblico">
         <Field
           label="Display name"
@@ -247,6 +259,89 @@ export default function MeSettingsPage() {
         </button>
       </Section>
     </div>
+  )
+}
+
+function SubpagesNav() {
+  const items: Array<{
+    href: string
+    label: string
+    desc: string
+    icon: React.ReactNode
+  }> = [
+    {
+      href: '/me/settings/security',
+      label: 'Security',
+      desc: 'Sessione, logout, wallet',
+      icon: <Shield size={16} />,
+    },
+    {
+      href: '/me/settings/telegram',
+      label: 'Telegram',
+      desc: 'Link bot per notifiche e signals',
+      icon: <Send size={16} />,
+    },
+    {
+      href: '/me/settings/billing',
+      label: 'Billing & KYC',
+      desc: 'Metodi pagamento, KYC status',
+      icon: <CreditCard size={16} />,
+    },
+    {
+      href: '/me/settings/preferences',
+      label: 'Preferences',
+      desc: 'Tema, default filtri, chart timeframe',
+      icon: <Sliders size={16} />,
+    },
+    {
+      href: '/me/settings/data',
+      label: 'Data & Privacy',
+      desc: 'Export dati, danger zone',
+      icon: <Database size={16} />,
+    },
+  ]
+  return (
+    <nav
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: 'var(--space-2)',
+      }}
+      aria-label="Sezioni avanzate impostazioni"
+    >
+      {items.map((it) => (
+        <Link
+          key={it.href}
+          href={it.href}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            padding: 'var(--space-3)',
+            background: 'var(--color-bg-secondary)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            textDecoration: 'none',
+            color: 'var(--color-text-primary)',
+          }}
+        >
+          <span style={{ color: 'var(--color-text-muted)', flexShrink: 0 }}>{it.icon}</span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <strong style={{ display: 'block', fontSize: 'var(--font-sm)' }}>{it.label}</strong>
+            <span
+              style={{
+                display: 'block',
+                fontSize: 'var(--font-xs)',
+                color: 'var(--color-text-muted)',
+              }}
+            >
+              {it.desc}
+            </span>
+          </span>
+          <ChevronRight size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
+        </Link>
+      ))}
+    </nav>
   )
 }
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/useAuth'
+import { useBalance } from '@/lib/stores/useBalance'
 import { SidebarPortfolio } from './SidebarPortfolio'
 import { SidebarSignals } from './SidebarSignals'
 import { SidebarActivity } from './SidebarActivity'
@@ -23,8 +24,13 @@ import { SidebarNews } from './SidebarNews'
  */
 export function Sidebar() {
   const { authenticated, ready, login } = useAuth()
-  // TODO MA4: collegare a balances reali Supabase. Per ora hasDeposit = false sempre.
-  const hasDeposit = false
+  const usdcBalance = useBalance((s) => s.usdcBalance)
+  const demoBalance = useBalance((s) => s.demoBalance)
+  const realPortfolioValue = useBalance((s) => s.realPortfolioValue)
+  const demoPortfolioValue = useBalance((s) => s.demoPortfolioValue)
+  // hasDeposit = ha cash o posizioni in REAL o DEMO. Default demoBalance=10000 → user è subito "active".
+  const hasDeposit =
+    usdcBalance > 0 || realPortfolioValue > 0 || demoBalance > 0 || demoPortfolioValue > 0
 
   const state: 'guest' | 'logged-no-deposit' | 'logged-active' = !ready
     ? 'guest'

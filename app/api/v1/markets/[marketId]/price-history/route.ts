@@ -31,12 +31,14 @@ export async function GET(
   const since = new Date(Date.now() - ms).toISOString()
 
   const supabase = createAdminClient()
+  // La colonna nel DB è `recorded_at` (mig price_history). Aliasiamo a
+  // `timestamp` nella response per mantenere il contratto col chart client.
   const { data, error } = await supabase
     .from('price_history')
-    .select('timestamp, yes_price, no_price')
+    .select('timestamp:recorded_at, yes_price, no_price')
     .eq('market_id', marketId)
-    .gte('timestamp', since)
-    .order('timestamp', { ascending: true })
+    .gte('recorded_at', since)
+    .order('recorded_at', { ascending: true })
     .limit(500)
 
   if (error) {
