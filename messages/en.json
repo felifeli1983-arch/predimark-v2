@@ -1,0 +1,35 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "skip": "Skip"
+  },
+  "header": {
+    "deposit": "Deposit",
+    "signin": "Sign in",
+    "logout": "Logout"
+  },
+  "home": {
+    "title": "Markets",
+    "subtitle": "Top prediction markets",
+    "trending": "Trending now"
+  },
+  "trade": {
+    "buy_yes": "Buy YES",
+    "buy_no": "Buy NO",
+    "amount": "Amount",
+    "max": "Max",
+    "submit": "Submit Trade",
+    "confirm": "Confirm Trade"
+  },
+  "geoblock": {
+    "title": "Auktora is not available in your country",
+    "vpn_warning": "If you are using a VPN, please disable it.",
+    "back_home": "Back to home"
+  }
+}

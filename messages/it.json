@@ -1,0 +1,35 @@
+{
+  "common": {
+    "loading": "Caricamento...",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "back": "Indietro",
+    "next": "Avanti",
+    "submit": "Invia",
+    "confirm": "Conferma",
+    "skip": "Salta"
+  },
+  "header": {
+    "deposit": "Deposita",
+    "signin": "Accedi",
+    "logout": "Esci"
+  },
+  "home": {
+    "title": "Mercati",
+    "subtitle": "Top mercati di predizione",
+    "trending": "In trend ora"
+  },
+  "trade": {
+    "buy_yes": "Compra SÌ",
+    "buy_no": "Compra NO",
+    "amount": "Importo",
+    "max": "Max",
+    "submit": "Invia trade",
+    "confirm": "Conferma trade"
+  },
+  "geoblock": {
+    "title": "Auktora non è disponibile nel tuo paese",
+    "vpn_warning": "Se utilizzi una VPN, disabilitala.",
+    "back_home": "Torna alla home"
+  }
+}
