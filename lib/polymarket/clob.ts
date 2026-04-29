@@ -12,10 +12,14 @@ export { PriceHistoryInterval }
 export type { MarketPrice, MarketTradeEvent }
 
 /**
- * URL CLOB V2. Pre-cutover usa `clob-v2.polymarket.com`, post-cutover
- * (V1 spento) la stessa URL canonica `clob.polymarket.com` punta a V2.
+ * URL CLOB V2.
+ *
+ * IMPORTANTE: post-cutover il subdomain `clob-v2.polymarket.com` ritorna
+ * 301 redirect senza body (l'SDK non segue il redirect). L'URL canonico
+ * `clob.polymarket.com` punta direttamente a V2 e funziona.
+ * Verificato 2026-04-30: clob-v2 = 301 vuoto, clob = 200 con prezzi reali.
  */
-export const CLOB_URL = process.env.POLYMARKET_CLOB_URL ?? 'https://clob-v2.polymarket.com'
+export const CLOB_URL = process.env.POLYMARKET_CLOB_URL ?? 'https://clob.polymarket.com'
 
 /** Chain Polymarket — production Polygon, dev/test Amoy. */
 export const CLOB_CHAIN: Chain =
@@ -64,6 +68,9 @@ export async function getMarket(conditionId: string): Promise<unknown> {
  * Storico prezzi per un tokenID (clobTokenIds[0] = YES token).
  * Ritorna array { t: unix_seconds, p: price_0_to_1 } ordinato per t crescente.
  * Intervalli disponibili: 1h | 6h | 1d | 1w | max.
+ *
+ * NOTA: l'API risponde `{ "history": [...] }` ma il SDK type dichiara
+ * `Promise<MarketPrice[]>` (sbagliato). Estraiamo manualmente .history.
  */
 export async function getPricesHistory(
   tokenId: string,
@@ -72,14 +79,16 @@ export async function getPricesHistory(
   endTs?: number
 ): Promise<MarketPrice[]> {
   const client = createReadOnlyClient()
-  const result = await client.getPricesHistory({
+  const result = (await client.getPricesHistory({
     market: tokenId,
     interval,
     startTs,
     endTs,
     fidelity: 60,
-  })
-  return Array.isArray(result) ? result : []
+  })) as MarketPrice[] | { history?: MarketPrice[] } | null
+  if (Array.isArray(result)) return result
+  if (result && Array.isArray(result.history)) return result.history
+  return []
 }
 
 /** Prezzo dell'ultimo trade eseguito per un tokenID. */

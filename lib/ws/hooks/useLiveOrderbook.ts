@@ -14,6 +14,7 @@ export interface OrderbookData {
 }
 
 const EMPTY: OrderbookData = { bids: [], asks: [] }
+const CLOB_REST = 'https://clob.polymarket.com'
 
 function parseLevels(raw: PriceLevel[] | undefined): OrderLevel[] {
   if (!raw) return []
@@ -24,10 +25,14 @@ function parseLevels(raw: PriceLevel[] | undefined): OrderLevel[] {
 
 /**
  * Hook React: ritorna bids/asks live per un asset CLOB.
- * Passa `null` come assetId per disattivare la subscription.
  *
- * Polymarket invia il book come `buys`/`sells` (alias di `bids`/`asks`).
- * Normalizziamo qui dentro al formato `{ price, size }` con number.
+ * Strategia:
+ *  1. Initial fetch REST `/book?token_id=...` per popolare immediatamente
+ *     (CORS aperto verificato 2026-04-30, no proxy server-side necessario).
+ *  2. WebSocket `book` channel sovrascrive lo state ad ogni update.
+ *
+ * Senza l'initial REST il pannello restava bloccato su "Caricamento..."
+ * fino al primo trade (anche minuti per market poco attivi).
  */
 export function useLiveOrderbook(assetId: string | null): OrderbookData {
   const [book, setBook] = useState<OrderbookData>(EMPTY)
@@ -42,14 +47,33 @@ export function useLiveOrderbook(assetId: string | null): OrderbookData {
 
     // Reset al cambio di asset
     setBook(EMPTY)
+    let cancelled = false
 
+    // 1. Initial REST snapshot
+    fetch(`${CLOB_REST}/book?token_id=${encodeURIComponent(assetId)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { bids?: PriceLevel[]; asks?: PriceLevel[] } | null) => {
+        if (cancelled || !data) return
+        setBook({
+          bids: parseLevels(data.bids),
+          asks: parseLevels(data.asks),
+        })
+      })
+      .catch(() => {
+        /* WS subentrerà se disponibile */
+      })
+
+    // 2. WebSocket subscription per updates incrementali
     const unsubscribe = subscribeToBook([assetId], (event) => {
       const bids = parseLevels(event.bids ?? event.buys)
       const asks = parseLevels(event.asks ?? event.sells)
       setBook({ bids, asks })
     })
 
-    return unsubscribe
+    return () => {
+      cancelled = true
+      unsubscribe()
+    }
   }, [assetId])
 
   return book
