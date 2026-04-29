@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { Loader2, TrendingUp, Activity, Coins } from 'lucide-react'
 import type { CardKind } from '@/lib/polymarket/mappers'
-import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
+import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 
 interface PricePoint {
   timestamp: string
@@ -24,8 +24,8 @@ const PERIOD_OPTIONS: ReadonlyArray<{ value: Period; label: string }> = [
 interface Props {
   marketId: string
   cardKind?: CardKind
-  /** clobTokenId YES per live midpoint (crypto_up_down) */
-  assetId?: string | null
+  /** Simbolo crypto es. 'btcusdt' — estratto da EventPageShell per crypto_up_down */
+  cryptoSymbol?: string
   /** Evento attualmente live — usato per h2h_sport (mostra score stub) */
   isLive?: boolean
 }
@@ -41,9 +41,9 @@ interface Props {
  *
  * `marketId` è il clobTokenIds[0] (YES token) del market — non l'id Gamma.
  */
-export function PriceHistoryChart({ marketId, cardKind = 'binary', assetId, isLive }: Props) {
+export function PriceHistoryChart({ marketId, cardKind = 'binary', cryptoSymbol, isLive }: Props) {
   if (cardKind === 'crypto_up_down') {
-    return <LiveSpotView assetId={assetId ?? null} />
+    return <LiveSpotView cryptoSymbol={cryptoSymbol ?? ''} />
   }
   if (cardKind === 'h2h_sport' && isLive) {
     return <LiveScoreStub />
@@ -226,15 +226,21 @@ function HistoryChartView({ marketId }: { marketId: string }) {
   )
 }
 
-function LiveSpotView({ assetId }: { assetId: string | null }) {
-  const { midpoint, change } = useLiveMidpoint(assetId)
-  const connected = midpoint !== null
+function formatSpotPrice(price: number): string {
+  if (price >= 1000) return `$${price.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+  if (price >= 1) return `$${price.toFixed(2)}`
+  return `$${price.toFixed(4)}`
+}
+
+function LiveSpotView({ cryptoSymbol }: { cryptoSymbol: string }) {
+  const { price, change24h, loading } = useCryptoLivePrice(cryptoSymbol, 'chainlink')
+  const connected = price !== null
 
   return (
     <Container>
       <SectionTitle>
         <Coins size={12} style={{ display: 'inline', marginRight: 4 }} />
-        Prezzo spot live · CLOB
+        Prezzo spot live · Chainlink
       </SectionTitle>
       <div
         style={{
@@ -246,16 +252,11 @@ function LiveSpotView({ assetId }: { assetId: string | null }) {
           padding: 'var(--space-3) 0',
         }}
       >
-        {!assetId ? (
-          <span
-            style={{
-              fontSize: 'var(--font-sm)',
-              color: 'var(--color-text-muted)',
-            }}
-          >
-            Token CLOB non disponibile per questo evento.
+        {!cryptoSymbol ? (
+          <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
+            Asset non riconosciuto per questo evento.
           </span>
-        ) : !connected ? (
+        ) : loading && !connected ? (
           <>
             <Loader2
               size={20}
@@ -263,10 +264,10 @@ function LiveSpotView({ assetId }: { assetId: string | null }) {
               style={{ color: 'var(--color-text-muted)' }}
             />
             <span style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
-              Connessione WebSocket…
+              Connessione live feed…
             </span>
           </>
-        ) : (
+        ) : connected ? (
           <>
             <strong
               style={{
@@ -274,23 +275,28 @@ function LiveSpotView({ assetId }: { assetId: string | null }) {
                 fontWeight: 800,
                 color: 'var(--color-text-primary)',
                 letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {(midpoint * 100).toFixed(1)}¢
+              {formatSpotPrice(price!)}
             </strong>
-            {change !== null && (
+            {change24h !== null && (
               <span
                 style={{
                   fontSize: 'var(--font-sm)',
                   fontWeight: 600,
-                  color: change >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
+                  color: change24h >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
                 }}
               >
-                {change >= 0 ? '+' : ''}
-                {change.toFixed(2)}% sessione
+                {change24h >= 0 ? '+' : ''}
+                {change24h.toFixed(2)}% (24h)
               </span>
             )}
           </>
+        ) : (
+          <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
+            Feed non disponibile.
+          </span>
         )}
       </div>
     </Container>

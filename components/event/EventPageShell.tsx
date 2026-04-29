@@ -20,9 +20,21 @@ interface Props {
   event: AuktoraEvent
 }
 
+/** Estrae il simbolo crypto dallo slug+titolo per il feed Chainlink. */
+function extractCryptoSymbol(slug: string, title: string): string {
+  const text = `${slug} ${title}`.toLowerCase()
+  if (text.includes('btc') || text.includes('bitcoin')) return 'btcusdt'
+  if (text.includes('eth') || text.includes('ethereum')) return 'ethusdt'
+  if (text.includes('sol') || text.includes('solana')) return 'solusdt'
+  if (text.includes('matic') || text.includes('polygon')) return 'maticusdt'
+  return ''
+}
+
 export function EventPageShell({ event }: Props) {
   const primaryTag = event.tags[0] ?? 'all'
   const isResolved = event.closed
+  const cryptoSymbol =
+    event.kind === 'crypto_up_down' ? extractCryptoSymbol(event.slug, event.title) : undefined
 
   function openTradeWidget(marketId: string, side: string) {
     const market = event.markets.find((m) => m.id === marketId)
@@ -105,7 +117,7 @@ export function EventPageShell({ event }: Props) {
             <PriceHistoryChart
               marketId={event.markets[0].clobTokenIds[0]}
               cardKind={event.kind}
-              assetId={event.markets[0].clobTokenIds[0]}
+              cryptoSymbol={cryptoSymbol}
               isLive={event.active && !event.closed}
             />
           )}
