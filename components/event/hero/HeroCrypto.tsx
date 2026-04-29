@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { Coins, Clock } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
-import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
+import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { LiveBadge, EventActions, formatLong } from './HeroCommon'
 
@@ -12,13 +12,31 @@ interface Props {
   event: AuktoraEvent
 }
 
+/**
+ * Estrae il symbol crypto dallo slug+titolo dell'evento.
+ * Supporta i 4 asset principali su Polymarket crypto_up_down.
+ */
+function extractCryptoSymbol(event: AuktoraEvent): string {
+  const text = `${event.slug} ${event.title}`.toLowerCase()
+  if (text.includes('btc') || text.includes('bitcoin')) return 'btcusdt'
+  if (text.includes('eth') || text.includes('ethereum')) return 'ethusdt'
+  if (text.includes('sol') || text.includes('solana')) return 'solusdt'
+  if (text.includes('matic') || text.includes('polygon')) return 'maticusdt'
+  return ''
+}
+
+function formatSpot(price: number): string {
+  if (price >= 1000) return `$${price.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+  if (price >= 1) return `$${price.toFixed(2)}`
+  return `$${price.toFixed(4)}`
+}
+
 export function HeroCrypto({ event }: Props) {
   const [imgFailed, setImgFailed] = useState(false)
   const initial = event.title?.[0]?.toUpperCase() ?? '?'
   const isLive = event.active && !event.closed
-  const market = event.markets[0]
-  const yesTokenId = market?.clobTokenIds?.[0] ?? null
-  const { midpoint, change } = useLiveMidpoint(yesTokenId)
+  const symbol = extractCryptoSymbol(event)
+  const { price, change24h, loading } = useCryptoLivePrice(symbol, 'chainlink')
   const countdown = useCountdown(event.endDate)
   const imgSrc = event.icon || event.image
 
@@ -98,7 +116,7 @@ export function HeroCrypto({ event }: Props) {
                 gap: 4,
               }}
             >
-              <Coins size={11} /> Crypto
+              <Coins size={11} /> Crypto · Chainlink
             </span>
           </div>
           <EventActions event={event} />
@@ -125,7 +143,7 @@ export function HeroCrypto({ event }: Props) {
             gap: 'var(--space-3)',
           }}
         >
-          {midpoint !== null ? (
+          {price !== null ? (
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
               <strong
                 style={{
@@ -133,26 +151,31 @@ export function HeroCrypto({ event }: Props) {
                   fontWeight: 800,
                   color: 'var(--color-text-primary)',
                   letterSpacing: '-0.02em',
+                  fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                {(midpoint * 100).toFixed(1)}¢
+                {formatSpot(price)}
               </strong>
-              {change !== null && (
+              {change24h !== null && (
                 <span
                   style={{
                     fontSize: 'var(--font-sm)',
                     fontWeight: 600,
-                    color: change >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
+                    color: change24h >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
                   }}
                 >
-                  {change >= 0 ? '+' : ''}
-                  {change.toFixed(2)}%
+                  {change24h >= 0 ? '+' : ''}
+                  {change24h.toFixed(2)}% (24h)
                 </span>
               )}
             </div>
-          ) : yesTokenId ? (
+          ) : symbol && loading ? (
             <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
-              Connessione WebSocket…
+              Connessione live feed…
+            </span>
+          ) : !symbol ? (
+            <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
+              Asset non riconosciuto.
             </span>
           ) : null}
 
@@ -171,14 +194,7 @@ export function HeroCrypto({ event }: Props) {
             </span>
           )}
 
-          <span
-            style={{
-              fontSize: 'var(--font-sm)',
-              color: 'var(--color-text-muted)',
-            }}
-          >
-            ·
-          </span>
+          <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>·</span>
           <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
             Closes {formatLong(event.endDate)}
           </span>

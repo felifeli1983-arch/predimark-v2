@@ -6,12 +6,20 @@ import type { CardKind } from '@/lib/polymarket/mappers'
 import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 
 interface PricePoint {
-  recorded_at: string
+  timestamp: string
   yes_price: number
   no_price: number
 }
 
-type Period = '1d' | '7d' | '30d' | 'all'
+type Period = '1h' | '6h' | '1d' | '7d' | 'all'
+
+const PERIOD_OPTIONS: ReadonlyArray<{ value: Period; label: string }> = [
+  { value: '1h', label: '1H' },
+  { value: '6h', label: '6H' },
+  { value: '1d', label: '1G' },
+  { value: '7d', label: '7G' },
+  { value: 'all', label: 'MAX' },
+]
 
 interface Props {
   marketId: string
@@ -127,15 +135,15 @@ function HistoryChartView({ marketId }: { marketId: string }) {
           )}
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
-          {(['1d', '7d', '30d', 'all'] as Period[]).map((p) => (
+          {PERIOD_OPTIONS.map((opt) => (
             <button
-              key={p}
+              key={opt.value}
               type="button"
-              onClick={() => setPeriod(p)}
+              onClick={() => setPeriod(opt.value)}
               style={{
                 padding: '4px 8px',
-                background: period === p ? 'var(--color-cta)' : 'var(--color-bg-tertiary)',
-                color: period === p ? '#fff' : 'var(--color-text-muted)',
+                background: period === opt.value ? 'var(--color-cta)' : 'var(--color-bg-tertiary)',
+                color: period === opt.value ? '#fff' : 'var(--color-text-muted)',
                 border: 'none',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 9,
@@ -144,7 +152,7 @@ function HistoryChartView({ marketId }: { marketId: string }) {
                 textTransform: 'uppercase',
               }}
             >
-              {p}
+              {opt.label}
             </button>
           ))}
         </div>

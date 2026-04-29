@@ -1,4 +1,15 @@
-import { ClobClient, Chain, type OrderBookSummary } from '@polymarket/clob-client-v2'
+import {
+  ClobClient,
+  Chain,
+  PriceHistoryInterval,
+  Side,
+  type OrderBookSummary,
+  type MarketPrice,
+  type MarketTradeEvent,
+} from '@polymarket/clob-client-v2'
+
+export { PriceHistoryInterval }
+export type { MarketPrice, MarketTradeEvent }
 
 /**
  * URL CLOB V2. Pre-cutover usa `clob-v2.polymarket.com`, post-cutover
@@ -47,4 +58,73 @@ export async function getOrderBook(tokenId: string): Promise<OrderBookSummary> {
 /** Dettagli market per `conditionId` (Polymarket). */
 export async function getMarket(conditionId: string): Promise<unknown> {
   return createReadOnlyClient().getMarket(conditionId)
+}
+
+/**
+ * Storico prezzi per un tokenID (clobTokenIds[0] = YES token).
+ * Ritorna array { t: unix_seconds, p: price_0_to_1 } ordinato per t crescente.
+ * Intervalli disponibili: 1h | 6h | 1d | 1w | max.
+ */
+export async function getPricesHistory(
+  tokenId: string,
+  interval: PriceHistoryInterval = PriceHistoryInterval.ONE_WEEK,
+  startTs?: number,
+  endTs?: number
+): Promise<MarketPrice[]> {
+  const client = createReadOnlyClient()
+  const result = await client.getPricesHistory({
+    market: tokenId,
+    interval,
+    startTs,
+    endTs,
+    fidelity: 60,
+  })
+  return Array.isArray(result) ? result : []
+}
+
+/** Prezzo dell'ultimo trade eseguito per un tokenID. */
+export async function getLastTradePrice(tokenId: string): Promise<number | null> {
+  try {
+    const client = createReadOnlyClient()
+    const res = (await client.getLastTradePrice(tokenId)) as { price?: string | number } | null
+    const value = typeof res?.price === 'string' ? Number(res.price) : (res?.price ?? NaN)
+    return Number.isFinite(value) ? value : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Ultimi trade eseguiti su un market (conditionId).
+ * Ritorna array vuoto in caso di errore.
+ */
+export async function getMarketRecentTrades(conditionId: string): Promise<MarketTradeEvent[]> {
+  try {
+    const client = createReadOnlyClient()
+    return await client.getMarketTradesEvents(conditionId)
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Stima il prezzo medio per acquistare/vendere `amount` USDC di un tokenID
+ * (price impact preview pre-submit). Ritorna null se errore.
+ */
+export async function calculateMarketImpact(
+  tokenId: string,
+  side: 'BUY' | 'SELL',
+  amount: number
+): Promise<number | null> {
+  try {
+    const client = createReadOnlyClient()
+    const price = await client.calculateMarketPrice(
+      tokenId,
+      side === 'BUY' ? Side.BUY : Side.SELL,
+      amount
+    )
+    return Number.isFinite(price) ? price : null
+  } catch {
+    return null
+  }
 }

@@ -1,74 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getPricesHistory, PriceHistoryInterval, type MarketPrice } from '@/lib/polymarket/clob'
 
-const ERR = (code: string, message: string, status: number) =>
-  NextResponse.json({ error: { code, message } }, { status })
-
-const PERIODS = {
-  '1d': 24 * 3600 * 1000,
-  '7d': 7 * 24 * 3600 * 1000,
-  '30d': 30 * 24 * 3600 * 1000,
-  all: 365 * 24 * 3600 * 1000,
+const INTERVAL_MAP: Record<string, PriceHistoryInterval> = {
+  '1h': PriceHistoryInterval.ONE_HOUR,
+  '6h': PriceHistoryInterval.SIX_HOURS,
+  '1d': PriceHistoryInterval.ONE_DAY,
+  '7d': PriceHistoryInterval.ONE_WEEK,
+  '30d': PriceHistoryInterval.ONE_WEEK, // SDK max è 1w; 30d fallback su 1w
+  all: PriceHistoryInterval.MAX,
 }
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
 /**
- * GET /api/v1/markets/[marketId]/price-history?period=1d|7d|30d|all
- * Sprint 3.5.2 — fornisce serie storica per chart.
+ * GET /api/v1/markets/[marketId]/price-history?period=1h|6h|1d|7d|all
  *
- * `marketId` può essere:
- *  - UUID locale (markets.id)
- *  - Polymarket market id (text) — risolto via markets.polymarket_market_id
- *
- * Source: tabella `price_history`, popolata dal cron `sync-price-history`
- * (ogni 6h). Pubblico — no auth.
+ * `marketId` = clobTokenIds[0] (YES token id del market).
+ * Sprint 3.5.4 — legge direttamente dalla CLOB V2 API, niente DB.
+ * Cache Next.js ISR: 300s (5 min) — bilancia freschezza vs rate limit.
  */
+export const revalidate = 300
+
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ marketId: string }> }
 ): Promise<NextResponse> {
   const { marketId } = await context.params
-  if (!marketId) return ERR('MISSING_ID', 'marketId richiesto', 400)
-
-  const url = new URL(_request.url)
-  const period = (url.searchParams.get('period') ?? '7d') as keyof typeof PERIODS
-  const ms = PERIODS[period] ?? PERIODS['7d']
-  const since = new Date(Date.now() - ms).toISOString()
-
-  const supabase = createAdminClient()
-
-  // Risolve Polymarket text id → UUID locale, se necessario.
-  let localId: string | null = UUID_RE.test(marketId) ? marketId : null
-  if (!localId) {
-    const { data: row } = await supabase
-      .from('markets')
-      .select('id')
-      .eq('polymarket_market_id', marketId)
-      .maybeSingle()
-    localId = row?.id ?? null
-  }
-  if (!localId) {
-    // Mercato non ancora syncato localmente: nessuna storia da mostrare.
-    return NextResponse.json({ market_id: marketId, period, items: [] })
+  if (!marketId) {
+    return NextResponse.json(
+      { error: { code: 'MISSING_ID', message: 'marketId richiesto' } },
+      { status: 400 }
+    )
   }
 
-  const { data, error } = await supabase
-    .from('price_history')
-    .select('recorded_at, yes_price, no_price')
-    .eq('market_id', localId)
-    .gte('recorded_at', since)
-    .order('recorded_at', { ascending: true })
-    .limit(500)
+  const url = new URL(request.url)
+  const period = url.searchParams.get('period') ?? '7d'
+  const interval = INTERVAL_MAP[period] ?? PriceHistoryInterval.ONE_WEEK
 
-  if (error) {
-    console.error('[price-history]', error)
-    return ERR('INTERNAL_ERROR', 'Errore lettura price_history', 500)
+  try {
+    const points: MarketPrice[] = await getPricesHistory(marketId, interval)
+    return NextResponse.json({
+      market_id: marketId,
+      period,
+      items: points.map((p) => ({
+        timestamp: new Date(p.t * 1000).toISOString(),
+        yes_price: p.p,
+        no_price: 1 - p.p,
+      })),
+    })
+  } catch (err) {
+    console.error('[price-history CLOB]', err)
+    return NextResponse.json({
+      market_id: marketId,
+      period,
+      items: [],
+    })
   }
-
-  return NextResponse.json({
-    market_id: marketId,
-    period,
-    items: data ?? [],
-  })
 }
