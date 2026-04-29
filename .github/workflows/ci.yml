@@ -15,6 +15,11 @@ jobs:
     name: Validate (typecheck + lint + test)
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # Stub env per il test step (lib/supabase/__tests__/client.test.ts legge
+      # process.env). Real values via Vercel env in produzione.
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://stub.supabase.co' }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'stub-anon-key' }}
     steps:
       - uses: actions/checkout@v4
 
