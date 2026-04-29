@@ -29,7 +29,58 @@
 
 - ❗ **Builder profile KYC** su `polymarket.com/settings` — manuale 1-time setup utente. Senza KYC, trade fees Y2 (30 bps) NON vengono incassate. Da fare PRIMA di switch Y1→Y2 (~mese 12 da launch)
 - ⚠️ **Smoke test E2E reale** mai eseguito completo: deposit $5 → wrap pUSD → trade REAL → sell → withdraw. Da eseguire prima del marketing launch pubblico
-- ⚠️ **Geo-block middleware deploy**: `lib/polymarket/geoblock.ts` shipped MA4.4 ma NON verificato se attivo nel middleware Next.js. Da verificare in audit MA4.7
+- 🔴 **Geo-block middleware NON wired** (CONFIRMED da audit 2026-04-29): file `lib/polymarket/geoblock.ts` con 31 BLOCKED_COUNTRIES + 4 CLOSE_ONLY + 4 RESTRICTED_REGIONS esiste, ma NO file `/middleware.ts` al root. Check solo spot a `/api/v1/auth/session` e `/api/v1/trades/submit`. **CRITICAL compliance fix in MA4.7 Fase 1**
+
+---
+
+## 🔍 Audit completo 2026-04-29 — Stato reale ~35% MVP-ready
+
+**Eseguito da**: subagent Explore con cross-check 19 docs vs codebase
+
+### 10 Gap critici identificati
+
+1. **Admin panel 0/36 sub-pages** — `/app/admin/` directory inesistente. Blocker launch pubblico → MA5.2
+2. **Leaderboard 0%** — `/leaderboard` route + API mancanti, DB tables esistenti → MA5.1
+3. **Creator UI 0%** — `/creator/*` routes mancanti, DB `creators` esistente → MA5.1
+4. **Copy trading UI 0%** — `/me/following`, `/me/sessions`, `/api/v1/copy/*` mancanti → MA6
+5. **API endpoints 12/80 (15%)** — mancano creators(7), leaderboard(3), copy(2), signals(3), notifications(3), admin(9+), kyc(2), referrals(1), telegram(2), deposit/withdraw(2)
+6. **Geo-block middleware non wired** → MA4.7 Fase 1 (CRITICAL)
+7. **Signup UX dedicato 0%** — `/signup`, `/signup/welcome`, `/signup/choose-mode` mancanti → MA4.7 Fase 3
+8. **/me 4/22 sub-pages** — manca `/me/settings/*`, `/me/kyc/*`, `/me/deposit`, `/me/withdraw`, ecc. → MA4.7-MA5.3
+9. **Real/Demo toggle UI assente** in header — flag `is_demo` esiste in DB → MA4.7 Fase 4
+10. **i18n incompleto** — Doc 5 specifica 5 lingue, no integration → MA8
+
+### Cosa è SHIPPED e funziona ✅
+
+- Home + Event detail (Gamma API live, 5 layout per CardKind)
+- CLOB V2 integration (MA4.4)
+- Funding flow Privy + MoonPay (MA4.6)
+- Trading core (submit REAL, sell, P&L, history, demo flag)
+- Auth Privy + Supabase RLS
+- Design tokens 244 inline → CSS vars (Doc 13)
+- Database 30/39 tabelle (77%, mancano `leaderboard_cache`, `telegram_*`, `payments`)
+- Routes 24/110 (22%)
+
+### Roadmap REVISIONATA post-audit
+
+| Sprint           | Cosa                                                                     | Effort              | Status         |
+| ---------------- | ------------------------------------------------------------------------ | ------------------- | -------------- |
+| **MA4.7 ESTESO** | Polymarket import + geoblock middleware + signup flow + Real/Demo toggle | **6-8h** (era 2-3h) | NEXT           |
+| MA5.1            | Leaderboard + Creators UI + API                                          | 2-3 giorni          | post-MA4.7     |
+| MA5.2            | Admin Panel foundation                                                   | 3-4 giorni          | post-MA5.1     |
+| MA5              | Signal AI engine (gratis)                                                | 3-4 giorni          | post-MA5.2     |
+| MA5.3            | User settings dashboard                                                  | 2-3 giorni          | parallel-MA5   |
+| MA6              | Copy trading UI + execution                                              | 1-1.5 settimane     | post-MA5.1+5.2 |
+| MA6.1            | Auto-copy session keys                                                   | 1 settimana         | post-MA6       |
+| MA7              | Telegram bot                                                             | 1 settimana         | post-MA6       |
+| MA8              | Discord + polish + Auktora Pro                                           | 1-2 settimane       | finale         |
+
+**Timeline launch August 2026**: feasible se 8-10 settimane di lavoro nei prossimi sprint.
+
+### Memorie audit persistite
+
+- `project_audit_2026_04_29_state.md` — stato 35% + gap critici + roadmap
+- `project_ma47_extended_scope.md` — MA4.7 ESTESO 4 fasi 6-8h
 
 **Memorie persistite oggi**:
 
