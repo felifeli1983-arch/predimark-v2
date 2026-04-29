@@ -24,7 +24,13 @@ function filterByCategory(
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams
-  const rawEvents = await fetchFeaturedEvents(40)
+  // Limit 8 (era 40 → 20 → 8): la response uncompressed di Gamma supera i
+  // 2MB già a partire da ~10 eventi (fields description sono lunghissime),
+  // e oltre quel threshold Next.js NON cacha il fetch — ogni request della
+  // home rifa la chiamata. A 8 eventi il payload sta sotto i 2MB e la cache
+  // funziona, prima request lenta poi tutto immediato.
+  // Pagination/load more arriverà come feature dedicata.
+  const rawEvents = await fetchFeaturedEvents(8)
   const all = rawEvents.map(mapGammaEvent)
   const heroEvents = all.slice(0, 3)
   const remaining = all.slice(3)

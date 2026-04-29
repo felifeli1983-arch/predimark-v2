@@ -96,12 +96,17 @@ export async function getLastTradePrice(tokenId: string): Promise<number | null>
 
 /**
  * Ultimi trade eseguiti su un market (conditionId).
- * Ritorna array vuoto in caso di errore.
+ * NOTA: SDK type dichiara `Promise<MarketTradeEvent[]>` ma l'endpoint
+ * `/markets/live-activity/<conditionId>` restituisce in realtà solo metadata
+ * del market (oggetto, NON array di trade). Verificato via curl il 2026-04-30.
+ * La feed real-time dei trade richiede un endpoint diverso (data-api), TBD.
+ * Per ora ritorniamo array vuoto se la response non è un array → evita 500.
  */
 export async function getMarketRecentTrades(conditionId: string): Promise<MarketTradeEvent[]> {
   try {
     const client = createReadOnlyClient()
-    return await client.getMarketTradesEvents(conditionId)
+    const result = await client.getMarketTradesEvents(conditionId)
+    return Array.isArray(result) ? result : []
   } catch {
     return []
   }

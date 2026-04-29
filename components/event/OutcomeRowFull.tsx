@@ -32,9 +32,16 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
         overflow: 'hidden',
       }}
     >
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setExpanded((v) => !v)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setExpanded((v) => !v)
+          }
+        }}
         aria-expanded={expanded}
         className="outcome-row"
         style={{
@@ -130,7 +137,7 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
             justifySelf: 'end',
           }}
         />
-      </button>
+      </div>
 
       {expanded && (
         <div
