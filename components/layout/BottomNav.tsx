@@ -30,12 +30,12 @@ import { useAuth } from '@/lib/hooks/useAuth'
 const MORE_ITEMS_AUTHENTICATED = [
   { href: '/me', icon: User, label: 'Profile' },
   { href: '/watchlist', icon: Star, label: 'Watchlist' },
-  { href: '/following', icon: Users, label: 'Following' },
+  { href: '/me/following', icon: Users, label: 'Following' },
   { href: '/me/positions', icon: Activity, label: 'Sessions' },
-  { href: '/me/stats', icon: Trophy, label: 'Achievements' },
+  { href: '/me/stats', icon: Trophy, label: 'Stats' },
   { href: '/me/settings', icon: Settings, label: 'Settings' },
   { href: '/leaderboard', icon: BarChart2, label: 'Classifica' },
-  { href: '/creator', icon: Star, label: 'Creator program' },
+  { href: '/creator/apply', icon: Star, label: 'Diventa Creator' },
   { href: '/about', icon: Info, label: 'About' },
   { href: '/pricing', icon: CreditCard, label: 'Pricing' },
   { href: '/help', icon: HelpCircle, label: 'Help' },
@@ -44,7 +44,7 @@ const MORE_ITEMS_AUTHENTICATED = [
 
 const MORE_ITEMS_GUEST = [
   { href: '/leaderboard', icon: BarChart2, label: 'Classifica' },
-  { href: '/creator', icon: Star, label: 'Creator program' },
+  { href: '/creator/apply', icon: Star, label: 'Diventa Creator' },
   { href: '/about', icon: Info, label: 'About' },
   { href: '/pricing', icon: CreditCard, label: 'Pricing' },
   { href: '/help', icon: HelpCircle, label: 'Help' },
@@ -70,10 +70,13 @@ export function BottomNav() {
       {/*
        * PWA: BottomNav è IN FLOW nel flex column dell'app shell (layout.tsx).
        * NON usa position:fixed — il flex column lo spinge automaticamente in fondo.
-       * md:hidden lo nasconde su desktop (≥768px).
+       * lg:hidden lo nasconde su desktop (≥1024px). Su tablet portrait (768-1023)
+       * resta visibile per allineare con PageContainer sidebar (hidden lg:block).
+       * Bug fix: prima era md:hidden (nascosto da 768px) ma sidebar appare solo a
+       * 1024px → utenti tablet senza nav.
        */}
       <nav
-        className="flex md:hidden"
+        className="flex lg:hidden"
         style={{
           flexShrink: 0,
           background: 'var(--color-bg-secondary)',
@@ -138,7 +141,7 @@ export function BottomNav() {
       ══════════════════════════════════════ */}
       {moreOpen && (
         <div
-          className="md:hidden"
+          className="lg:hidden"
           style={{
             position: 'fixed',
             inset: 0,

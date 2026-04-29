@@ -1,9 +1,11 @@
+import { Suspense } from 'react'
 import { fetchFeaturedEvents } from '@/lib/polymarket/queries'
 import { mapGammaEvent } from '@/lib/polymarket/mappers'
 import { HeroZone } from '@/components/home/HeroZone'
 import { MarketsSection } from '@/components/home/MarketsSection'
 import { Sidebar } from '@/components/home/Sidebar'
 import { MobileSidebarRails } from '@/components/home/MobileSidebarRails'
+import { NavTabs } from '@/components/home/NavTabs'
 import { PageContainer } from '@/components/layout/PageContainer'
 
 interface SearchParams {
@@ -29,10 +31,15 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const filtered = filterByCategory(remaining, params.category)
 
   return (
-    <PageContainer sidebar={<Sidebar />}>
-      <HeroZone events={heroEvents} />
-      <MobileSidebarRails />
-      <MarketsSection initialEvents={filtered} />
-    </PageContainer>
+    <>
+      <Suspense fallback={null}>
+        <NavTabs />
+      </Suspense>
+      <PageContainer sidebar={<Sidebar />}>
+        <HeroZone events={heroEvents} />
+        <MobileSidebarRails />
+        <MarketsSection initialEvents={filtered} />
+      </PageContainer>
+    </>
   )
 }
