@@ -2,7 +2,29 @@
 
 > Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
 > Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
-> Ultimo update: 2026-04-29 — Privy dashboard verificato live + Doc 14 + 2 sprint plan + audit pre-MA4.7
+> Ultimo update: 2026-04-29 tarda sera — MA4.7 ESTESO chiuso (4 fasi)
+
+---
+
+## Stato corrente (2026-04-29 tarda sera)
+
+**MA4.7 ESTESO chiuso in 4 commits** (sprint completo post-audit):
+
+- ✅ **Fase 1 (commit `e4e1d47`)** — Geoblock middleware deploy. `middleware.ts` al root intercept `/me/*` + `/api/v1/trades/*` + `/api/v1/polymarket/*`. BLOCKED → redirect `/geo-blocked` o 403 JSON. CLOSE_ONLY → solo POST `/api/v1/trades/sell` allowed. Page `/geo-blocked` branded con country detection.
+- ✅ **Fase 2 (commit `267c196`)** — Polymarket account import. OnboardCard fallback a `wallets[0]` per external wallet support. PolymarketImportBanner.tsx mostra welcome banner one-time con pUSD + posizioni reali. Persist dismiss in localStorage.
+- ✅ **Fase 3 (commit `562df54`)** — Signup flow dedicato. Routes `/signup` + `/signup/welcome` + `/signup/choose-mode` + `/login`. Layout pubblico `(auth)` route group. UX wording "Collega il tuo account Polymarket" esplicito.
+- ✅ **Fase 4 (commit `77f1023`)** — Real/Demo toggle UI. RealDemoToggle.tsx esisteva già. Aggiunto DemoModeBanner.tsx top-page quando isDemo=true.
+
+**Effort effettivo MA4.7 ESTESO**: ~3h totali (vs 6-8h stimato). Ottimizzato grazie a Privy già configurato + RealDemoToggle esistente + SDK V2 createOrDeriveApiKey() auto-gestito.
+
+**Closes 4 dei 10 gap critici dall'audit 2026-04-29**:
+
+1. ✅ Geo-block middleware non wired (CRITICAL compliance)
+2. ✅ Signup UX dedicato 0%
+3. ✅ Polymarket account import (acquisition multiplier)
+4. ✅ Real/Demo toggle visibility (banner globale)
+
+**Stato post-MA4.7 ESTESO**: ~40% MVP-ready (era 35% pre-sprint). 11 commit locali pronti per push. Prossimo: MA5.1 leaderboard + creators (~2-3 giorni).
 
 ---
 
