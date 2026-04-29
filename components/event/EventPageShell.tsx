@@ -35,6 +35,17 @@ export function EventPageShell({ event }: Props) {
   const isResolved = event.closed
   const cryptoSymbol =
     event.kind === 'crypto_up_down' ? extractCryptoSymbol(event.slug, event.title) : undefined
+  const multiMarkets =
+    event.kind === 'multi_outcome'
+      ? [...event.markets]
+          .sort((a, b) => b.yesPrice - a.yesPrice)
+          .slice(0, 5)
+          .map((m) => ({
+            tokenId: m.clobTokenIds?.[0] ?? '',
+            label: m.groupItemTitle || m.question,
+          }))
+          .filter((m) => m.tokenId !== '')
+      : undefined
 
   function openTradeWidget(marketId: string, side: string) {
     const market = event.markets.find((m) => m.id === marketId)
@@ -119,6 +130,7 @@ export function EventPageShell({ event }: Props) {
               cardKind={event.kind}
               cryptoSymbol={cryptoSymbol}
               isLive={event.active && !event.closed}
+              multiMarkets={multiMarkets}
             />
           )}
           <EventProbabilities event={event} onTrade={openTradeWidget} />
