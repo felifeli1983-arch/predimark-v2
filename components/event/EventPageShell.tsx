@@ -13,6 +13,8 @@ import { EventInfoTabs } from './EventInfoTabs'
 import { EventRules } from './EventRules'
 import { EventSidebarStub } from './EventSidebarStub'
 import { EventTradeBoot } from './EventTradeBoot'
+import { SignalBanner } from './SignalBanner'
+import { PriceHistoryChart } from './PriceHistoryChart'
 
 interface Props {
   event: AuktoraEvent
@@ -98,7 +100,8 @@ export function EventPageShell({ event }: Props) {
           {isResolved && <ResolvedBanner />}
 
           <EventHero event={event} />
-          <ChartHistoryStub />
+          {event.markets[0] && <SignalBanner marketId={event.markets[0].id} />}
+          {event.markets[0] && <PriceHistoryChart marketId={event.markets[0].id} />}
           <EventProbabilities event={event} onTrade={openTradeWidget} />
           <EventRules description={event.description} />
           {/* Sidebar inline su mobile + tablet portrait (<1024px) — solo Segnale + Mercati correlati,
@@ -176,26 +179,6 @@ function ResolvedBanner() {
       }}
     >
       Resolved · mercato chiuso
-    </div>
-  )
-}
-
-function ChartHistoryStub() {
-  return (
-    <div
-      style={{
-        height: 200,
-        background: 'var(--color-bg-secondary)',
-        border: '1px solid var(--color-border-subtle)',
-        borderRadius: 'var(--radius-md)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'var(--color-text-muted)',
-        fontSize: 'var(--font-base)',
-      }}
-    >
-      Chart storico — disponibile in Sprint 3.5.2
     </div>
   )
 }

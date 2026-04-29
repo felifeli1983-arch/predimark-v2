@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import type { AuktoraMarket } from '@/lib/polymarket/mappers'
+import { OrderBookPanel } from './OrderBookPanel'
 
 interface Props {
   market: AuktoraMarket
@@ -134,13 +135,10 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
       {expanded && (
         <div
           style={{
-            padding: 'var(--space-3) var(--space-4)',
             borderTop: '1px solid var(--color-border-subtle)',
-            color: 'var(--color-text-muted)',
-            fontSize: 'var(--font-sm)',
           }}
         >
-          Libro ordini — disponibile in MA4
+          <OrderBookPanel assetId={market.clobTokenIds?.[0] ?? null} />
         </div>
       )}
     </div>
