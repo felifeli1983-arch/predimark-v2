@@ -31,13 +31,15 @@ interface Props {
 }
 
 /**
- * Sprint 3.5.2 / 3.5.3 — Chart prezzi event-page.
+ * Sprint 3.5.4 — Chart prezzi event-page, dati live da CLOB V2 diretta.
  *
  * Routing per CardKind:
- *  - binary | multi_outcome | multi_strike → history chart da `price_history`
- *  - crypto_up_down → live spot midpoint via WS CLOB
+ *  - binary | multi_outcome | multi_strike → history chart via /price-history (CLOB)
+ *  - crypto_up_down → live spot midpoint via WS CLOB (token YES)
  *  - h2h_sport (live) → stub "Score live · MA6"
  *  - h2h_sport (non-live) → history chart standard
+ *
+ * `marketId` è il clobTokenIds[0] (YES token) del market — non l'id Gamma.
  */
 export function PriceHistoryChart({ marketId, cardKind = 'binary', assetId, isLive }: Props) {
   if (cardKind === 'crypto_up_down') {
@@ -177,7 +179,7 @@ function HistoryChartView({ marketId }: { marketId: string }) {
               padding: 'var(--space-2)',
             }}
           >
-            Storia non ancora disponibile. Verrà popolata dal cron sync-price-history (ogni 6h).
+            Storia non ancora disponibile per questo intervallo.
           </span>
         </CenteredBox>
       ) : (
