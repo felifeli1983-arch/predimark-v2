@@ -2,11 +2,51 @@
 
 > Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
 > Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
-> Ultimo update: 2026-04-29 mezzanotte — MA5.2 base chiuso (admin foundation + dashboard + users)
+> Ultimo update: 2026-04-29 dopo mezzanotte — **6 sprint chiusi in single session** (MA4.7 → MA7) ~75% MVP
 
 ---
 
-## Stato corrente (2026-04-29 mezzanotte) — MA5.2 base chiuso
+## Stato finale sessione (2026-04-29 fine sessione)
+
+**Sessione record: 26 commit pushati a origin/main, 6 sprint chiusi MVP**
+
+### Sprint chiusi questa sessione
+
+1. **MA4.7 ESTESO** (4 commits) — Geoblock middleware + Polymarket import + Signup flow + Real/Demo banner
+2. **MA5.1** (`3b5e231`) — Leaderboard + Creators UI + 7 API
+3. **MA5.2 base** (`40c83e4`) — Admin foundation
+4. **MA5.2 advanced** (`43c6f5a`) — Fees + Creators apps + Audit-log + Geo-block
+5. **MA5.3** (`a51d2cf`) — User settings + Notifications + Me hub
+6. **MA5 Signal AI** (`6598d1a`) — /signals page + 2 API
+7. **MA6 base** (`93eb0b5`) — Copy trading UI + DB schema
+8. **MA7 base** (`b7f9e35`) — Telegram bot scaffolding
+
+### Migrations applicate production
+
+- 015_app_settings_and_creators_fee_override
+- 016_copy_trades_and_follows_extension
+- 017_telegram_subscriptions
+
+### Audit findings finali: 9/10 chiusi
+
+Solo cron jobs + KYC + admin markets advanced rimangono per MA8.
+
+### Stato MVP
+
+**~75% MVP-ready** (era 35% inizio sessione).
+
+### Setup richiesto utente
+
+| Feature               | Setup                                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| Telegram bot          | @BotFather → env TELEGRAM_BOT_TOKEN + WEBHOOK_SECRET + NEXT_PUBLIC_TELEGRAM_BOT_USERNAME |
+| Builder fee Y2 30bps  | KYC su polymarket.com/settings (post-launch)                                             |
+| Signal AI engine cron | MA8                                                                                      |
+| Copy execution        | MA6.1 con session keys                                                                   |
+
+---
+
+## Stato precedente (2026-04-29 mezzanotte) — MA5.2 base chiuso
 
 **Sprint MA5.2 base chiuso (commit `40c83e4`)** — Admin Panel foundation operativa.
 
