@@ -5,6 +5,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { useBalance } from '@/lib/stores/useBalance'
 import { TrendingUp, TrendingDown, Activity } from 'lucide-react'
+import { EquitySparkline } from './EquitySparkline'
 
 interface Stats {
   totalValue: number
@@ -146,6 +147,8 @@ export function HeroFinanziario() {
           icon={<Activity size={12} />}
         />
       </div>
+
+      <EquitySparkline />
     </div>
   )
 }

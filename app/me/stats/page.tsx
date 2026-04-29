@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { Loader2, TrendingUp, Award, Target, Activity } from 'lucide-react'
+import { CalibrationCurve } from '@/components/me/CalibrationCurve'
 
 interface UserStats {
   total_trades: number
@@ -186,19 +187,7 @@ export default function MeStatsPage() {
         />
       </div>
 
-      <div
-        style={{
-          padding: 'var(--space-4)',
-          background: 'var(--color-bg-secondary)',
-          border: '1px solid var(--color-border-subtle)',
-          borderRadius: 'var(--radius-md)',
-          fontSize: 'var(--font-sm)',
-          color: 'var(--color-text-muted)',
-          textAlign: 'center',
-        }}
-      >
-        📈 Calibration curve + equity chart over time arriveranno in MA8 polish.
-      </div>
+      <CalibrationCurve />
     </div>
   )
 }

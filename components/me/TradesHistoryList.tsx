@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
-import { History } from 'lucide-react'
+import { History, Download } from 'lucide-react'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { fetchTradesHistory, type TradeHistoryItem } from '@/lib/api/positions-client'
 import { TradeHistoryRow } from './TradeHistoryRow'
@@ -70,14 +70,71 @@ export function TradesHistoryList() {
   if (!ready) return <SkeletonList />
   if (!authenticated) return <LoginPrompt onLogin={login} />
 
+  function exportCsv() {
+    const headers = ['Date', 'Type', 'Market', 'Side', 'Shares', 'Price', 'Total', 'PnL', 'IsDemo']
+    const rows = items.map((t) => {
+      const item = t as unknown as Record<string, unknown>
+      return [
+        item.executed_at ?? '',
+        item.trade_type ?? '',
+        item.market_title ?? item.market_id ?? '',
+        item.side ?? '',
+        item.shares ?? 0,
+        item.price ?? 0,
+        item.total_amount ?? 0,
+        item.pnl ?? 0,
+        item.is_demo ?? false,
+      ].join(',')
+    })
+    const csv = [headers.join(','), ...rows].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `auktora-trades-${new Date().toISOString().split('T')[0]}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <FilterBar
-        typeFilter={typeFilter}
-        periodFilter={periodFilter}
-        onTypeChange={setTypeFilter}
-        onPeriodChange={setPeriodFilter}
-      />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+          flexWrap: 'wrap',
+        }}
+      >
+        <FilterBar
+          typeFilter={typeFilter}
+          periodFilter={periodFilter}
+          onTypeChange={setTypeFilter}
+          onPeriodChange={setPeriodFilter}
+        />
+        {items.length > 0 && (
+          <button
+            type="button"
+            onClick={exportCsv}
+            aria-label="Export CSV"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '6px 12px',
+              background: 'var(--color-bg-tertiary)',
+              border: '1px solid var(--color-border-subtle)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--color-text-secondary)',
+              fontSize: 'var(--font-xs)',
+              cursor: 'pointer',
+            }}
+          >
+            <Download size={12} /> Export CSV
+          </button>
+        )}
+      </div>
 
       {error ? (
         <p style={{ color: 'var(--color-danger)', fontSize: 'var(--font-base)' }}>{error}</p>
