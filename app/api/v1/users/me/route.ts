@@ -78,9 +78,9 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
   }
 
   const supabase = createAdminClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await supabase
     .from('users')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .update(update as any)
     .eq('id', auth.userId)
 
