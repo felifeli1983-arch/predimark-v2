@@ -91,10 +91,23 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
         // Send Telegram if enabled
         if (f.notify_via_telegram && isBotEnabled()) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: telegramSub } = await (
-            supabase.from('telegram_subscriptions' as any) as any
-          )
+          // Cast intermediate per types Database non rigenerati post-mig 017
+          const tgClient = supabase.from('telegram_subscriptions' as never) as unknown as {
+            select: (cols: string) => {
+              eq: (
+                col: string,
+                val: string
+              ) => {
+                maybeSingle: () => Promise<{
+                  data: {
+                    telegram_chat_id: string | null
+                    is_linked: boolean | null
+                  } | null
+                }>
+              }
+            }
+          }
+          const { data: telegramSub } = await tgClient
             .select('telegram_chat_id, is_linked')
             .eq('user_id', f.follower_user_id)
             .maybeSingle()
