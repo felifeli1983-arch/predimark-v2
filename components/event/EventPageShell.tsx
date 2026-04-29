@@ -15,6 +15,10 @@ import { EventSidebarStub } from './EventSidebarStub'
 import { EventTradeBoot } from './EventTradeBoot'
 import { SignalBanner } from './SignalBanner'
 import { PriceHistoryChart } from './PriceHistoryChart'
+import { CryptoRoundNav } from './CryptoRoundNav'
+import { OrderBookExpander } from './OrderBookExpander'
+import { SentimentCard } from './SentimentCard'
+import { RelatedMarkets } from './RelatedMarkets'
 
 interface Props {
   event: AuktoraEvent
@@ -61,7 +65,17 @@ export function EventPageShell({ event }: Props) {
       <Suspense fallback={null}>
         <EventTradeBoot event={event} />
       </Suspense>
-      <PageContainer sidebar={<TradeWidget layout="sidebar" />}>
+      <PageContainer
+        sidebar={
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 24 }}>
+            <TradeWidget layout="sidebar" />
+            <SentimentCard event={event} />
+            {primaryTag !== 'all' && (
+              <RelatedMarkets primaryTag={primaryTag} excludeId={event.id} />
+            )}
+          </div>
+        }
+      >
         <div
           style={{
             display: 'flex',
@@ -133,14 +147,20 @@ export function EventPageShell({ event }: Props) {
               multiMarkets={multiMarkets}
             />
           )}
+          {event.kind === 'crypto_up_down' && event.seriesSlug && (
+            <CryptoRoundNav seriesSlug={event.seriesSlug} currentSlug={event.slug} />
+          )}
+          {event.markets[0]?.clobTokenIds?.[0] && (
+            <OrderBookExpander assetId={event.markets[0].clobTokenIds[0]} />
+          )}
           <EventProbabilities event={event} onTrade={openTradeWidget} />
           <EventRules description={event.description} />
-          {/* Sidebar inline su mobile + tablet portrait (<1024px) — solo Segnale + Mercati correlati,
+          {/* Sidebar inline su mobile + tablet portrait (<1024px) — Sentiment + Related,
             Trade Widget mobile arriva via bottom sheet */}
           <div className="lg:hidden">
             <EventSidebarStub event={event} layout="inline" />
           </div>
-          <EventInfoTabs />
+          <EventInfoTabs event={event} />
         </div>
       </PageContainer>
       {/* Bottom sheet mobile — fuori dalla grid per overlay full-width */}

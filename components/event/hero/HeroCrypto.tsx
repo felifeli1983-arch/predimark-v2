@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Coins, Clock } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useCountdown } from '@/lib/hooks/useCountdown'
@@ -32,6 +33,7 @@ function formatSpot(price: number): string {
 }
 
 export function HeroCrypto({ event }: Props) {
+  const router = useRouter()
   const [imgFailed, setImgFailed] = useState(false)
   const initial = event.title?.[0]?.toUpperCase() ?? '?'
   const isLive = event.active && !event.closed
@@ -39,6 +41,16 @@ export function HeroCrypto({ event }: Props) {
   const { price, change24h, loading } = useCryptoLivePrice(symbol, 'chainlink')
   const countdown = useCountdown(event.endDate)
   const imgSrc = event.icon || event.image
+  const refreshedRef = useRef(false)
+
+  // Auto-refresh 3s dopo scadenza round — ricarica dati Server Component
+  useEffect(() => {
+    if (countdown.expired && !refreshedRef.current) {
+      refreshedRef.current = true
+      const timer = setTimeout(() => router.refresh(), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [countdown.expired, router])
 
   return (
     <header

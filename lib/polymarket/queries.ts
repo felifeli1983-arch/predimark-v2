@@ -40,3 +40,20 @@ export async function searchEvents(query: string, limit: number = 20): Promise<G
     { revalidate: 15 }
   )
 }
+
+/**
+ * Fetch round della stessa serie crypto (es. tutti i round 'btc-up-or-down-5m').
+ * Ordinati per endDate decrescente (più recenti prima).
+ * Usato da CryptoRoundNav per mostrare pallini esito dei round storici.
+ */
+export async function fetchRelatedRounds(
+  seriesSlug: string,
+  limit: number = 15
+): Promise<GammaEvent[]> {
+  const events = await gammaGet<GammaEvent[]>(
+    '/events',
+    { seriesSlug, limit, order: 'endDate', ascending: false },
+    { revalidate: 60 }
+  )
+  return Array.isArray(events) ? events : []
+}

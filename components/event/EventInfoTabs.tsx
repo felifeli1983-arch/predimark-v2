@@ -1,19 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { SidebarActivity } from '@/components/home/SidebarActivity'
+import type { AuktoraEvent } from '@/lib/polymarket/mappers'
+import { EventActivity } from './EventActivity'
 
-type TabId = 'comments' | 'news' | 'holders' | 'activity'
+type TabId = 'activity' | 'comments' | 'news' | 'holders'
 
 const TABS: Array<{ id: TabId; label: string }> = [
+  { id: 'activity', label: 'Activity' },
   { id: 'comments', label: 'Comments' },
   { id: 'news', label: 'News' },
   { id: 'holders', label: 'Holders' },
-  { id: 'activity', label: 'Activity' },
 ]
 
-export function EventInfoTabs() {
-  const [active, setActive] = useState<TabId>('comments')
+interface Props {
+  event: AuktoraEvent
+}
+
+export function EventInfoTabs({ event }: Props) {
+  const [active, setActive] = useState<TabId>('activity')
+  const conditionId = event.markets[0]?.conditionId ?? ''
 
   return (
     <section
@@ -64,10 +70,16 @@ export function EventInfoTabs() {
         })}
       </div>
       <div style={{ padding: 16, minHeight: 140 }}>
-        {active === 'comments' && <Placeholder text="Commenti in arrivo" />}
-        {active === 'news' && <Placeholder text="News in arrivo" />}
-        {active === 'holders' && <Placeholder text="Top holder in arrivo" />}
-        {active === 'activity' && <SidebarActivity />}
+        {active === 'activity' && <EventActivity conditionId={conditionId} />}
+        {active === 'comments' && (
+          <Placeholder text="Feed commenti — integrazione provider Polymarket Comments in MA6." />
+        )}
+        {active === 'news' && (
+          <Placeholder text="News aggregator — feed dedicato in MA6 (Decrypt, Coindesk, Reuters per categoria)." />
+        )}
+        {active === 'holders' && (
+          <Placeholder text="Top holders — query positions on-chain per outcome, in MA6." />
+        )}
       </div>
     </section>
   )
@@ -79,9 +91,10 @@ function Placeholder({ text }: { text: string }) {
       style={{
         margin: 0,
         color: 'var(--color-text-muted)',
-        fontSize: 'var(--font-base)',
+        fontSize: 'var(--font-sm)',
         textAlign: 'center',
         padding: '32px 16px',
+        lineHeight: 1.5,
       }}
     >
       {text}

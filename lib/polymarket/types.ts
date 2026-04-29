@@ -96,4 +96,6 @@ export interface GammaEventsParams {
   id?: string
   slug?: string
   search?: string
+  /** Filtra per slug serie (es. 'btc-up-or-down-5m') — round crypto correlati */
+  seriesSlug?: string
 }

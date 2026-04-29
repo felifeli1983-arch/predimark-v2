@@ -1,7 +1,8 @@
 'use client'
 
-import { Sparkles, Target } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
+import { SentimentCard } from './SentimentCard'
+import { RelatedMarkets } from './RelatedMarkets'
 
 interface Props {
   event: AuktoraEvent
@@ -9,15 +10,17 @@ interface Props {
 }
 
 /**
- * Sidebar event-page stubs — Segnale Auktora + Mercati correlati.
+ * Sprint "Make Event Page Real" — sidebar evento con Sentiment reale
+ * + Mercati correlati live da Gamma. Sostituisce gli stub MA5.
  *
- * Il Trade Widget reale è ora montato direttamente da `EventPageShell`:
- * - desktop ≥lg: come slot sidebar di `<PageContainer>`
- * - mobile <lg: come bottom sheet (visibility controllata da `useTradeWidget.isOpen`)
+ * Il Trade Widget è montato direttamente da `EventPageShell`:
+ *  - desktop ≥lg: come slot sidebar di `<PageContainer>`
+ *  - mobile <lg: come bottom sheet (visibility da `useTradeWidget.isOpen`)
  *
- * Quando layout='inline' (mobile dentro main column) mostra solo i 2 stub.
+ * Quando layout='inline' (mobile dentro main column) mostra Sentiment+Related.
  */
-export function EventSidebarStub({ layout }: Props) {
+export function EventSidebarStub({ event, layout }: Props) {
+  const primaryTag = event.tags[0] ?? ''
   return (
     <div
       style={{
@@ -27,86 +30,8 @@ export function EventSidebarStub({ layout }: Props) {
         paddingBottom: layout === 'sidebar' ? 24 : 0,
       }}
     >
-      <SignalStub />
-      <RelatedStub />
+      <SentimentCard event={event} />
+      {primaryTag && <RelatedMarkets primaryTag={primaryTag} excludeId={event.id} />}
     </div>
-  )
-}
-
-function SignalStub() {
-  return (
-    <section
-      style={{
-        background: 'var(--color-bg-secondary)',
-        border: '1px solid var(--color-border-subtle)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 14,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <Target size={14} style={{ color: 'var(--color-warning)' }} />
-        <h3
-          style={{
-            margin: 0,
-            fontSize: 'var(--font-sm)',
-            fontWeight: 700,
-            color: 'var(--color-text-primary)',
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Segnale Auktora
-        </h3>
-      </div>
-      <p
-        style={{
-          margin: 0,
-          fontSize: 'var(--font-xs)',
-          color: 'var(--color-text-muted)',
-          lineHeight: 1.55,
-        }}
-      >
-        Segnale algoritmico — disponibile in MA5.
-      </p>
-    </section>
-  )
-}
-
-function RelatedStub() {
-  return (
-    <section
-      style={{
-        background: 'var(--color-bg-secondary)',
-        border: '1px solid var(--color-border-subtle)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 14,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <Sparkles size={14} style={{ color: 'var(--color-cta)' }} />
-        <h3
-          style={{
-            margin: 0,
-            fontSize: 'var(--font-sm)',
-            fontWeight: 700,
-            color: 'var(--color-text-primary)',
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Mercati correlati
-        </h3>
-      </div>
-      <p
-        style={{
-          margin: 0,
-          fontSize: 'var(--font-xs)',
-          color: 'var(--color-text-muted)',
-          lineHeight: 1.55,
-        }}
-      >
-        Mercati correlati — disponibile in MA5.
-      </p>
-    </section>
   )
 }

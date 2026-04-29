@@ -6,6 +6,7 @@ import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { CenteredBox, Container, SectionTitle } from './chart/ChartShell'
 import { HistoryChart } from './HistoryChart'
 import { MultiLineChart, type MultiMarket } from './MultiLineChart'
+import { CryptoCandleChart } from './CryptoCandleChart'
 
 interface Props {
   marketId: string
@@ -62,40 +63,23 @@ function LiveSpotView({ cryptoSymbol }: { cryptoSymbol: string }) {
 
   return (
     <Container>
-      <SectionTitle>
-        <Coins size={12} style={{ display: 'inline', marginRight: 4 }} />
-        Prezzo spot live · Chainlink
-      </SectionTitle>
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          gap: 'var(--space-1)',
-          padding: 'var(--space-3) 0',
+          justifyContent: 'space-between',
+          gap: 'var(--space-2)',
         }}
       >
-        {!cryptoSymbol ? (
-          <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
-            Asset non riconosciuto per questo evento.
-          </span>
-        ) : loading && !connected ? (
-          <>
-            <Loader2
-              size={20}
-              className="animate-spin"
-              style={{ color: 'var(--color-text-muted)' }}
-            />
-            <span style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
-              Connessione live feed…
-            </span>
-          </>
-        ) : connected ? (
-          <>
+        <SectionTitle>
+          <Coins size={12} style={{ display: 'inline', marginRight: 4 }} />
+          Prezzo spot live · Chainlink
+        </SectionTitle>
+        {connected && (
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
             <strong
               style={{
-                fontSize: 'var(--font-2xl)',
+                fontSize: 'var(--font-lg)',
                 fontWeight: 800,
                 color: 'var(--color-text-primary)',
                 letterSpacing: '-0.02em',
@@ -113,16 +97,33 @@ function LiveSpotView({ cryptoSymbol }: { cryptoSymbol: string }) {
                 }}
               >
                 {change24h >= 0 ? '+' : ''}
-                {change24h.toFixed(2)}% (24h)
+                {change24h.toFixed(2)}%
               </span>
             )}
-          </>
-        ) : (
-          <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
-            Feed non disponibile.
-          </span>
+          </div>
         )}
       </div>
+
+      {!cryptoSymbol ? (
+        <CenteredBox>
+          <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
+            Asset non riconosciuto per questo evento.
+          </span>
+        </CenteredBox>
+      ) : loading && !connected ? (
+        <CenteredBox>
+          <Loader2
+            size={20}
+            className="animate-spin"
+            style={{ color: 'var(--color-text-muted)' }}
+          />
+          <span style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
+            Connessione live feed…
+          </span>
+        </CenteredBox>
+      ) : (
+        <CryptoCandleChart symbol={cryptoSymbol} />
+      )}
     </Container>
   )
 }

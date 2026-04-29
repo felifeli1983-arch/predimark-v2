@@ -17,6 +17,8 @@ export interface AuktoraOutcome {
 
 export interface AuktoraMarket {
   id: string
+  /** Polymarket conditionId — usato per query CLOB (recent-trades, market details). */
+  conditionId: string
   question: string
   slug: string
   yesPrice: number // 0-1, alias di outcomes[0].price
@@ -59,6 +61,12 @@ export interface AuktoraEvent {
   tags: string[]
   markets: AuktoraMarket[]
   kind: CardKind
+  /**
+   * Slug della serie Polymarket (es. 'btc-up-or-down-5m').
+   * Presente solo per eventi crypto_up_down con series[].
+   * Usato da CryptoRoundNav per fetchare round storici adiacenti.
+   */
+  seriesSlug?: string
 }
 
 const CRYPTO_HINTS = ['btc', 'eth', 'sol', 'crypto', 'bitcoin', 'ethereum']
@@ -143,6 +151,7 @@ export function mapGammaMarket(raw: GammaMarket): AuktoraMarket {
 
   return {
     id: raw.id,
+    conditionId: raw.conditionId ?? '',
     question: raw.question,
     slug: raw.slug,
     yesPrice,
@@ -176,5 +185,6 @@ export function mapGammaEvent(raw: GammaEvent): AuktoraEvent {
     tags: (raw.tags ?? []).map((t) => t.slug),
     markets: (raw.markets ?? []).map(mapGammaMarket),
     kind: classifyEvent(raw),
+    seriesSlug: raw.series?.[0]?.slug ?? undefined,
   }
 }
