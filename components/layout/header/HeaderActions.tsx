@@ -49,7 +49,7 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
       console.error('[deposit] no wallet found', { walletsCount: wallets.length })
       return
     }
-    console.info('[deposit] starting fundWallet', { address: embedded.address })
+    console.warn('[deposit] starting fundWallet', { address: embedded.address })
     try {
       await fundWallet({
         address: embedded.address,
@@ -59,7 +59,7 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
           asset: 'USDC',
         },
       })
-      console.info('[deposit] fundWallet completed')
+      console.warn('[deposit] fundWallet completed')
       // BalanceHydrator si auto-refreshrà al prossimo poll
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Errore deposito'

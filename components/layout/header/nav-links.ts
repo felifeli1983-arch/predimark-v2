@@ -1,7 +1,5 @@
 export const NAV_LINKS = [
-  { href: '/markets', label: 'Markets' },
-  { href: '/signals', label: 'Signals' },
+  { href: '/', label: 'Markets' },
   { href: '/leaderboard', label: 'Leaderboard' },
-  { href: '/news', label: 'News' },
-  { href: '/creator', label: 'Creator' },
+  { href: '/creator/apply', label: 'Diventa Creator' },
 ] as const
