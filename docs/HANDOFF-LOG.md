@@ -2,7 +2,56 @@
 
 > Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
 > Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
-> Ultimo update: 2026-04-29 tarda sera — MA4.7 ESTESO chiuso (4 fasi)
+> Ultimo update: 2026-04-29 notte — MA5.1 chiuso (Leaderboard + Creators UI base)
+
+---
+
+## Stato corrente (2026-04-29 notte) — MA5.1 chiuso
+
+**Sprint MA5.1 chiuso (commit `3b5e231`)** — Leaderboard + Creators UI base.
+
+### Backend API (7 endpoint)
+
+- `GET /api/v1/leaderboard?tab=creators|external|both&period=today|7d|30d|all` — pubblico
+- `GET /api/v1/creators/apply` — status application del current user
+- `POST /api/v1/creators/apply` — INSERT creators con application_status='pending'
+- `GET /api/v1/creators/[creatorId]` — profile pubblico Verified Creator
+- `GET /api/v1/traders/[traderId]` — profile External Trader Polymarket
+- `GET /api/v1/follows` — lista follow del current user
+- `POST /api/v1/follows` — toggle follow/unfollow
+
+### Frontend pages
+
+- `/leaderboard` — tab switcher (Tutti / Verified Creators / Top Polymarket Traders) + period filter
+- `/creator/[creatorId]` — hero profile con stats (followers, copiers, earnings, score)
+- `/trader/[traderId]` — External Trader profile con 4 ranks (today/7d/30d/all)
+- `/creator/apply` — form application con state machine (none/pending/approved/rejected)
+
+### Components nuovi
+
+- `components/creator/FollowButton.tsx` — toggle reusable, optimistic update, login redirect
+- `components/leaderboard/LeaderboardView.tsx` — main client view con fetch + filters
+
+### Schema utilizzato
+
+Zero migration nuove. Tabelle esistenti (mig 003 + 005): `creators`, `external_traders`, `follows`.
+
+### Out of scope (rinviato)
+
+- Cron sync external_traders (manuale popolamento per MVP, cron daily in MA5.2 admin)
+- Performance chart ROI over time
+- Posizioni/trade list per Creator/Trader profile (MA6)
+
+### Closes 2/10 gap audit
+
+- ✅ Leaderboard 0% (era completely missing)
+- ✅ Creator UI 0% (profile + apply form)
+
+**Stato post-MA5.1**: ~50% MVP-ready (era 40%). Prossimo: MA5.2 admin panel foundation (~3-4 giorni).
+
+---
+
+## MA4.7 ESTESO chiuso (2026-04-29 tarda sera)
 
 ---
 
