@@ -2,7 +2,77 @@
 
 > Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
 > Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
-> Ultimo update: 2026-04-29 notte — MA5.1 chiuso (Leaderboard + Creators UI base)
+> Ultimo update: 2026-04-29 mezzanotte — MA5.2 base chiuso (admin foundation + dashboard + users)
+
+---
+
+## Stato corrente (2026-04-29 mezzanotte) — MA5.2 base chiuso
+
+**Sprint MA5.2 base chiuso (commit `40c83e4`)** — Admin Panel foundation operativa.
+
+### Audit + test E2E (pre-sprint)
+
+Eseguito `npm run validate` + `npm run build` + smoke test routes con dev server live:
+
+- ✅ Typecheck: 0 errori
+- ✅ Lint: 0 errors, 2 warnings (`console.info` debug logs in HeaderActions, non bloccanti)
+- ✅ Tests: **85/85 vitest passing** in 15 file
+- ✅ Build production: 33 routes statiche + 17 API endpoint compilati
+- ✅ Smoke routes (13 page routes): tutte 200/307 OK
+- ✅ Smoke API (6 endpoint testati): pubblici 200, auth-required 401 corretti
+- ✅ Geo-block middleware verificato live: US → 307 `/geo-blocked`, AE/UAE → 200, IT su API → 403 JSON
+
+### MA5.2 base — implementato
+
+**Foundation**:
+
+- `lib/admin/auth.ts`: `requireAdmin(roles[])` server-side guard, hierarchy `super_admin > admin > moderator > viewer`. Ritorna 404 (non 403) se non admin per non leak panel
+- `/api/v1/admin/me`: GET endpoint per UI gating
+- `/app/admin/layout.tsx`: client-side guard (fetch /api/v1/admin/me, redirect / se non admin), render AdminTopBar + AdminSidebar + main content
+- `components/admin/AdminSidebar.tsx`: 8 group nav (Overview/Users/Markets/Fees/Creators/Compliance/Audit/Settings), 240px fixed
+- `components/admin/AdminTopBar.tsx`: bordeaux distinctive bg, role badge, switch-to-user-view, logout
+
+**Dashboard /admin**:
+
+- 6 KPI card (utenti totali, active 7d, trade totali, volume + 24h, KYC pending, refund pending)
+- `/api/v1/admin/analytics`: aggrega DAU, signups, trades, volume da DB
+- Charts + recent activity placeholder (rinviato Fase B avanzata)
+
+**Users management /admin/users**:
+
+- Search (email + username) + filter status (Active/Banned/Suspended)
+- Table con badge status colorati
+- `/api/v1/admin/users`: GET con pagination + search + status filter
+
+**Bonus DB**:
+
+- Inserito Feliciano (`7f909255-65fa-4aaf-845f-fbe13acd4049`) come `super_admin` in `admin_users` production. Dopo login a auktora.com può accedere a `/admin`
+
+### Out of scope MA5.2 base (rinviato MA5.2 advanced)
+
+- `/admin/markets` curate drag-drop
+- `/admin/fees` runtime config form (builder fee Y1/Y2 + Creator share editor)
+- `/admin/creators/applications` queue review
+- `/admin/audit-log` searchable
+- `/admin/compliance/geo-block` editor
+- `/admin/settings/team` member management
+- Audit log middleware (`logAdminAction`)
+- ConfirmDialog destructive actions
+
+### Closes 1/4 gap audit critici
+
+- ✅ Admin panel foundation operativa (era 0/36 sub-pages, ora 3/36 + auth + layout)
+
+### Stato post-MA5.2 base
+
+- **MVP-ready**: ~55% (era 50% post-MA5.1, 35% inizio sessione)
+- **16 commit locali**: branch ahead di 16, NO push
+- **Audit findings closes**: 7/10 (admin foundation parziale + 6 chiusi prima)
+- **Prossimo**: MA5.2 advanced sub-pages oppure MA5 (Signal AI) oppure pausa per push
+
+---
+
+## MA5.1 chiuso (2026-04-29 notte)
 
 ---
 
