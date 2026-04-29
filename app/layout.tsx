@@ -9,6 +9,7 @@ import { Header } from '@/components/layout/Header'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Footer } from '@/components/layout/Footer'
 import { DemoModeBanner } from '@/components/layout/DemoModeBanner'
+import { OnboardingModal } from '@/components/onboarding/OnboardingModal'
 import { NavTabs } from '@/components/home/NavTabs'
 import { WatchlistHydrator } from '@/components/WatchlistHydrator'
 import { BalanceHydrator } from '@/components/BalanceHydrator'
@@ -113,6 +114,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <BottomNav />
                 <WatchlistHydrator />
                 <BalanceHydrator />
+                <OnboardingModal />
               </div>
             </ThemeProvider>
           </PrivyProvider>
