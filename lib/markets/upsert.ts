@@ -12,6 +12,8 @@ export interface MarketUpsertPayload {
   currentYesPrice?: number
   /** [yesTokenId, noTokenId] — Polymarket conditional token IDs. */
   clobTokenIds?: [string, string] | null
+  /** Mercato aperto e non risolto. Default true se non fornito. */
+  isActive?: boolean
 }
 
 /**
@@ -34,6 +36,7 @@ export async function resolveOrUpsertMarket(
     image_url: payload.image ?? null,
     current_yes_price: payload.currentYesPrice ?? null,
     clob_token_ids: payload.clobTokenIds ?? null,
+    is_active: payload.isActive ?? true,
     last_synced_at: new Date().toISOString(),
   }
 

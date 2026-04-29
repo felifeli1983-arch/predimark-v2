@@ -101,7 +101,14 @@ export function EventPageShell({ event }: Props) {
 
           <EventHero event={event} />
           {event.markets[0] && <SignalBanner marketId={event.markets[0].id} />}
-          {event.markets[0] && <PriceHistoryChart marketId={event.markets[0].id} />}
+          {event.markets[0] && (
+            <PriceHistoryChart
+              marketId={event.markets[0].id}
+              cardKind={event.kind}
+              assetId={event.markets[0].clobTokenIds?.[0] ?? null}
+              isLive={event.active && !event.closed}
+            />
+          )}
           <EventProbabilities event={event} onTrade={openTradeWidget} />
           <EventRules description={event.description} />
           {/* Sidebar inline su mobile + tablet portrait (<1024px) — solo Segnale + Mercati correlati,
