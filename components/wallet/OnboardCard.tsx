@@ -67,8 +67,8 @@ export function OnboardCard() {
     setError(null)
     setBusy(true)
     try {
-      const embedded = getEmbeddedConnectedWallet(wallets)
-      if (!embedded) throw new Error('Wallet embedded Privy non trovato')
+      const embedded = getEmbeddedConnectedWallet(wallets) ?? wallets[0]
+      if (!embedded) throw new Error('Nessun wallet rilevato — riprova dopo il login')
       const provider = await embedded.getEthereumProvider()
       const walletClient: WalletClient = createWalletClient({
         account: embedded.address as `0x${string}`,
@@ -270,8 +270,8 @@ function WrapPusdSection({ onSuccess }: { onSuccess: () => void | Promise<void> 
       const num = Number(amount)
       if (!Number.isFinite(num) || num <= 0) throw new Error('Importo non valido')
 
-      const embedded = getEmbeddedConnectedWallet(wallets)
-      if (!embedded) throw new Error('Wallet embedded non trovato')
+      const embedded = getEmbeddedConnectedWallet(wallets) ?? wallets[0]
+      if (!embedded) throw new Error('Nessun wallet rilevato')
 
       const provider = await embedded.getEthereumProvider()
       const walletClient = createWalletClient({
