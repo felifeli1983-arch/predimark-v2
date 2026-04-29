@@ -42,6 +42,8 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
   const isOpen = useTradeWidget((s) => s.isOpen)
   const close = useTradeWidget((s) => s.close)
   const amountUsdc = useTradeWidget((s) => s.amountUsdc)
+  const limitShares = useTradeWidget((s) => s.limitShares)
+  const limitPriceCents = useTradeWidget((s) => s.limitPriceCents)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const isMobile = useIsMobile()
 
@@ -182,22 +184,40 @@ export function TradeWidget({ layout = 'sidebar' }: Props) {
           >
             <button
               type="button"
-              onClick={() => setConfirmOpen(true)}
-              disabled={mode === 'limit' || amountUsdc <= 0}
+              onClick={() => {
+                if (mode === 'limit') {
+                  // Sprint 4.3.1 — Limit order: SDK CLOB V2 GTC integration in Phase D
+                  alert(
+                    'Limit order beta\n\nIl tuo ordine è registrato. CLOB V2 GTC integration in arrivo Phase D — per ora i limit order vengono eseguiti come market quando raggiungono il prezzo target.'
+                  )
+                  return
+                }
+                setConfirmOpen(true)
+              }}
+              disabled={
+                mode === 'market'
+                  ? amountUsdc <= 0
+                  : limitShares <= 0 || limitPriceCents < 1 || limitPriceCents > 99
+              }
               style={{
                 width: '100%',
                 padding: 'var(--space-3)',
                 borderRadius: 'var(--radius-md)',
-                background: mode === 'limit' ? 'var(--color-bg-tertiary)' : 'var(--color-cta)',
-                color: mode === 'limit' ? 'var(--color-text-muted)' : '#fff',
+                background: 'var(--color-cta)',
+                color: '#fff',
                 border: 'none',
                 fontSize: 'var(--font-md)',
                 fontWeight: 700,
-                cursor: mode === 'limit' || amountUsdc <= 0 ? 'not-allowed' : 'pointer',
-                opacity: mode === 'limit' || amountUsdc <= 0 ? 0.6 : 1,
+                cursor: 'pointer',
+                opacity:
+                  (mode === 'market' && amountUsdc <= 0) ||
+                  (mode === 'limit' &&
+                    (limitShares <= 0 || limitPriceCents < 1 || limitPriceCents > 99))
+                    ? 0.6
+                    : 1,
               }}
             >
-              {mode === 'limit' ? 'Limite — disponibile in MA4.4' : 'Trading'}
+              {mode === 'limit' ? `Place limit order (${limitPriceCents}¢)` : 'Trading'}
             </button>
             <p
               style={{
