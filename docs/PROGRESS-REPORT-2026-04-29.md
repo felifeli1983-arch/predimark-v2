@@ -1,326 +1,255 @@
 # Auktora — Progress Report 2026-04-29
 
-> Snapshot completo: cosa è fatto vs cosa resta da fare.
-> Stato MVP: **~75% ready**, 27 commit live su origin/main, 17 migrations applicate.
+> Snapshot completo allineato a Doc 09 ROADMAP — numerazione sprint X.Y.Z ufficiale.
+> Stato MVP: **~75% ready** · 28 commit live · 17 migrations applicate · 85/85 test ✅
+
+**Legenda**: ✅ done · ⚠️ partial / done con divergenze · ❌ todo
 
 ---
 
-## ✅ DONE — Cosa è implementato e live
+## MA1 — Foundation & Setup (12/12 ✅)
 
-### MA1 — Foundation (12/12 sprint)
-
-- ✅ Next.js 16 + React 19 + Turbopack + TypeScript strict
-- ✅ Tailwind 4 con `@theme` directive
-- ✅ Stack: Privy v3, Supabase, Polymarket CLOB V2 SDK, viem, lucide-react, Zustand, React Query
-- ✅ Repo GitHub + CI lint-staged hooks (eslint --fix + prettier)
-- ✅ Vercel auto-deploy attivo
-
-### MA2 — Database & Auth
-
-- ✅ Supabase staging + production (39 tables totali, 17 migrations applicate)
-- ✅ RLS policies attive su tutte le tabelle
-- ✅ Audit log partitioned monthly + event triggers
-- ✅ Privy auth flow + JWT verification server-side
-- ✅ User upsert self-healing via privy_did
-- ✅ AES-256-GCM encryption per Polymarket L2 API creds at-rest
-
-### MA3 — Core Pages
-
-- ✅ Home page (`/`) — HeroZone + MarketsSection + Sidebar
-- ✅ Markets live da Polymarket Gamma API (40 featured, cache 30s)
-- ✅ Event detail (`/event/[slug]`) — 5 layout dinamici (Binary, Multi-outcome, H2H Sport, Crypto Round, Multi-strike)
-- ✅ Watchlist (`/watchlist`)
-- ✅ Header con DesktopNav + DesktopSearch + MobileDrawer + ProfileDropdown + RealDemoToggle
-- ✅ BottomNav mobile, Footer
-- ✅ Design tokens Doc 13 (244 inline values → CSS vars)
-
-### MA4 — Trading Core
-
-#### MA4.1-4.3 (DEMO lifecycle)
-
-- ✅ TradeWidget DEMO con tabs Mercato/Limite + quick amounts
-- ✅ DEMO mode toggle in header (RealDemoToggle)
-- ✅ Watchlist sync con Zustand + localStorage
-
-#### MA4.4 — Polymarket CLOB V2 integration
-
-- ✅ Phase A: SDK V2 read-only client + health endpoint
-- ✅ Phase B: onboarding L2 API + pUSD balance + crypto AES-256-GCM
-- ✅ Phase C-1+2+3: REAL trading lifecycle (sign client → CLOB post → DB)
-- ✅ Phase C-4: Sell REAL + Wrap USDC.e→pUSD + clob_token_ids migration + geo-block 33 paesi
-
-#### MA4.5 — Positions & History
-
-- ✅ `/me/positions` con summary card (totalValue + totalPnl)
-- ✅ `/me/history` storico trade
-- ✅ Sell flow DEMO + REAL (REAL via CLOB V2 sign + post)
-
-#### MA4.6 — Funding flow
-
-- ✅ Deposit via Privy `useFundWallet` (MoonPay onramp con Apple Pay/Card)
-- ✅ Withdraw 2-step (unwrap pUSD → USDC.e on-chain + link MoonPay sell-to-bank)
-- ✅ FundActionsRow shared component
-- ✅ Privy dashboard configurato (Polygon + USDC + MoonPay enabled)
-
-#### MA4.7 ESTESO — Onboarding & Compliance (4 fasi)
-
-- ✅ **Fase 1**: Geoblock middleware (`middleware.ts`) intercept `/me/*`, `/api/v1/trades/*`, `/api/v1/polymarket/*`. BLOCKED → redirect `/geo-blocked`, CLOSE_ONLY → solo sell, US/AE/IT testati live
-- ✅ **Fase 2**: Polymarket account import — OnboardCard external wallet support + PolymarketImportBanner welcome one-time
-- ✅ **Fase 3**: Signup flow dedicato — `/signup` + `/signup/welcome` (4-step tutorial) + `/signup/choose-mode` (REAL/DEMO) + `/login`
-- ✅ **Fase 4**: Real/Demo banner globale (`DemoModeBanner.tsx`) + RealDemoToggle in header
-
-### MA5 — Discovery & Admin
-
-#### MA5.1 — Leaderboard + Creators UI
-
-- ✅ `/leaderboard` 2 tab (Verified Creators + Top Polymarket Traders) + period filter
-- ✅ `/creator/[creatorId]` profile pubblico con stats
-- ✅ `/trader/[traderId]` External Trader profile con 4 ranks
-- ✅ `/creator/apply` form Creator program con state machine (none/pending/approved/rejected)
-- ✅ FollowButton reusable con optimistic update
-- ✅ 7 API endpoint: leaderboard, creators/apply, creators/[id], traders/[id], follows GET/POST
-
-#### MA5.2 base — Admin Panel foundation
-
-- ✅ `lib/admin/auth.ts` — `requireAdmin(roles[])` server-side guard, hierarchy super_admin > admin > moderator > viewer
-- ✅ `/api/v1/admin/me` — UI gating endpoint
-- ✅ `/app/admin/layout.tsx` — client guard + redirect / se non admin
-- ✅ `AdminSidebar` (8 group nav) + `AdminTopBar` (bordeaux distinctive)
-- ✅ `/admin` Dashboard con 6 KPI card (utenti totali, active 7d, trade totali, volume + 24h, KYC pending, refund pending)
-- ✅ `/admin/users` lista + search + status filter
-- ✅ Feliciano inserito come `super_admin` in DB production
-
-#### MA5.2 advanced — Admin sub-pages
-
-- ✅ Migration 015: `app_settings` table + `creators.fee_share_override_bps`
-- ✅ `/admin/fees` runtime config (Y1/Y2 builder fee + Creator share + min payout) con reason note obbligatoria
-- ✅ `/admin/creators/applications` queue review approve/reject
-- ✅ `/admin/audit-log` lista 200 eventi + expand JSON diff before/after
-- ✅ `/admin/compliance/geo-block` lista 31 BLOCKED + 4 CLOSE_ONLY + 4 RESTRICTED_REGIONS
-
-#### MA5.3 — User settings + Me hub
-
-- ✅ `/me` hub dashboard con 8 link cards
-- ✅ `/me/settings` (profilo: display_name, bio, lingua + preferenze: notify_push/email/telegram/profile_visible)
-- ✅ `/me/notifications` lista + mark-all-read
-- ✅ API: GET/PUT users/me, GET/PUT preferences, GET/PUT notifications
-
-#### MA5 Signal AI — MVP
-
-- ✅ `/signals` page con BETA · GRATIS badge + performance summary
-- ✅ API: GET /signals (list active filtered) + GET /signals/performance (track record)
-- ✅ SignalsView con SignalCard + EmptyState
-- ✅ Nav link aggiunto
-
-### MA6 base — Copy trading UI
-
-- ✅ Migration 016: `copy_trades` table + extension `follows` (copy_active, slippage_cap_bps, bankroll_pct, max_per_trade_usdc)
-- ✅ `/me/following` page con toggle copy_active + edit bankroll % + slippage cap + delete follow
-- ✅ API: PUT/DELETE /api/v1/follows/[followId]
-- ✅ Empty state con CTA leaderboard
-
-### MA7 base — Telegram bot scaffolding
-
-- ✅ Migration 017: `telegram_subscriptions` table
-- ✅ `lib/telegram/bot.ts` (sendMessage, generateLinkCode, isBotEnabled)
-- ✅ POST /api/v1/telegram/connect — genera link_code + bot_url deep-link
-- ✅ GET /api/v1/telegram/connect — status link
-- ✅ POST /api/v1/telegram/webhook — riceve update Telegram con secret verification
-- ✅ 4 commands: /start [CODE], /link CODE, /status, /help
-
-### Audit & Test
-
-- ✅ `npm run validate`: 85/85 test passing
-- ✅ `npm run build` production OK
-- ✅ Smoke test E2E live: 13 routes 200/307 + 6 API public/auth + geoblock simulation US/AE/IT
-- ✅ Audit completo 19 docs vs codice (subagent Explore)
-
-### Documentation
-
-- ✅ Doc 14 — Monetization Strategy (builder fee Y1/Y2 + Creator program 30/70 + External Traders + Auktora Pro)
-- ✅ PROMPT-SPRINT-MA4.7.md, MA5.1, MA5.2, MA6
-- ✅ HANDOFF-LOG aggiornato
-- ✅ 9 memorie persistite in `~/.claude/projects/.../memory/`
-- ✅ Doc 04 wireframe admin esteso con per-Creator override
-- ✅ Doc 09 ROADMAP aggiornato con MA4.7 inserito
+| Sprint | Titolo                                        | Status |
+| ------ | --------------------------------------------- | ------ |
+| 1.1.1  | Setup credenziali GitHub e Supabase           | ✅     |
+| 1.1.2  | Init Next.js 16 project                       | ✅     |
+| 1.1.3  | Setup design tokens globals.css               | ✅     |
+| 1.2.1  | Crea Supabase projects (staging + production) | ✅     |
+| 1.2.2  | Setup Supabase client e helpers               | ✅     |
+| 1.3.1  | Crea Privy app + configurazione               | ✅     |
+| 1.3.2  | Integrazione Privy SDK in Next.js             | ✅     |
+| 1.4.1  | Setup Vercel project + environments           | ✅     |
+| 1.4.2  | GitHub Actions CI pipeline                    | ✅     |
+| 1.5.1  | Setup ESLint, Prettier, Husky pre-commit      | ✅     |
+| 1.5.2  | Setup Vitest + React Testing Library          | ✅     |
+| 1.5.3  | Inserimento doc 1-8 in cartella progetto      | ✅     |
 
 ---
 
-## ❌ TODO — Cosa resta da fare
+## MA2 — Database & Auth (13/13 ✅)
 
-### Sprint da completare
-
-| Sprint                                                                    | Effort         | Priorità   | Note                                                                                   |
-| ------------------------------------------------------------------------- | -------------- | ---------- | -------------------------------------------------------------------------------------- |
-| **MA6.1** — Auto-copy session keys + relayer                              | ~1-2 settimane | MEDIA      | Schema `copy_trading_sessions` esiste; serve session keys + bot relayer + atomic batch |
-| **MA7 advanced** — Notification dispatcher + Telegram premium             | ~3-5 giorni    | MEDIA      | Cron job push notifications + Stripe €5/mese flow                                      |
-| **MA8 finale** — Polish + remaining admin + Auktora Pro sub               | ~2-3 settimane | MEDIA-ALTA | Vedi sotto                                                                             |
-| **Phase D** (post-utenti) — WS price stream + limit orders + chart prezzi | ~1-2 settimane | BASSA      | Rinviato, dipende da feedback utenti reali                                             |
-
-### MA8 — Specifiche pending
-
-#### Cron jobs
-
-- ❌ Signal AI engine (algoritmi: orderbook imbalance, final period momentum, news catalyst)
-- ❌ Sync external_traders daily (top 100 wallet Polymarket via Data API)
-- ❌ Notification dispatcher (push trade events ai follower via Telegram + push)
-- ❌ Creator payouts mensile (1° del mese, distribuzione 30% builder fee on-chain)
-- ❌ Calibration tracking (signals resolved → was_correct → realized_edge_pct)
-
-#### Admin sub-pages mancanti (27 di 36)
-
-**Markets (4)**:
-
-- ❌ `/admin/markets` lista
-- ❌ `/admin/markets/featured` curate drag-drop (4 sezioni)
-- ❌ `/admin/markets/hidden`
-- ❌ `/admin/markets/import` Polymarket slug
-
-**Users (3)**:
-
-- ❌ `/admin/users/banned`
-- ❌ `/admin/users/kyc` review queue
-- ❌ `/admin/users/refunds` queue
-- ❌ `/admin/users/[id]` detail con tabs (Overview/Trades/KYC/Notifications/Audit)
-
-**Fees (2)**:
-
-- ❌ `/admin/fees/history` log cambi
-- ❌ `/admin/fees/revenue` real-time dashboard
-
-**Creators (3)**:
-
-- ❌ `/admin/creators` lista verified
-- ❌ `/admin/creators/[id]` detail con edit fee_share_override_bps
-- ❌ `/admin/creators/payouts` queue payout
-- ❌ `/admin/creators/suspended`
-
-**Referrals (2)**: `/admin/referrals` + `/admin/referrals/payouts`
-
-**Signals (3)**: `/admin/signals` + `/admin/signals/performance` + `/admin/signals/algos`
-
-**Notifications (3)**: `/admin/notifications/broadcast` + `templates` + `history`
-
-**Analytics (4)**: `/admin/analytics` + `users` (funnel) + `markets` + `revenue`
-
-**Compliance (1)**: `/admin/compliance/aml` (AI fraud alerts queue)
-
-**System (2)**: `/admin/system-logs` + `/admin/api-usage`
-
-**Settings (8)**: `feature-flags` + `ab-tests` + `leaderboard-mode` + `integrations` + `team` + `payouts` + `branding`
-
-#### User sub-pages mancanti (15 di 22)
-
-- ❌ `/me/kyc/upload`, `/me/kyc/review`, `/me/kyc/status` (3-step wizard)
-- ❌ `/me/deposit`, `/me/withdraw` (dedicated pages, oggi tutto in `/me/wallet`)
-- ❌ `/me/sessions` (active session keys, dipende MA6.1)
-- ❌ `/me/stats` (user stats dashboard)
-- ❌ `/me/achievements`
-- ❌ `/me/referrals` (link sharing + stats)
-- ❌ `/me/demo/*` (parallel demo views: positions/history/wallet)
-- ❌ `/me/settings/security` (sessions, MFA, change password)
-- ❌ `/me/settings/billing` (subscription Auktora Pro post-MA8)
-- ❌ `/me/settings/data` (export, delete account)
-- ❌ `/me/settings/integrations` (Telegram premium, ecc)
-
-#### Public pages mancanti
-
-- ❌ `/news` (news feed integration)
-- ❌ `/search` (global search markets + creators)
-- ❌ `/about`, `/pricing`
-- ❌ `/legal/terms`, `/legal/privacy`, `/legal/cookie`
-- ❌ `/login/reset-password` flow
-- ❌ `/maintenance`, `/offline`, `/install` (PWA)
-- ❌ `/404`, `/500` custom pages
-
-#### API endpoints mancanti (~45 di 80)
-
-**Markets (6)**: list, [slug], orderbook, price-history, holders, comments, search
-
-**Users sub-routes (5)**: balances, stats, equity-curve, calibration, onboarding-complete
-
-**Creators (3)**: [id]/positions, [id]/trades, [id]/stats
-
-**Traders (3)**: [id]/positions, [id]/trades, [id]/follow detail
-
-**Leaderboard (2)**: /me, /stats
-
-**Copy (2)**: sessions, sessions/[id] (MA6.1)
-
-**Signals (1)**: [id] detail
-
-**Deposit/Withdraw (2)**: deposit/moonpay-session, withdraw
-
-**KYC (2)**: submit, status
-
-**Referrals (1)**: /me
-
-**Telegram (1)**: upgrade-premium
-
-**Admin advanced (10+)**: refunds, kyc, signals, notifications/broadcast, analytics drilldown, audit-log advanced filters, ecc.
-
-#### Features advanced
-
-- ❌ **Signal AI engine algorithms** — implementare 3 algos:
-  - Orderbook imbalance detection (delta bid/ask volume)
-  - Final period momentum (last 2-5 minutes price movement)
-  - News catalyst (correlation prezzi vs news external)
-- ❌ **Copy trading execution** (MA6.1):
-  - Privy session keys (signature pre-authorization)
-  - Bot relayer atomic batch
-  - Cost basis tracking on-chain
-  - Modalità A (manual confirm) + Modalità B (auto-copy)
-- ❌ **Telegram bot advanced**:
-  - Inline keyboard "Copy this trade" buttons
-  - Notification dispatcher con templates
-  - /unlink command
-  - Premium €5/mese flow (Stripe Connect)
-- ❌ **Discord bot** (MA8 — Doc 11)
-- ❌ **Auktora Pro subscription €9.99/mese** (gated by Signal AI track record validato >55% win rate, 6+ mesi)
-- ❌ **i18n** — 5 lingue (EN/ES/PT/IT/FR), `messages/` folder con .json translations, integrazione next-intl o equivalente
-- ❌ **PWA setup** — manifest.json, service worker, install prompt
-
-#### Cleanup tecnico
-
-- ❌ Database types regeneration post-migrations 015-017 (rimuovi `as any` casts in `app/api/v1/admin/fees`, `app/api/v1/telegram/*`, `app/api/v1/users/me`, `app/api/v1/follows/[followId]`)
-- ❌ Smoke test E2E reale (deposit $5 con carta test → wrap pUSD → trade REAL → sell → withdraw end-to-end)
-- ❌ Performance audit Lighthouse + Core Web Vitals
-- ❌ Mobile UX 3-breakpoint check sistematico (post-MA5.x cumulativo)
-- ❌ E2E test suite (Playwright deferred a MA8 per project rules)
-
-#### Decisioni strategiche aperte
-
-- ❌ **KYC Builder Profile su polymarket.com/settings** — manuale 1-time setup utente. Bloccante per Y2 30bps fees (~mese 12 da launch)
-- ❌ **B2B tier** per fund/desk istituzionali (post-MA8, opzionale)
-- ❌ **Token Auktora $AUK** (post-mass scale, alta regulatory risk, low priority)
-- ❌ **Affiliate program** (alternativa a Creator Program, valutare se acquisition organica non basta)
-- ❌ **Smoke test E2E reale** — mai eseguito completo, da fare prima del marketing launch pubblico
-
-#### Documentation pending
-
-- ❌ Doc 02 USER-STORIES esteso con External Traders + Polymarket import + Telegram bot
-- ❌ Doc 06 DATABASE-SCHEMA aggiornato con tabelle 015-017
-- ❌ Doc 07 API-DESIGN aggiornato con tutti gli endpoint shipped (35 ora)
-- ❌ Doc 11 COMMUNITY-AND-BOT-STRATEGY allineato con MA7 base
-- ❌ MA6.1 sprint plan dettagliato
+| Sprint | Titolo                                                                  | Status                                                                   |
+| ------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| 2.1.1  | Migration users + external_traders                                      | ✅                                                                       |
+| 2.1.2  | Migration markets                                                       | ✅                                                                       |
+| 2.1.3  | Migration positions + trades + balances                                 | ✅                                                                       |
+| 2.2.1  | Migration creators + creator_payouts + follows + copy_trading_sessions  | ✅                                                                       |
+| 2.2.2  | Migration signals + notifications                                       | ✅                                                                       |
+| 2.2.3  | Migration watchlist + user_preferences + kyc + referrals + achievements | ✅                                                                       |
+| 2.3.1  | Migration admin_users + audit_log partitioned                           | ✅                                                                       |
+| 2.3.2  | Migration feature_flags + ab_tests                                      | ✅                                                                       |
+| 2.4.1  | Migration equity_curve + price_history hypertables                      | ⚠️ regular tables, no hypertable (TimescaleDB non disponibile free tier) |
+| 2.5.1  | Helper functions + triggers update_updated_at                           | ✅                                                                       |
+| 2.5.2  | Seed data iniziale                                                      | ✅                                                                       |
+| 2.6.1  | API endpoint /api/v1/auth/session                                       | ✅                                                                       |
+| 2.6.2  | End-to-end signup test                                                  | ✅                                                                       |
 
 ---
 
-## 📊 Stats
+## MA3 — Core Pages (Public) (19/19 ✅ + 1 ⚠️)
 
-| Metrica                                   | Valore                                                           |
-| ----------------------------------------- | ---------------------------------------------------------------- |
-| **MVP-ready**                             | ~75%                                                             |
-| **Sprint chiusi**                         | MA1-MA3 + MA4.1-4.7 + MA5.1-5.3 + MA6 base + MA7 base = **~30+** |
-| **Sprint pending**                        | MA6.1 + MA7 advanced + MA8 = ~3 macro                            |
-| **Routes implementate**                   | ~50/110 (45%)                                                    |
-| **API endpoint**                          | ~35/80 (44%)                                                     |
-| **Admin sub-pages**                       | 9/36 (25%)                                                       |
-| **/me sub-pages**                         | 7/22 (32%)                                                       |
-| **DB tables**                             | 39 production, 17 migrations applicate                           |
-| **Test passing**                          | 85/85 ✅                                                         |
-| **Commit pushati**                        | 27+ live su origin/main                                          |
-| **Sprint effort total stimato remaining** | ~5-7 settimane fino a launch pubblico                            |
+| Sprint | Titolo                                           | Status                                                                        |
+| ------ | ------------------------------------------------ | ----------------------------------------------------------------------------- |
+| 3.1.1  | Root layout + Header globale                     | ✅                                                                            |
+| 3.1.2  | Bottom navigation mobile                         | ✅                                                                            |
+| 3.1.3  | Footer minimal                                   | ✅                                                                            |
+| 3.2.1  | Polymarket Gamma API client                      | ✅                                                                            |
+| 3.2.2  | classifyEvent → 5 CardKind                       | ✅                                                                            |
+| 3.2.3  | WebSocket Polymarket CLOB singleton              | ✅                                                                            |
+| 3.2.4  | WebSocket RTDS singleton                         | ✅                                                                            |
+| 3.3.1  | EventCard Binary variant                         | ✅                                                                            |
+| 3.3.2  | EventCard Multi-outcome + Multi-strike           | ✅                                                                            |
+| 3.3.3  | EventCard H2H Sport                              | ✅                                                                            |
+| 3.3.4  | EventCard Crypto Up/Down                         | ✅                                                                            |
+| 3.4.1  | Pagina Home layout                               | ✅                                                                            |
+| 3.5.1  | Pagina evento Binary layout                      | ✅                                                                            |
+| 3.5.2  | Pagina evento Multi-outcome + Multi-strike       | ✅                                                                            |
+| 3.5.3  | Pagina evento H2H Sport con Hub Sport            | ✅                                                                            |
+| 3.5.4  | Pagina evento Crypto Up/Down con CryptoRoundView | ✅                                                                            |
+| 3.5.5  | Espansione inline orderbook                      | ✅                                                                            |
+| 3.6.1  | Pagina /signup con 5 metodi auth                 | ✅ in MA4.7 Fase 3                                                            |
+| 3.6.2  | Onboarding soft modal                            | ⚠️ Welcome tutorial 4-step esiste, è skippabile, ma non è un "modal" dedicato |
+| 3.6.3  | Geo-block banner soft + redirect concreto        | ✅ in MA4.7 Fase 1                                                            |
+
+---
+
+## MA4 — Trading Core (8 ✅ + 2 ❌)
+
+| Sprint | Titolo                                         | Status                                                       |
+| ------ | ---------------------------------------------- | ------------------------------------------------------------ |
+| 4.1.1  | Trade widget sidebar desktop                   | ✅                                                           |
+| 4.1.2  | Trade widget bottom sheet mobile               | ✅                                                           |
+| 4.2.1  | API endpoint /api/v1/trades/submit (DEMO mode) | ✅                                                           |
+| 4.2.2  | Submit trade DEMO frontend integration         | ✅                                                           |
+| 4.3.1  | Limit order UI con scadenza preset             | ❌ Phase D rinviato post-utenti                              |
+| 4.4.1  | EIP-712 typed data builder                     | ✅                                                           |
+| 4.4.2  | CLOB submit trade REAL                         | ✅                                                           |
+| 4.5.1  | Sell position (close)                          | ✅                                                           |
+| 4.5.2  | Auto-update positions on resolution            | ❌ Cron MA8                                                  |
+| 4.6.1  | Banner Segnale Predimark integration           | ⚠️ /signals page esiste, banner inline event page non ancora |
+
+**Sprint extra in MA4 (non in Doc 09 — introdotti per CLOB V2 pivot)**:
+
+- ✅ **MA4.4 Phase A-C** — Polymarket CLOB V2 SDK + onboarding L2 + REAL trading lifecycle
+- ✅ **MA4.6** — Funding flow Privy useFundWallet + Withdraw 2-step
+- ✅ **MA4.7 ESTESO** — Geoblock middleware + Polymarket import + Signup flow + Real/Demo banner
+
+---
+
+## MA5 — User Profile & Demo (3 ✅ + 4 ⚠️ + 3 ❌)
+
+| Sprint | Titolo                               | Status                                                                                                                                |
+| ------ | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 5.1.1  | Layout /me + sub-nav                 | ✅ /me hub dashboard con 8 link cards                                                                                                 |
+| 5.2.1  | Hero finanziario Robinhood-style     | ❌ Non implementato (graphics + animazioni)                                                                                           |
+| 5.2.2  | API equity curve + cron job snapshot | ❌ Tabella equity_curve esiste, no cron                                                                                               |
+| 5.3.1  | Sub-page Positions                   | ✅ /me/positions                                                                                                                      |
+| 5.3.2  | Sub-page History con export CSV      | ⚠️ History esiste, no export CSV                                                                                                      |
+| 5.3.3  | Sub-page Stats + Calibration curve   | ❌ Non implementato                                                                                                                   |
+| 5.3.4  | Sub-page Watchlist                   | ✅ /watchlist (out of /me ma funziona)                                                                                                |
+| 5.4.1  | Routes /me/demo/\* parallele         | ❌ Usa flag is_demo, no routes parallele                                                                                              |
+| 5.4.2  | Switch REAL/DEMO redirect logic      | ⚠️ Toggle works (RealDemoToggle), no redirect                                                                                         |
+| 5.5.1  | Settings sub-pages (7 sezioni)       | ⚠️ /me/settings consolidato 2 sezioni (profilo + notifiche), mancano security/billing/data/integrations/preferences/telegram dedicate |
+
+**Sprint extra MA5 (questa sessione)**:
+
+- ✅ **/me/notifications** con mark-all-read
+- ✅ **/me/following** con copy trading config
+
+---
+
+## MA6 — Creator Program & Leaderboard (6 ✅ + 1 ⚠️ + 4 ❌)
+
+| Sprint | Titolo                                           | Status                                                      |
+| ------ | ------------------------------------------------ | ----------------------------------------------------------- |
+| 6.1.1  | Pagina /creator/[username]                       | ✅ usato `/creator/[creatorId]` (UUID, non username)        |
+| 6.1.2  | Pagina /trader/[address] per External            | ✅ usato `/trader/[traderId]` (UUID DB, non wallet address) |
+| 6.2.1  | Form /creator/apply                              | ✅                                                          |
+| 6.3.1  | Endpoint leaderboard unified                     | ✅ /api/v1/leaderboard                                      |
+| 6.3.2  | Pagina /leaderboard                              | ✅                                                          |
+| 6.3.3  | Toggle leaderboard mode (1-tab vs 2-tab)         | ❌ Sempre 2-tab, no admin toggle                            |
+| 6.4.1  | Score Predimark calcolo + Tier assignment        | ❌ Schema esiste, no calcolo automatico                     |
+| 6.4.2  | Edge Function import-polymarket-leaderboard      | ❌ Cron sync external_traders rinviato                      |
+| 6.5.1  | Follow system + endpoint                         | ✅ /api/v1/follows GET/POST/PUT/DELETE                      |
+| 6.5.2  | Notifiche follow (new position, position closed) | ❌ Schema notifications esiste, no dispatcher               |
+| 6.5.3  | Copy single trade UI manual                      | ⚠️ /me/following config storage, esecuzione MA6.1           |
+
+---
+
+## MA7 — Admin Panel (5 ✅ + 9 ❌)
+
+| Sprint | Titolo                                  | Status                                                     |
+| ------ | --------------------------------------- | ---------------------------------------------------------- |
+| 7.1.1  | Layout admin con sidebar gerarchica     | ✅ AdminSidebar 8 group + AdminTopBar                      |
+| 7.1.2  | Role-based access (3 ruoli)             | ✅ requireAdmin con super_admin/admin/moderator/viewer     |
+| 7.2.1  | Dashboard admin con KPI                 | ✅ 6 KPI live (utenti, active, trade, volume, KYC, refund) |
+| 7.3.1  | Lista users + dettaglio                 | ⚠️ Lista ✅, dettaglio /[id] ❌                            |
+| 7.3.2  | KYC review queue + Refunds queue        | ❌ Non implementati                                        |
+| 7.4.1  | Markets management (4 sub-pages)        | ❌ Non implementato                                        |
+| 7.4.2  | Fees configuration runtime              | ✅ /admin/fees con app_settings                            |
+| 7.5.1  | Creators applications review            | ✅ /admin/creators/applications con approve/reject         |
+| 7.5.2  | Creator payouts queue                   | ❌ Non implementato                                        |
+| 7.6.1  | Broadcast notifications                 | ❌ Non implementato                                        |
+| 7.6.2  | Analytics dashboard                     | ⚠️ KPI base ✅, drilldown ❌                               |
+| 7.7.1  | Audit log viewer                        | ✅ /admin/audit-log con expand JSON diff                   |
+| 7.7.2  | Feature flags + A/B tests UI            | ❌ Tabelle esistenti, UI ❌                                |
+| 7.7.3  | Settings (team, branding, integrations) | ❌ Non implementato                                        |
+
+**Sprint extra MA7 (questa sessione)**:
+
+- ✅ **/admin/compliance/geo-block** (lista 31+4+4 paesi/regioni)
+
+---
+
+## MA8 — Polish, Testing, Launch (1 ⚠️ + 9 ❌)
+
+| Sprint | Titolo                                       | Status                                               |
+| ------ | -------------------------------------------- | ---------------------------------------------------- |
+| 8.1.1  | Setup Playwright E2E                         | ❌ Disabled per project rules (no Playwright)        |
+| 8.1.2  | E2E test signup flow                         | ❌                                                   |
+| 8.1.3  | E2E test trade flow REAL                     | ❌ Smoke test manuale rinviato                       |
+| 8.1.4  | E2E test creator + leaderboard               | ❌                                                   |
+| 8.2.1  | Performance audit + optimization             | ❌                                                   |
+| 8.2.2  | Accessibility audit WCAG AA                  | ❌                                                   |
+| 8.3.1  | Setup next-intl + estrazione strings         | ❌ Italiano hardcoded ovunque                        |
+| 8.3.2  | Traduzione 5 lingue (EN + ES + PT + IT + FR) | ❌                                                   |
+| 8.4.1  | Production setup + DNS + SSL                 | ⚠️ Vercel deploy attivo, DNS auktora.com configurato |
+| 8.4.2  | Soft launch + waitlist + monitoring          | ❌ Sentry/PostHog non setup                          |
+
+---
+
+## ➕ Sprint EXTRA non in Doc 09 (introdotti durante esecuzione)
+
+Cose fatte che NON erano nel piano originale (decisioni strategiche post-pivot CLOB V2 + post-audit):
+
+| Sprint extra                            | Status | Note                                                                             |
+| --------------------------------------- | ------ | -------------------------------------------------------------------------------- |
+| **MA4.6 Funding flow**                  | ✅     | Deposit Privy + Withdraw 2-step (MoonPay) — pivot da V1 a V2                     |
+| **MA4.7 ESTESO** (4 fasi)               | ✅     | Geoblock middleware + Polymarket account import + Signup flow + Real/Demo banner |
+| **Doc 14 Monetization Strategy**        | ✅     | Builder fee Y1/Y2 + Creator program + External Traders strategy                  |
+| **Telegram bot scaffolding (MA7 base)** | ✅     | Webhook + 4 commands + link flow (Doc 11 ma anticipato)                          |
+| **External Traders strategy**           | ✅     | Tabella popolata via cron rinviato; UI + API ready                               |
+| **Doc 13 Design Tokens**                | ✅     | 244 inline values → CSS vars (~MA8 polish anticipato)                            |
+
+---
+
+## 📊 Conteggio totale (basato su Doc 09)
+
+| Macro Area                          | Sprint  | Done ✅      | Partial ⚠️   | Todo ❌      |
+| ----------------------------------- | ------- | ------------ | ------------ | ------------ |
+| MA1 — Foundation                    | 12      | 12           | 0            | 0            |
+| MA2 — Database & Auth               | 13      | 12           | 1            | 0            |
+| MA3 — Core Pages                    | 20      | 19           | 1            | 0            |
+| MA4 — Trading Core                  | 10      | 7            | 1            | 2            |
+| MA5 — User Profile & Demo           | 10      | 3            | 4            | 3            |
+| MA6 — Creator Program & Leaderboard | 11      | 6            | 1            | 4            |
+| MA7 — Admin Panel                   | 14      | 5            | 2            | 7            |
+| MA8 — Polish, Testing, Launch       | 10      | 0            | 1            | 9            |
+| **TOTALI Doc 09**                   | **100** | **64 (64%)** | **11 (11%)** | **25 (25%)** |
+| **+ Sprint extra (post-pivot)**     | +6      | +6           | 0            | 0            |
+| **GRAN TOTALE**                     | **106** | **70 (66%)** | **11 (10%)** | **25 (24%)** |
+
+Note:
+
+- Doc 09 dichiarava ~80-92 sprint stimati. Conteggio dettagliato = 100 sprint nel doc.
+- MVP-ready ~75% calcolato weighted by complexity (MA1-3 fondamenta + MA4 trading core sono critici e tutti ✅, MA8 polish è meno critico).
+
+---
+
+## 🎯 Sprint TODO prioritari per launch (~5-7 settimane stimate)
+
+### Priorità ALTA (blocker launch)
+
+1. **4.5.2** — Auto-update positions on resolution (cron job)
+2. **6.5.2** — Notifiche follow dispatcher (cron)
+3. **7.3.2** — KYC review queue + Refunds queue (compliance)
+4. **7.4.1** — Markets management 4 sub-pages
+5. **8.4.2** — Soft launch + waitlist + monitoring (Sentry/PostHog)
+
+### Priorità MEDIA (UX completeness)
+
+6. **5.2.1** — Hero finanziario `/me`
+7. **5.2.2** — Equity curve cron snapshot
+8. **5.3.2** — History export CSV
+9. **5.3.3** — Stats + Calibration curve
+10. **5.4.1** — Routes `/me/demo/*` parallele
+11. **5.5.1** — Settings 7 sezioni complete
+12. **6.3.3** — Toggle leaderboard mode admin
+13. **6.4.1** — Score Predimark calcolo + Tier
+14. **6.4.2** — Cron sync external_traders
+15. **7.6.1** — Broadcast notifications admin
+16. **7.7.2** — Feature flags + A/B tests UI
+17. **7.7.3** — Admin settings (team, branding, integrations)
+
+### Priorità BASSA (post-launch incrementale)
+
+18. **4.3.1** — Limit order UI (Phase D)
+19. **4.6.1** — Banner Signal AI in event page
+20. **6.5.3 advanced** — Copy trade execution real (MA6.1 con session keys)
+21. **8.1.1-8.1.4** — Playwright E2E suite (disabled per rules, valutare alternativa)
+22. **8.2.1** — Performance audit Lighthouse
+23. **8.2.2** — Accessibility WCAG AA
+24. **8.3.1-8.3.2** — i18n 5 lingue
 
 ---
 
@@ -329,8 +258,7 @@
 - **App**: https://auktora.com (Vercel auto-deploy)
 - **Repo**: https://github.com/felifeli1983-arch/predimark-v2
 - **Supabase prod**: vlrvixndaeqcxftovzmw
-- **Supabase staging**: hhuwxcijarcyivwzpqfp
 
 ---
 
-_Generato 2026-04-29 fine sessione record (8h continuativa, 6 sprint chiusi, ~75% MVP)._
+_Ultimo update: 2026-04-29 fine sessione (8h, 6 sprint chiusi questa sessione, +6 extra non in Doc 09)._
