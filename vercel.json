@@ -9,6 +9,18 @@
     {
       "path": "/api/v1/cron/equity-snapshot",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/v1/cron/sync-external-traders",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/v1/cron/creator-scores",
+      "schedule": "0 5 * * 1"
+    },
+    {
+      "path": "/api/v1/cron/follow-notifications",
+      "schedule": "*/15 * * * *"
     }
   ],
   "headers": [
