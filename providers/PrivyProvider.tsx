@@ -14,6 +14,12 @@ export function PrivyProvider({ children }: Props) {
     throw new Error('NEXT_PUBLIC_PRIVY_APP_ID is not set')
   }
 
+  // CI build with stub envs: skip Privy SDK init (BasePrivyProvider rejects
+  // invalid app IDs during prerender). Real deploy uses real envs and renders normally.
+  if (appId.startsWith('stub')) {
+    return <>{children}</>
+  }
+
   return (
     <BasePrivyProvider
       appId={appId}

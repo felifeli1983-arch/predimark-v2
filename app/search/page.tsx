@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search as SearchIcon, Loader2 } from 'lucide-react'
@@ -16,6 +16,24 @@ interface MarketResult {
 }
 
 export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-4)' }}>
+          <Loader2
+            size={20}
+            className="animate-spin"
+            style={{ color: 'var(--color-text-muted)' }}
+          />
+        </div>
+      }
+    >
+      <SearchPageInner />
+    </Suspense>
+  )
+}
+
+function SearchPageInner() {
   const router = useRouter()
   const params = useSearchParams()
   const initialQ = params.get('q') ?? ''
