@@ -11,12 +11,18 @@ const PERIODS = {
   all: 365 * 24 * 3600 * 1000,
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 /**
  * GET /api/v1/markets/[marketId]/price-history?period=1d|7d|30d|all
  * Sprint 3.5.2 — fornisce serie storica per chart.
  *
- * Source: tabella `price_history` (popolata da cron sync).
- * Pubblico — no auth.
+ * `marketId` può essere:
+ *  - UUID locale (markets.id)
+ *  - Polymarket market id (text) — risolto via markets.polymarket_market_id
+ *
+ * Source: tabella `price_history`, popolata dal cron `sync-price-history`
+ * (ogni 6h). Pubblico — no auth.
  */
 export async function GET(
   _request: NextRequest,
@@ -31,12 +37,26 @@ export async function GET(
   const since = new Date(Date.now() - ms).toISOString()
 
   const supabase = createAdminClient()
-  // La colonna nel DB è `recorded_at` (mig price_history). Aliasiamo a
-  // `timestamp` nella response per mantenere il contratto col chart client.
+
+  // Risolve Polymarket text id → UUID locale, se necessario.
+  let localId: string | null = UUID_RE.test(marketId) ? marketId : null
+  if (!localId) {
+    const { data: row } = await supabase
+      .from('markets')
+      .select('id')
+      .eq('polymarket_market_id', marketId)
+      .maybeSingle()
+    localId = row?.id ?? null
+  }
+  if (!localId) {
+    // Mercato non ancora syncato localmente: nessuna storia da mostrare.
+    return NextResponse.json({ market_id: marketId, period, items: [] })
+  }
+
   const { data, error } = await supabase
     .from('price_history')
-    .select('timestamp:recorded_at, yes_price, no_price')
-    .eq('market_id', marketId)
+    .select('recorded_at, yes_price, no_price')
+    .eq('market_id', localId)
     .gte('recorded_at', since)
     .order('recorded_at', { ascending: true })
     .limit(500)

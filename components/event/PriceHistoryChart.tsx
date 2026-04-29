@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { Loader2, TrendingUp } from 'lucide-react'
 
 interface PricePoint {
-  timestamp: string
+  recorded_at: string
   yes_price: number
   no_price: number
 }
