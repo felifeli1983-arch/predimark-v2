@@ -38,11 +38,14 @@ const cardStyle: React.CSSProperties = {
 }
 
 export function EventCard({ event, onBookmark, badge }: EventCardProps) {
-  // Badge curato: NON overlay top-left (copriva avatar+title). Sostituito con
-  // - bordo sinistro 3px colorato (segnale visivo non invasivo)
-  // - micro-pill bottom-right sull'area vuota del footer
+  // Badge curato: bordo sx 1.5px (era 3px, troppo spesso) + micro-pill
+  // bottom-right. Border-left con esplicito 1.5px tramite outline negativo
+  // non funziona — usiamo box-shadow inset per ottenere ~half-pixel feel.
   const styleWithBadge: React.CSSProperties = badge
-    ? { ...cardStyle, borderLeft: `3px solid ${badge.color}` }
+    ? {
+        ...cardStyle,
+        boxShadow: `inset 2px 0 0 0 ${badge.color}`,
+      }
     : cardStyle
   return (
     <Link href={`/event/${event.slug}`} style={styleWithBadge} className="hover-lift">
