@@ -139,10 +139,9 @@ export function EventPageShell({ event }: Props) {
 
           <EventHero event={event} />
           {event.markets[0] && <SignalBanner marketId={event.markets[0].id} />}
-          {event.markets[0] && (
+          {event.markets[0]?.clobTokenIds?.[0] && (
             <PriceHistoryChart
-              marketId={event.markets[0].clobTokenIds?.[0] ?? ''}
-              marketSlug={event.markets[0].slug}
+              marketId={event.markets[0].clobTokenIds[0]}
               cardKind={event.kind}
               cryptoSymbol={cryptoSymbol}
               isLive={event.active && !event.closed}

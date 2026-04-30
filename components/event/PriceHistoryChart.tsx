@@ -7,60 +7,36 @@ import { CenteredBox, Container, SectionTitle } from './chart/ChartShell'
 import { HistoryChart } from './HistoryChart'
 import { MultiLineChart, type MultiMarket } from './MultiLineChart'
 import { CryptoCandleChart } from './CryptoCandleChart'
-import { PolymarketEmbed } from './PolymarketEmbed'
-
 interface Props {
   marketId: string
   cardKind?: CardKind
-  /** Slug Polymarket del primo market — usato per l'iframe embed ufficiale. */
-  marketSlug?: string
-  /** Simbolo crypto es. 'btcusdt' — estratto da EventPageShell per crypto_up_down */
+  /** Simbolo crypto es. 'btcusdt' — per crypto_up_down spot price */
   cryptoSymbol?: string
   /** Evento attualmente live — usato per h2h_sport (mostra score stub) */
   isLive?: boolean
-  /**
-   * Solo per cardKind === 'multi_outcome': array di top-5 outcome.
-   * Se presente con multi_outcome → usa MultiLineChart.
-   */
+  /** Solo multi_outcome: array di top-5 outcome (usato da MultiLineChart). */
   multiMarkets?: MultiMarket[]
 }
 
 /**
  * Router CardKind-aware per il chart event-page.
+ * Tutto custom — niente iframe Polymarket (branded + redirect via).
  *
- *  - crypto_up_down (con marketSlug) → PolymarketEmbed con liveactivity=true
- *    (round 5m/15m, mostra anche feed trade live sotto il chart)
- *  - binary | h2h_sport (non-live, con marketSlug) → PolymarketEmbed iframe
- *    ufficiale (chart identico a polymarket.com — niente da reinventare)
- *  - multi_outcome (con multiMarkets) → MultiLineChart custom (Polymarket
- *    embed iframe non supporta multi-event, dobbiamo costruirlo noi)
+ *  - binary | h2h_sport (non-live) → HistoryChart con dual-line YES/NO
+ *  - multi_outcome → MultiLineChart (fino a 5 curve, legenda toggle, auto-zoom)
  *  - multi_strike → HistoryChart single-line YES
- *  - crypto_up_down (senza marketSlug) → LiveSpotView (Chainlink + Binance)
+ *  - crypto_up_down → LiveSpotView (Chainlink + Binance candles)
  *  - h2h_sport (live) → LiveScoreStub (sport-data MA6+)
- *  - fallback → HistoryChart custom
  */
 export function PriceHistoryChart({
   marketId,
   cardKind = 'binary',
-  marketSlug,
   cryptoSymbol,
   isLive,
   multiMarkets,
 }: Props) {
-  if (cardKind === 'crypto_up_down' && marketSlug) {
-    // liveactivity=true → trade feed real-time sotto il chart Polymarket
-    return <PolymarketEmbed marketSlug={marketSlug} liveActivity height={420} />
-  }
   if (cardKind === 'crypto_up_down') {
-    // Fallback: nessuno slug → spot price Chainlink
     return <LiveSpotView cryptoSymbol={cryptoSymbol ?? ''} />
-  }
-  if (cardKind === 'h2h_sport' && marketSlug) {
-    // Endpoint /sports dedicato: layout team affiancati + win probability +
-    // (per i live) score real-time. Funziona anche per partite future.
-    return (
-      <PolymarketEmbed marketSlug={marketSlug} kind="sports" liveActivity={isLive} height={420} />
-    )
   }
   if (cardKind === 'h2h_sport' && isLive) {
     return <LiveScoreStub />
@@ -68,11 +44,6 @@ export function PriceHistoryChart({
   if (cardKind === 'multi_outcome' && multiMarkets && multiMarkets.length > 0) {
     return <MultiLineChart markets={multiMarkets} />
   }
-  // Binary: embed standard Polymarket
-  if (cardKind === 'binary' && marketSlug) {
-    return <PolymarketEmbed marketSlug={marketSlug} liveActivity={isLive} />
-  }
-  // Fallback custom (multi_strike o cardKind senza slug)
   const dualLine = cardKind === 'binary' || cardKind === 'h2h_sport'
   return <HistoryChart marketId={marketId} showBothLines={dualLine} />
 }

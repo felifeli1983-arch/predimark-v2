@@ -221,40 +221,138 @@ export function MultiLineChart({ markets }: Props) {
         </CenteredBox>
       ) : (
         <>
-          <svg
-            viewBox={`0 0 ${width} ${height}`}
-            preserveAspectRatio="none"
-            style={{ width: '100%', height: 320, display: 'block' }}
-            role="img"
-            aria-label="Multi-outcome probability chart"
-          >
-            {[0, 0.25, 0.5, 0.75, 1].map((y) => {
-              const yPos = height - ((y - yMin) / (yMax - yMin)) * height
-              if (yPos < 0 || yPos > height) return null
-              return (
-                <line
-                  key={y}
-                  x1={0}
-                  y1={yPos}
-                  x2={width}
-                  y2={yPos}
-                  stroke="var(--color-border-subtle)"
-                  strokeWidth={0.2}
-                  strokeDasharray="1,1"
-                />
-              )
-            })}
-            {paths.map((p) => (
-              <path
-                key={p.label}
-                d={p.d}
-                stroke={p.color}
-                strokeWidth={1.5}
-                fill="none"
-                vectorEffect="non-scaling-stroke"
-              />
-            ))}
-          </svg>
+          {/* Chart area con SVG + overlay HTML per label (no preserveAspectRatio
+              fa stretchare il testo SVG, quindi label sono HTML assoluti) */}
+          <div style={{ position: 'relative', width: '100%' }}>
+            <div style={{ position: 'relative', height: 320, paddingRight: 110 }}>
+              <svg
+                viewBox={`0 0 ${width} ${height}`}
+                preserveAspectRatio="none"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: 'calc(100% - 110px)',
+                  height: 320,
+                }}
+                role="img"
+                aria-label="Multi-outcome probability chart"
+              >
+                {/* Grid Y orizzontale (4 step) */}
+                {[0, 0.25, 0.5, 0.75, 1].map((y) => {
+                  const yVal = yMin + y * (yMax - yMin)
+                  const yPos = height - ((yVal - yMin) / (yMax - yMin)) * height
+                  return (
+                    <line
+                      key={y}
+                      x1={0}
+                      y1={yPos}
+                      x2={width}
+                      y2={yPos}
+                      stroke="var(--color-border-subtle)"
+                      strokeWidth={0.2}
+                      strokeDasharray="1,1"
+                    />
+                  )
+                })}
+                {paths.map((p) => (
+                  <path
+                    key={p.label}
+                    d={p.d}
+                    stroke={p.color}
+                    strokeWidth={1.6}
+                    fill="none"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                ))}
+              </svg>
+
+              {/* Y-axis labels (% sulla destra, allineati alla griglia) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 90,
+                  top: 0,
+                  bottom: 0,
+                  width: 20,
+                  pointerEvents: 'none',
+                }}
+              >
+                {[0, 0.25, 0.5, 0.75, 1].map((y) => {
+                  const yVal = yMin + y * (yMax - yMin)
+                  const topPct = (1 - y) * 100
+                  return (
+                    <span
+                      key={y}
+                      style={{
+                        position: 'absolute',
+                        top: `calc(${topPct}% - 6px)`,
+                        right: 0,
+                        fontSize: 9,
+                        color: 'var(--color-text-muted)',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {(yVal * 100).toFixed(0)}%
+                    </span>
+                  )
+                })}
+              </div>
+
+              {/* End-of-line labels — "Spain 15.5%" allineato a destra
+                  in corrispondenza dell'ultimo punto */}
+              <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 90 }}>
+                {paths.map((p) => {
+                  const s = series.find((x) => x.label === p.label)
+                  if (!s) return null
+                  const last = s.points[s.points.length - 1]?.yes_price ?? 0
+                  const topPct = (1 - (last - yMin) / (yMax - yMin)) * 100
+                  return (
+                    <div
+                      key={p.label}
+                      style={{
+                        position: 'absolute',
+                        top: `calc(${topPct}% - 9px)`,
+                        left: 4,
+                        right: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        fontSize: 10,
+                        fontVariantNumeric: 'tabular-nums',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          background: p.color,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span
+                        style={{
+                          color: 'var(--color-text-secondary)',
+                          maxWidth: 60,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {p.label}
+                      </span>
+                      <span style={{ color: p.color, fontWeight: 700 }}>
+                        {(last * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* X-axis time labels (start / middle / end basato sui dati) */}
+            <XAxisLabels series={series} period={period} />
+          </div>
 
           <div
             style={{
@@ -317,5 +415,42 @@ export function MultiLineChart({ markets }: Props) {
         </>
       )}
     </Container>
+  )
+}
+
+/**
+ * Labels asse X temporale: start / mid / end del range visibile.
+ * Format adattivo al period: 1H/6H → HH:MM, 1G → "ore X", 7G/MAX → date.
+ */
+function XAxisLabels({ series, period }: { series: SeriesData[]; period: Period }) {
+  const allTimestamps = series.flatMap((s) => s.points.map((p) => p.timestamp)).sort()
+  if (allTimestamps.length < 2) return null
+  const start = new Date(allTimestamps[0]!)
+  const end = new Date(allTimestamps[allTimestamps.length - 1]!)
+  const mid = new Date((start.getTime() + end.getTime()) / 2)
+
+  function fmt(d: Date) {
+    if (period === '1h' || period === '6h' || period === '1d') {
+      return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+    }
+    return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })
+  }
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginTop: 4,
+        paddingRight: 110,
+        fontSize: 9,
+        color: 'var(--color-text-muted)',
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      <span>{fmt(start)}</span>
+      <span>{fmt(mid)}</span>
+      <span>{fmt(end)}</span>
+    </div>
   )
 }

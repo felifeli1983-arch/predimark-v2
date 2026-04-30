@@ -180,57 +180,192 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
           </span>
         </CenteredBox>
       ) : (
-        <svg
-          viewBox={`0 0 ${chartData.width} ${chartData.height}`}
-          preserveAspectRatio="none"
-          style={{ width: '100%', height: 320, display: 'block' }}
-          role="img"
-          aria-label="Probability history chart"
-        >
-          {[0, 0.25, 0.5, 0.75, 1].map((y) => {
-            const yPos =
-              chartData.height -
-              ((y - chartData.min) / (chartData.max - chartData.min)) * chartData.height
-            if (yPos < 0 || yPos > chartData.height) return null
-            return (
-              <line
-                key={y}
-                x1={0}
-                y1={yPos}
-                x2={chartData.width}
-                y2={yPos}
-                stroke="var(--color-border-subtle)"
-                strokeWidth={0.2}
-                strokeDasharray="1,1"
+        <div style={{ position: 'relative', width: '100%' }}>
+          <div style={{ position: 'relative', height: 320, paddingRight: 70 }}>
+            <svg
+              viewBox={`0 0 ${chartData.width} ${chartData.height}`}
+              preserveAspectRatio="none"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: 'calc(100% - 70px)',
+                height: 320,
+              }}
+              role="img"
+              aria-label="Probability history chart"
+            >
+              {[0, 0.25, 0.5, 0.75, 1].map((y) => {
+                const yVal = chartData.min + y * (chartData.max - chartData.min)
+                const yPos =
+                  chartData.height -
+                  ((yVal - chartData.min) / (chartData.max - chartData.min)) * chartData.height
+                return (
+                  <line
+                    key={y}
+                    x1={0}
+                    y1={yPos}
+                    x2={chartData.width}
+                    y2={yPos}
+                    stroke="var(--color-border-subtle)"
+                    strokeWidth={0.2}
+                    strokeDasharray="1,1"
+                  />
+                )
+              })}
+              <path
+                d={`${chartData.yesPath} L${chartData.width},${chartData.height} L0,${chartData.height} Z`}
+                fill={showBothLines ? 'var(--color-success)' : 'var(--color-cta)'}
+                fillOpacity={showBothLines ? 0.08 : 0.1}
               />
-            )
-          })}
-          <path
-            d={`${chartData.yesPath} L${chartData.width},${chartData.height} L0,${chartData.height} Z`}
-            fill={showBothLines ? 'var(--color-success)' : 'var(--color-cta)'}
-            fillOpacity={showBothLines ? 0.08 : 0.1}
-          />
-          <path
-            d={chartData.yesPath}
-            stroke={showBothLines ? 'var(--color-success)' : 'var(--color-cta)'}
-            strokeWidth={1}
-            fill="none"
-            vectorEffect="non-scaling-stroke"
-          />
-          {chartData.noPath && (
-            <path
-              d={chartData.noPath}
-              stroke="var(--color-danger)"
-              strokeWidth={1}
-              fill="none"
-              vectorEffect="non-scaling-stroke"
-            />
-          )}
-        </svg>
-      )}
+              <path
+                d={chartData.yesPath}
+                stroke={showBothLines ? 'var(--color-success)' : 'var(--color-cta)'}
+                strokeWidth={1.6}
+                fill="none"
+                vectorEffect="non-scaling-stroke"
+              />
+              {chartData.noPath && (
+                <path
+                  d={chartData.noPath}
+                  stroke="var(--color-danger)"
+                  strokeWidth={1.6}
+                  fill="none"
+                  vectorEffect="non-scaling-stroke"
+                />
+              )}
+            </svg>
 
-      {showBothLines && chartData && <DualLineLegend />}
+            {/* Y-axis label % a destra */}
+            <div
+              style={{
+                position: 'absolute',
+                right: 50,
+                top: 0,
+                bottom: 0,
+                width: 20,
+                pointerEvents: 'none',
+              }}
+            >
+              {[0, 0.25, 0.5, 0.75, 1].map((y) => {
+                const yVal = chartData.min + y * (chartData.max - chartData.min)
+                const topPct = (1 - y) * 100
+                return (
+                  <span
+                    key={y}
+                    style={{
+                      position: 'absolute',
+                      top: `calc(${topPct}% - 6px)`,
+                      right: 0,
+                      fontSize: 9,
+                      color: 'var(--color-text-muted)',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {(yVal * 100).toFixed(0)}%
+                  </span>
+                )
+              })}
+            </div>
+
+            {/* End-of-line YES label */}
+            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 50 }}>
+              <EndLabel
+                value={chartData.lastYes}
+                color={showBothLines ? 'var(--color-success)' : 'var(--color-cta)'}
+                yMin={chartData.min}
+                yMax={chartData.max}
+                label="YES"
+              />
+              {chartData.noPath !== null && (
+                <EndLabel
+                  value={chartData.lastNo}
+                  color="var(--color-danger)"
+                  yMin={chartData.min}
+                  yMax={chartData.max}
+                  label="NO"
+                />
+              )}
+            </div>
+          </div>
+
+          <XAxisTimeLabels timestamps={points.map((p) => p.timestamp)} period={period} />
+        </div>
+      )}
     </Container>
+  )
+}
+
+function EndLabel({
+  value,
+  color,
+  yMin,
+  yMax,
+  label,
+}: {
+  value: number
+  color: string
+  yMin: number
+  yMax: number
+  label: string
+}) {
+  const topPct = (1 - (value - yMin) / (yMax - yMin)) * 100
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: `calc(${topPct}% - 9px)`,
+        left: 4,
+        right: 0,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        fontSize: 10,
+        fontVariantNumeric: 'tabular-nums',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <span
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          background: color,
+          flexShrink: 0,
+        }}
+      />
+      <span style={{ color: 'var(--color-text-muted)' }}>{label}</span>
+      <span style={{ color, fontWeight: 700 }}>{(value * 100).toFixed(1)}%</span>
+    </div>
+  )
+}
+
+function XAxisTimeLabels({ timestamps, period }: { timestamps: string[]; period: Period }) {
+  if (timestamps.length < 2) return null
+  const start = new Date(timestamps[0]!)
+  const end = new Date(timestamps[timestamps.length - 1]!)
+  const mid = new Date((start.getTime() + end.getTime()) / 2)
+  function fmt(d: Date) {
+    if (period === '1h' || period === '6h' || period === '1d') {
+      return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+    }
+    return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })
+  }
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginTop: 4,
+        paddingRight: 70,
+        fontSize: 9,
+        color: 'var(--color-text-muted)',
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      <span>{fmt(start)}</span>
+      <span>{fmt(mid)}</span>
+      <span>{fmt(end)}</span>
+    </div>
   )
 }
 
@@ -285,32 +420,5 @@ function ChartStats({
       ({data.noDelta >= 0 ? '+' : ''}
       {(data.noDelta * 100).toFixed(1)}%)
     </p>
-  )
-}
-
-function DualLineLegend() {
-  const dot = (color: string) => ({
-    width: 6,
-    height: 6,
-    borderRadius: '50%',
-    background: color,
-    display: 'inline-block',
-  })
-  return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 'var(--space-3)',
-        fontSize: 'var(--font-xs)',
-        color: 'var(--color-text-muted)',
-      }}
-    >
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-        <span style={dot('var(--color-success)')} /> YES
-      </span>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-        <span style={dot('var(--color-danger)')} /> NO
-      </span>
-    </div>
   )
 }
