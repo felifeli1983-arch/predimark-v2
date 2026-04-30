@@ -13,16 +13,28 @@ import type { WalletClient } from 'viem'
 import { CLOB_URL, BUILDER_CODE, getMarketDetails, getMarketDetailsByToken } from './clob'
 
 /**
- * Tipo wallet utente — determina come Polymarket valida la firma:
- *  - 'eoa'              → SignatureTypeV2.EOA (0). Path B (BYO MetaMask) e
- *                         Path C (Privy embedded wallet). L'utente paga gas POL.
- *  - 'poly_proxy'       → SignatureTypeV2.POLY_PROXY (1). Path A (utente
- *                         esistente Polymarket.com con proxy multisig).
- *                         Gasless via relayer.
- *  - 'poly_gnosis_safe' → SignatureTypeV2.POLY_GNOSIS_SAFE (2). Polymarket
- *                         Gnosis Safe (legacy onboarding).
- *  - 'poly_1271'        → SignatureTypeV2.POLY_1271 (3). EIP-1271 per smart
- *                         contract wallets / vaults.
+ * Tipo wallet utente — determina come Polymarket valida la firma.
+ * Doc "Trading CLOB Overview" Polymarket V2 (verbatim):
+ *
+ *  - 'eoa' → SignatureTypeV2.EOA (0). "Standalone wallet — you pay your
+ *    own gas (POL for gas). Funder = your EOA wallet address."
+ *    → Auktora default: utenti che firmano DIRETTAMENTE con Privy embedded
+ *      EOA, NO proxy Polymarket. Il funder è l'address Privy.
+ *
+ *  - 'poly_proxy' → SignatureTypeV2.POLY_PROXY (1). "Polymarket account
+ *    via Magic Link (email/Google login). Requires exported private key."
+ *    → Path A (MA4.7) — utenti che hanno già un account Polymarket Magic
+ *      Link e importano la chiave privata in Auktora.
+ *
+ *  - 'poly_gnosis_safe' → SignatureTypeV2.POLY_GNOSIS_SAFE (2).
+ *    "Polymarket account via browser wallet (MetaMask, Rabby) or embedded
+ *    wallet (Privy, Turnkey). Most common type. Funder = proxy wallet."
+ *    → SOLO per utenti che hanno un Polymarket Gnosis Safe già
+ *      deployato (onboarded via Polymarket UI). Auktora-onboarded users
+ *      con Privy embedded sono EOA standalone, non Gnosis Safe.
+ *
+ *  - 'poly_1271' → SignatureTypeV2.POLY_1271 (3). EIP-1271 per smart
+ *    contract wallets / vaults.
  */
 export type WalletKind = 'eoa' | 'poly_proxy' | 'poly_gnosis_safe' | 'poly_1271'
 
