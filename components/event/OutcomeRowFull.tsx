@@ -20,6 +20,12 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
   const noCents = 100 - yesCents
   const pct = yesCents
   const displayLabel = label || market.groupItemTitle || market.question
+  // Tradability: market on-chain ma con CLOB disabilitato O non più
+  // accettando ordini (es. sport post-kickoff) → disabilita bottoni.
+  const tradeDisabled = !market.enableOrderBook || !market.acceptingOrders
+  const disabledReason = !market.enableOrderBook
+    ? 'Mercato non disponibile per trading CLOB'
+    : 'Ordini sospesi (es. partita iniziata)'
 
   return (
     <div
@@ -111,6 +117,8 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           <SideBtn
             label={`Sì ${yesCents}¢`}
             variant="yes"
+            disabled={tradeDisabled}
+            disabledReason={disabledReason}
             onClick={(e) => {
               e.stopPropagation()
               onTrade('yes')
@@ -119,6 +127,8 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           <SideBtn
             label={`No ${noCents}¢`}
             variant="no"
+            disabled={tradeDisabled}
+            disabledReason={disabledReason}
             onClick={(e) => {
               e.stopPropagation()
               onTrade('no')
@@ -176,10 +186,14 @@ function SideBtn({
   label,
   variant,
   onClick,
+  disabled,
+  disabledReason,
 }: {
   label: string
   variant: 'yes' | 'no'
   onClick: (e: React.MouseEvent) => void
+  disabled?: boolean
+  disabledReason?: string
 }) {
   const isYes = variant === 'yes'
   return (
@@ -188,8 +202,10 @@ function SideBtn({
       className={`btn-trade ${isYes ? 'btn-trade-yes' : 'btn-trade-no'}`}
       onClick={(e) => {
         e.preventDefault()
-        onClick(e)
+        if (!disabled) onClick(e)
       }}
+      disabled={disabled}
+      title={disabled ? disabledReason : undefined}
       style={{
         padding: 'var(--space-3) var(--space-5)',
         borderRadius: 'var(--radius-md)',
@@ -199,6 +215,8 @@ function SideBtn({
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
         minWidth: 120,
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? 'not-allowed' : 'pointer',
       }}
     >
       {label}

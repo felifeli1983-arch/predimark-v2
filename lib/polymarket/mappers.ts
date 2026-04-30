@@ -19,6 +19,8 @@ export interface AuktoraMarket {
   id: string
   /** Polymarket conditionId — usato per query CLOB (recent-trades, market details). */
   conditionId: string
+  /** Polymarket questionId — hash della domanda usato per resolution UMA. */
+  questionId: string
   question: string
   slug: string
   yesPrice: number // 0-1, alias di outcomes[0].price
@@ -36,6 +38,28 @@ export interface AuktoraMarket {
   active: boolean
   closed: boolean
   clobTokenIds: [string, string] | null
+  /**
+   * Tradable via CLOB. Alcuni market esistono on-chain ma NON sono
+   * abilitati al CLOB (enableOrderBook=false). Per quelli, mostriamo i
+   * dati ma il bottone trade è disabilitato.
+   */
+  enableOrderBook: boolean
+  /**
+   * Il CLOB sta accettando nuovi ordini in questo momento. Per sport
+   * markets, va a false subito dopo il game start (Polymarket cancella
+   * automaticamente i limit orders pending allo start).
+   */
+  acceptingOrders: boolean
+  /**
+   * Tick size minimo per i limit orders (es. 0.01 = 1¢, 0.001 = 0.1¢).
+   * I mercati neg-risk hanno tick 0.001.
+   */
+  orderPriceMinTickSize: number
+  /**
+   * Importo minimo per single order (USDC). Sotto questa soglia il CLOB
+   * rigetta l'ordine.
+   */
+  orderMinSize: number
   /**
    * Label pulito del candidato/outcome per eventi multi-outcome.
    * Es. "Finland" invece di "Will Finland win Eurovision 2026?".
@@ -152,6 +176,7 @@ export function mapGammaMarket(raw: GammaMarket): AuktoraMarket {
   return {
     id: raw.id,
     conditionId: raw.conditionId ?? '',
+    questionId: raw.questionID ?? '',
     question: raw.question,
     slug: raw.slug,
     yesPrice,
@@ -163,6 +188,10 @@ export function mapGammaMarket(raw: GammaMarket): AuktoraMarket {
     active: raw.active,
     closed: raw.closed,
     clobTokenIds,
+    enableOrderBook: raw.enableOrderBook ?? false,
+    acceptingOrders: raw.acceptingOrders ?? false,
+    orderPriceMinTickSize: raw.orderPriceMinTickSize ?? 0.01,
+    orderMinSize: raw.orderMinSize ?? 1,
     groupItemTitle: raw.groupItemTitle ?? '',
   }
 }

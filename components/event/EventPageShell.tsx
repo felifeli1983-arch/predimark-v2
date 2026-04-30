@@ -55,6 +55,9 @@ export function EventPageShell({ event }: Props) {
   function openTradeWidget(marketId: string, side: string) {
     const market = event.markets.find((m) => m.id === marketId)
     if (!market) return
+    // Gate tradability: market che non ha order book attivo o non sta
+    // accettando ordini (es. sport post-kickoff) non può ricevere trade.
+    if (!market.enableOrderBook || !market.acceptingOrders) return
     const draft = buildDraft(event, market, side)
     if (!draft) return
     tradeWidgetActions.setDraft(draft)
@@ -136,6 +139,7 @@ export function EventPageShell({ event }: Props) {
           </nav>
 
           {isResolved && <ResolvedBanner />}
+          {event.kind === 'h2h_sport' && !isResolved && <SportLimitWarning />}
 
           <EventHero event={event} />
           {event.markets[0] && <SignalBanner marketId={event.markets[0].id} />}
@@ -229,6 +233,32 @@ function ResolvedBanner() {
       }}
     >
       Resolved · mercato chiuso
+    </div>
+  )
+}
+
+/**
+ * Avviso UX per sport markets: Polymarket cancella automaticamente i
+ * limit orders pending al fischio d'inizio della partita. Source: doc
+ * Markets & Events / "Sports Markets". Importante per evitare che un
+ * utente metta ordini limit pochi minuti prima del kickoff.
+ */
+function SportLimitWarning() {
+  return (
+    <div
+      style={{
+        padding: '8px 12px',
+        borderRadius: 'var(--radius-md)',
+        background: 'color-mix(in srgb, var(--color-warning) 12%, var(--color-bg-secondary))',
+        border: '1px solid var(--color-warning)',
+        fontSize: 'var(--font-xs)',
+        color: 'var(--color-text-secondary)',
+        lineHeight: 1.5,
+      }}
+    >
+      <strong style={{ color: 'var(--color-warning)' }}>Nota sport markets:</strong> i limit order
+      pending vengono cancellati automaticamente al fischio d&apos;inizio. Gli orari di partita
+      possono cambiare — controlla i tuoi ordini nei minuti precedenti.
     </div>
   )
 }
