@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { PulsingDot, useChartHover } from './chart/ChartShell'
+import { PulsingDotHtml, useChartHover } from './chart/ChartShell'
 
 interface Props {
   /** Symbol Binance es. 'btcusdt' (case-insensitive). */
@@ -220,12 +220,14 @@ export function CryptoCandleChart({ symbol }: Props) {
                   strokeDasharray="0.5,0.5"
                 />
               )}
-              <PulsingDot
-                cx={chart.width}
-                cy={chart.lastY}
-                color={chart.change >= 0 ? 'var(--color-success)' : 'var(--color-danger)'}
-              />
             </svg>
+            {/* Pulsing dot HTML — sempre cerchio perfetto e clippato dal
+                container `overflow: hidden`. Posizione % rispetto allo SVG. */}
+            <PulsingDotHtml
+              xPct={100}
+              yPct={(chart.lastY / chart.height) * 100}
+              color={chart.change >= 0 ? 'var(--color-success)' : 'var(--color-danger)'}
+            />
             {hover.xRatio !== null && hover.yPx !== null && candles && candles.length > 0 && (
               <CandleTooltip
                 candles={candles}

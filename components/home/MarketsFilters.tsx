@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { LayoutGrid, List, Search, SlidersHorizontal, Zap, ZapOff } from 'lucide-react'
+import { Filter, LayoutGrid, List, Search, SlidersHorizontal, Zap, ZapOff } from 'lucide-react'
 import { useThemeStore } from '@/lib/stores/themeStore'
 
 const SORT_OPTIONS = [
@@ -11,16 +11,6 @@ const SORT_OPTIONS = [
   { value: 'closing-soon', label: 'Closing soon' },
   { value: 'trending', label: 'Trending' },
   { value: 'edge', label: 'Edge highest' },
-] as const
-
-const RELATED_TAGS = [
-  { slug: 'all', label: 'All' },
-  { slug: 'trending', label: 'Trending' },
-  { slug: 'breaking', label: 'Breaking' },
-  { slug: 'politics', label: 'Politics' },
-  { slug: 'crypto', label: 'Crypto' },
-  { slug: 'nfl', label: 'NFL' },
-  { slug: 'gpt-5', label: 'GPT-5' },
 ] as const
 
 const SEARCH_DEBOUNCE_MS = 300
@@ -36,7 +26,6 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
   const searchParams = useSearchParams()
   const sort = searchParams.get('sort') ?? 'volume24h'
   const category = searchParams.get('category') ?? 'all'
-  const activeTag = searchParams.get('tag') ?? 'all'
   const initialQuery = searchParams.get('q') ?? ''
   const { animationsEnabled, setAnimationsEnabled } = useThemeStore()
 
@@ -102,6 +91,26 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
           <button
             type="button"
+            aria-label="Filtri"
+            title="Filtri (in arrivo)"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              background: 'var(--color-bg-secondary)',
+              border: '1px solid var(--color-border-subtle)',
+              color: 'var(--color-text-secondary)',
+              borderRadius: 'var(--radius-md)',
+              padding: '4px 10px',
+              fontSize: 'var(--font-sm)',
+              cursor: 'pointer',
+            }}
+          >
+            <Filter size={12} />
+            Filtri
+          </button>
+          <button
+            type="button"
             aria-label="Filtri avanzati"
             title="Filtri avanzati (in arrivo)"
             style={{
@@ -118,7 +127,7 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             }}
           >
             <SlidersHorizontal size={12} />
-            Filters
+            Filtri avanzati
           </button>
 
           <div
@@ -239,45 +248,6 @@ export function MarketsFilters({ layout, onLayoutChange }: Props) {
             </button>
           </div>
         </div>
-      </div>
-
-      {/* SECONDA RIGA: sub-filtri Related (tag scrollabili) */}
-      <div
-        style={{
-          display: 'flex',
-          gap: 4,
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
-          paddingBottom: 4,
-        }}
-      >
-        {RELATED_TAGS.map((tag) => {
-          const isActive = activeTag === tag.slug
-          return (
-            <button
-              key={tag.slug}
-              type="button"
-              onClick={() => setParam('tag', tag.slug, 'all')}
-              style={{
-                padding: '4px 10px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: 'var(--font-sm)',
-                fontWeight: isActive ? 600 : 500,
-                whiteSpace: 'nowrap',
-                cursor: 'pointer',
-                flexShrink: 0,
-                background: isActive ? 'var(--color-cta-bg)' : 'transparent',
-                color: isActive ? 'var(--color-cta)' : 'var(--color-text-muted)',
-                border: isActive
-                  ? '1px solid var(--color-cta)'
-                  : '1px solid var(--color-border-subtle)',
-                transition: 'background 150ms, color 150ms',
-              }}
-            >
-              {tag.label}
-            </button>
-          )
-        })}
       </div>
     </div>
   )

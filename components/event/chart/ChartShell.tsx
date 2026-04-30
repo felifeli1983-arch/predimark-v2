@@ -115,36 +115,70 @@ export function useChartHover(): {
 }
 
 /**
- * Pulsing dot SVG con animazione native `<animate>` su `r` (radius).
- * Cresce da cx/cy senza problemi di transformBox/transformOrigin
- * (CSS transforms su <circle> in SVG con preserveAspectRatio="none"
- * scalano dal corner del viewBox, non dal centro del cerchio → bug
- * "wrap dal basso all'alto" che vedeva l'utente).
+ * Pulsing dot HTML/CSS — sostituisce il vecchio dot SVG che con
+ * preserveAspectRatio="none" veniva stiracchiato in un'ellisse alta
+ * (60→320px) e usciva fuori dall'area del chart.
+ *
+ * Rende un cerchio in PX puri (sempre perfettamente rotondo) sopra al
+ * grafico. Il container deve essere `position: relative` + `overflow: hidden`
+ * così il pulse non sfora la card.
+ *
+ * Posizione: `xPct`/`yPct` 0-100 rispetto al container in cui è renderizzato.
+ * Il dot è centrato sulla coordinata (translate(-50%, -50%)).
  */
-export function PulsingDot({
-  cx,
-  cy,
+export function PulsingDotHtml({
+  xPct,
+  yPct,
   color,
-  radius = 1.2,
+  size = 8,
 }: {
-  cx: number
-  cy: number
+  /** 0-100, percentuale orizzontale dentro il container */
+  xPct: number
+  /** 0-100, percentuale verticale dentro il container */
+  yPct: number
   color: string
-  radius?: number
+  /** Diametro del dot statico in px (default 8). Il pulse è 2.2x → ~9px di raggio massimo. */
+  size?: number
 }) {
+  // Padding minimo dai bordi = raggio pulse a piena espansione + 1px buffer.
+  // size 8 → pulse 17.6px → raggio 8.8 → clamp 10px.
+  const pad = Math.ceil((size * 2.2) / 2) + 1
   return (
-    <g>
-      <circle cx={cx} cy={cy} r={radius * 2.5} fill={color} opacity={0}>
-        <animate
-          attributeName="r"
-          values={`${radius};${radius * 3}`}
-          dur="1.6s"
-          repeatCount="indefinite"
-        />
-        <animate attributeName="opacity" values="0.55;0" dur="1.6s" repeatCount="indefinite" />
-      </circle>
-      <circle cx={cx} cy={cy} r={radius} fill={color} />
-    </g>
+    <span
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        // clamp tiene il centro del dot dentro [pad, container - pad] → pulse mai
+        // fuori dalla card (anche con xPct=100, tipico per "ultimo punto").
+        left: `clamp(${pad}px, ${xPct}%, calc(100% - ${pad}px))`,
+        top: `clamp(${pad}px, ${yPct}%, calc(100% - ${pad}px))`,
+        width: size,
+        height: size,
+        transform: 'translate(-50%, -50%)',
+        pointerEvents: 'none',
+        zIndex: 2,
+      }}
+    >
+      <span
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '50%',
+          background: color,
+          animation: 'auktora-chart-pulse 1.6s ease-out infinite',
+          transformOrigin: 'center center',
+        }}
+      />
+      <span
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '50%',
+          background: color,
+          boxShadow: `0 0 0 1px var(--color-bg-secondary)`,
+        }}
+      />
+    </span>
   )
 }
 

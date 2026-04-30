@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
-import { HeroCard } from './HeroCard'
+import { HeroCard, type HeroBadge } from './HeroCard'
 
 interface Props {
   events: AuktoraEvent[]
+  /** Badge opzionale per evento, indicizzato per event.id. */
+  badges?: Record<string, HeroBadge>
 }
 
 const MAX_DOTS = 5
@@ -19,7 +21,7 @@ const MAX_DOTS = 5
  *   IntersectionObserver sincronizza i pagination dots.
  * - Dots + frecce in basso (entrambi i layout).
  */
-export function HeroZone({ events }: Props) {
+export function HeroZone({ events, badges }: Props) {
   const [activeIndex, setActiveIndex] = useState(0)
   // Mobile carousel: ref a ogni slide per IntersectionObserver
   const slideRefs = useRef<(HTMLLIElement | null)[]>([])
@@ -65,12 +67,14 @@ export function HeroZone({ events }: Props) {
     <div style={{ padding: '12px 16px 4px', position: 'relative' }}>
       {/* DESKTOP — grid 60% / 40% */}
       <div className="hidden md:grid md:grid-cols-[60%_40%]" style={{ gap: 12 }}>
-        {big && <HeroCard event={big} size="big" />}
+        {big && <HeroCard event={big} size="big" badge={badges?.[big.id]} />}
         {(small1 || small2) && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {small1 && small1.id !== big?.id && <HeroCard event={small1} size="small" />}
+            {small1 && small1.id !== big?.id && (
+              <HeroCard event={small1} size="small" badge={badges?.[small1.id]} />
+            )}
             {small2 && small2.id !== big?.id && small2.id !== small1?.id && (
-              <HeroCard event={small2} size="small" />
+              <HeroCard event={small2} size="small" badge={badges?.[small2.id]} />
             )}
           </div>
         )}
@@ -103,7 +107,7 @@ export function HeroZone({ events }: Props) {
               scrollSnapAlign: 'start',
             }}
           >
-            <HeroCard event={ev} size="big" />
+            <HeroCard event={ev} size="big" badge={badges?.[ev.id]} />
           </li>
         ))}
       </ul>

@@ -9,7 +9,7 @@ import {
   LastUpdateTicker,
   PERIOD_OPTIONS,
   PeriodTabs,
-  PulsingDot,
+  PulsingDotHtml,
   SectionTitle,
   useChartHover,
   type Period,
@@ -291,15 +291,28 @@ export function MultiLineChart({ markets }: Props) {
                     strokeDasharray="0.5,0.5"
                   />
                 )}
+              </svg>
 
-                {/* Pulsing dot a fine di ogni serie visibile */}
+              {/* Pulsing dots HTML overlay — perfetti cerchi clippati dal
+                  container, mai uscenti come l'ellisse stretchata SVG. */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: 'calc(100% - 110px)',
+                  height: CHART_HEIGHT,
+                  pointerEvents: 'none',
+                }}
+              >
                 {paths.map((p) => {
                   const s = series.find((x) => x.label === p.label)
                   const last = s?.points[s.points.length - 1]?.yes_price ?? 0
-                  const lastY = height - ((last - yMin) / (yMax - yMin || 1)) * height
-                  return <PulsingDot key={`dot-${p.label}`} cx={width} cy={lastY} color={p.color} />
+                  const yPct = (1 - (last - yMin) / (yMax - yMin || 1)) * 100
+                  return (
+                    <PulsingDotHtml key={`dot-${p.label}`} xPct={100} yPct={yPct} color={p.color} />
+                  )
                 })}
-              </svg>
+              </div>
 
               {/* Tooltip multi-serie on hover */}
               {hover.xRatio !== null && hover.yPx !== null && series.length > 0 && (

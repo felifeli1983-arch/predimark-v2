@@ -8,7 +8,7 @@ import {
   Container,
   LastUpdateTicker,
   PeriodTabs,
-  PulsingDot,
+  PulsingDotHtml,
   SectionTitle,
   useChartHover,
   useFlashOnChange,
@@ -282,21 +282,32 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
                   strokeDasharray="0.5,0.5"
                 />
               )}
+            </svg>
 
-              {/* Pulsing dots punti finali */}
-              <PulsingDot
-                cx={chartData.lastX}
-                cy={chartData.lastYesY}
+            {/* Pulsing dots punti finali — HTML overlay (perfetto cerchio,
+                clippato da `overflow: hidden` del container chart). */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: 'calc(100% - 70px)',
+                height: CHART_HEIGHT,
+                pointerEvents: 'none',
+              }}
+            >
+              <PulsingDotHtml
+                xPct={(chartData.lastX / chartData.width) * 100}
+                yPct={(chartData.lastYesY / chartData.height) * 100}
                 color={showBothLines ? 'var(--color-success)' : 'var(--color-cta)'}
               />
               {chartData.noPath && (
-                <PulsingDot
-                  cx={chartData.lastX}
-                  cy={chartData.lastNoY}
+                <PulsingDotHtml
+                  xPct={(chartData.lastX / chartData.width) * 100}
+                  yPct={(chartData.lastNoY / chartData.height) * 100}
                   color="var(--color-danger)"
                 />
               )}
-            </svg>
+            </div>
 
             {/* Tooltip on hover */}
             {hoveredPoint && hover.yPx !== null && (

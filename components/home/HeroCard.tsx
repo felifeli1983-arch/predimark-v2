@@ -6,6 +6,14 @@ import { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 
+export type HeroBadge = {
+  label: string
+  /** CSS color (es. 'var(--color-success)') */
+  color: string
+  /** Aggiunge pallino pulsante prima della label */
+  live?: boolean
+}
+
 const THEME_TOKEN: Record<string, string> = {
   sport: 'var(--color-cat-sport)',
   sports: 'var(--color-cat-sport)',
@@ -46,9 +54,10 @@ function pickAccent(tags: string[]): { color: string; cta: string } {
 interface Props {
   event: AuktoraEvent
   size?: 'big' | 'small'
+  badge?: HeroBadge
 }
 
-export function HeroCard({ event, size = 'small' }: Props) {
+export function HeroCard({ event, size = 'small', badge }: Props) {
   const [imgFailed, setImgFailed] = useState(false)
   const { color: accent, cta } = pickAccent(event.tags)
   const isBig = size === 'big'
@@ -99,6 +108,43 @@ export function HeroCard({ event, size = 'small' }: Props) {
             'linear-gradient(0deg, var(--color-hero-overlay-strong) 0%, var(--color-hero-overlay-soft) 55%, transparent 100%)',
         }}
       />
+      {badge && (
+        <span
+          style={{
+            position: 'absolute',
+            top: isBig ? 14 : 10,
+            left: isBig ? 16 : 12,
+            zIndex: 2,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: isBig ? '4px 10px' : '3px 8px',
+            borderRadius: 'var(--radius-full)',
+            background: badge.color,
+            color: '#fff',
+            fontSize: isBig ? 11 : 9,
+            fontWeight: 800,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+            lineHeight: 1,
+          }}
+        >
+          {badge.live && (
+            <span
+              className="live-dot"
+              style={{
+                display: 'inline-block',
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: '#fff',
+              }}
+            />
+          )}
+          {badge.label}
+        </span>
+      )}
       <div style={{ position: 'relative', padding: isBig ? '20px 22px' : '12px 14px' }}>
         <h3
           style={{
