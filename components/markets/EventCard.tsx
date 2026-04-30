@@ -38,19 +38,32 @@ const cardStyle: React.CSSProperties = {
 }
 
 export function EventCard({ event, onBookmark, badge }: EventCardProps) {
+  // Badge curato: NON overlay top-left (copriva avatar+title). Sostituito con
+  // - bordo sinistro 3px colorato (segnale visivo non invasivo)
+  // - micro-pill bottom-right sull'area vuota del footer
+  const styleWithBadge: React.CSSProperties = badge
+    ? { ...cardStyle, borderLeft: `3px solid ${badge.color}` }
+    : cardStyle
   return (
-    <Link href={`/event/${event.slug}`} style={cardStyle} className="hover-lift">
+    <Link href={`/event/${event.slug}`} style={styleWithBadge} className="hover-lift">
+      {event.kind === 'binary' && <BinaryCard event={event} onBookmark={onBookmark} />}
+      {event.kind === 'multi_outcome' && <MultiOutcomeCard event={event} onBookmark={onBookmark} />}
+      {event.kind === 'multi_strike' && <MultiStrikeCard event={event} onBookmark={onBookmark} />}
+      {event.kind === 'h2h_sport' && <H2HCard event={event} onBookmark={onBookmark} />}
+      {event.kind === 'crypto_up_down' && <CryptoCard event={event} onBookmark={onBookmark} />}
       {badge && (
         <span
+          aria-label={badge.label}
+          title={badge.label}
           style={{
             position: 'absolute',
-            top: 8,
-            left: 8,
+            bottom: 6,
+            right: 8,
             zIndex: 3,
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 5,
-            padding: '3px 8px',
+            gap: 4,
+            padding: '2px 7px',
             borderRadius: 'var(--radius-full)',
             background: badge.color,
             color: '#fff',
@@ -59,7 +72,7 @@ export function EventCard({ event, onBookmark, badge }: EventCardProps) {
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
             lineHeight: 1,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+            pointerEvents: 'none',
           }}
         >
           {badge.live && (
@@ -67,8 +80,8 @@ export function EventCard({ event, onBookmark, badge }: EventCardProps) {
               className="live-dot"
               style={{
                 display: 'inline-block',
-                width: 5,
-                height: 5,
+                width: 4,
+                height: 4,
                 borderRadius: '50%',
                 background: '#fff',
               }}
@@ -77,11 +90,6 @@ export function EventCard({ event, onBookmark, badge }: EventCardProps) {
           {badge.label}
         </span>
       )}
-      {event.kind === 'binary' && <BinaryCard event={event} onBookmark={onBookmark} />}
-      {event.kind === 'multi_outcome' && <MultiOutcomeCard event={event} onBookmark={onBookmark} />}
-      {event.kind === 'multi_strike' && <MultiStrikeCard event={event} onBookmark={onBookmark} />}
-      {event.kind === 'h2h_sport' && <H2HCard event={event} onBookmark={onBookmark} />}
-      {event.kind === 'crypto_up_down' && <CryptoCard event={event} onBookmark={onBookmark} />}
     </Link>
   )
 }
