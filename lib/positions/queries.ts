@@ -25,6 +25,10 @@ export interface PositionItem {
   tokenId: string | null
   /** Polymarket conditionId — fetchato al sell per tickSize/negRisk reali. */
   conditionId: string | null
+  /** Timestamp del redeem on-chain (NULL = mai redento, mostrare Claim button). */
+  redeemedAt: string | null
+  /** Tx hash on-chain del redeem (per audit + link Polygonscan). */
+  redeemTxHash: string | null
 }
 
 interface ListOptions {
@@ -46,7 +50,7 @@ export async function listUserPositions(
       `
         id, market_id, side, shares, avg_price, total_cost,
         current_price, current_value, unrealized_pnl, unrealized_pnl_pct,
-        is_demo, is_open, opened_at, closed_at,
+        is_demo, is_open, opened_at, closed_at, redeemed_at, redeem_tx_hash,
         markets ( id, polymarket_market_id, slug, title, image_url, category, clob_token_ids )
       `,
       { count: 'exact' }
@@ -98,6 +102,9 @@ export async function listUserPositions(
       // conditionId non in DB schema — SellConfirmModal usa tokenId per
       // getTickAndRiskByToken (lookup tickSize+negRisk diretto).
       conditionId: null,
+      // Redeem state — migration `add_redeemed_at_to_positions` (2026-04-30).
+      redeemedAt: row.redeemed_at,
+      redeemTxHash: row.redeem_tx_hash,
     }
   })
 

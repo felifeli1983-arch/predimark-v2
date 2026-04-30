@@ -60,6 +60,36 @@ export async function fetchResolvedPositions(
   return authedGet<PositionsResponse>(token, `/api/v1/users/me/positions?${params}`)
 }
 
+/**
+ * Marca una position come redeemed on-chain (salva tx_hash + timestamp
+ * in DB). Chiamato da useRedeem dopo che il tx è stato confermato.
+ */
+export async function markPositionRedeemed(
+  token: string,
+  positionId: string,
+  txHash: string
+): Promise<{ ok: boolean; alreadyRedeemed?: boolean }> {
+  const res = await fetch(
+    `/api/v1/users/me/positions/${encodeURIComponent(positionId)}/redeemed`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ txHash }),
+    }
+  )
+  if (!res.ok) {
+    let detail = ''
+    try {
+      const body = (await res.json()) as { error?: { message?: string } }
+      detail = body?.error?.message ?? ''
+    } catch {
+      /* ignore */
+    }
+    throw new Error(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}`)
+  }
+  return (await res.json()) as { ok: boolean; alreadyRedeemed?: boolean }
+}
+
 interface HistoryFilters {
   isDemo: boolean
   type?: 'open' | 'close' | 'resolution'

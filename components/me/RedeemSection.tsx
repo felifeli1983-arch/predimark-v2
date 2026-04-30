@@ -12,39 +12,21 @@ const POLYGONSCAN_TX = 'https://polygonscan.com/tx'
 
 /**
  * Sezione "Vincite da incassare" — lista posizioni risolte vincenti
- * (`is_open=false` AND `current_price > 0.5`) con bottone Claim per
- * ogni riga che chiama CTF.redeemPositions on-chain.
+ * (`is_open=false` AND `current_price > 0.5` AND `redeemed_at IS NULL`)
+ * con bottone Claim per ogni riga che chiama CTF.redeemPositions
+ * (o NegRiskAdapter.redeemPositions per neg-risk markets) on-chain.
  *
- * Storage `auktora.redeemed-positions` (localStorage) per nascondere
- * subito le righe già reedimati senza dover aspettare il receipt.
- * Idempotente lato CTF — se l'utente clicka due volte il secondo no-op.
+ * State backed da DB (column `redeemed_at`) — niente più localStorage.
+ * Idempotente lato CTF + side-effect sicuro.
  */
-const REDEEMED_KEY = 'auktora.redeemed-positions'
-
-function getRedeemedSet(): Set<string> {
-  if (typeof window === 'undefined') return new Set()
-  try {
-    const raw = window.localStorage.getItem(REDEEMED_KEY)
-    return new Set(raw ? (JSON.parse(raw) as string[]) : [])
-  } catch {
-    return new Set()
-  }
-}
-
-function persistRedeemed(set: Set<string>) {
-  try {
-    window.localStorage.setItem(REDEEMED_KEY, JSON.stringify([...set]))
-  } catch {
-    /* private mode etc. */
-  }
-}
-
 export function RedeemSection() {
   const { ready, authenticated, getAccessToken } = usePrivy()
   const isDemo = useThemeStore((s) => s.isDemo)
   const [items, setItems] = useState<PositionItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [redeemedSet, setRedeemedSet] = useState<Set<string>>(() => getRedeemedSet())
+  // Track posizioni claimate in questa session (prima che il refetch
+  // catturi `redeemed_at` dal DB).
+  const [optimisticClaimed, setOptimisticClaimed] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (!ready || !authenticated || isDemo) {
@@ -59,11 +41,16 @@ export function RedeemSection() {
         if (!token) return
         const data = await fetchResolvedPositions(token, false, { perPage: 100 })
         if (cancelled) return
-        // Filtra solo: closed (is_open=false) AND winning (current_price > 0.5)
-        const winning = data.items.filter(
-          (p) => !p.isOpen && (p.currentPrice ?? 0) > 0.5 && p.shares > 0
+        // Filtra: closed (is_open=false) AND winning (current_price > 0.5)
+        // AND non ancora redenta (redeemed_at IS NULL).
+        const claimable = data.items.filter(
+          (p) =>
+            !p.isOpen &&
+            (p.currentPrice ?? 0) > 0.5 &&
+            p.shares > 0 &&
+            p.redeemedAt === null
         )
-        setItems(winning)
+        setItems(claimable)
       } catch {
         /* silenzioso */
       } finally {
@@ -75,19 +62,15 @@ export function RedeemSection() {
     }
   }, [ready, authenticated, getAccessToken, isDemo])
 
-  function markClaimed(positionId: string) {
-    const next = new Set(redeemedSet)
-    next.add(positionId)
-    setRedeemedSet(next)
-    persistRedeemed(next)
+  function markClaimedOptimistic(positionId: string) {
+    setOptimisticClaimed((prev) => new Set(prev).add(positionId))
   }
 
-  // Demo mode → niente redeem on-chain
   if (isDemo) return null
   if (!ready || loading) return null
   if (!authenticated) return null
 
-  const claimable = items.filter((p) => !redeemedSet.has(p.id))
+  const claimable = items.filter((p) => !optimisticClaimed.has(p.id))
   if (claimable.length === 0) return null
 
   const totalPayout = claimable.reduce(
@@ -146,7 +129,7 @@ export function RedeemSection() {
       <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 6 }}>
         {claimable.map((p) => (
           <li key={p.id}>
-            <RedeemRow position={p} onClaimed={() => markClaimed(p.id)} />
+            <RedeemRow position={p} onClaimed={() => markClaimedOptimistic(p.id)} />
           </li>
         ))}
       </ul>
@@ -159,24 +142,28 @@ function RedeemRow({ position, onClaimed }: { position: PositionItem; onClaimed:
   const payout = position.currentValue ?? position.shares * (position.currentPrice ?? 1)
 
   async function handleClaim() {
-    // Fetch conditionId on-demand da Gamma — non è in DB.
     try {
+      // Fetch conditionId + neg_risk on-demand da Gamma — non in DB schema.
       const res = await fetch(
         `https://gamma-api.polymarket.com/markets/${encodeURIComponent(position.polymarketMarketId)}`,
         { cache: 'no-store' }
       )
       if (!res.ok) throw new Error(`Gamma ${res.status}`)
-      const market = (await res.json()) as { conditionId?: string }
+      const market = (await res.json()) as { conditionId?: string; negRisk?: boolean }
       if (!market.conditionId) throw new Error('conditionId non disponibile')
-      await redeem(market.conditionId)
-      // Mark redeemed solo se non c'è errore (state hook gestisce error path)
-      // L'effect sotto cattura state==='done' per chiamare onClaimed.
+      await redeem({
+        positionId: position.id,
+        conditionId: market.conditionId,
+        negRisk: Boolean(market.negRisk),
+      })
     } catch (err) {
       console.error('[redeem]', err)
     }
   }
 
-  // Quando il redeem è done, marca la riga come redeemed (storage + UI hide)
+  // Quando il tx è done, marca optimistic claimed così la riga sparisce
+  // subito (senza dover aspettare un refetch). Il DB è già stato updato
+  // in useRedeem, prossimo refetch confermerà.
   useEffect(() => {
     if (state === 'done') onClaimed()
   }, [state, onClaimed])
