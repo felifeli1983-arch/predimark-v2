@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { EventActivity } from './EventActivity'
+import { EventHolders } from './EventHolders'
 
 type TabId = 'activity' | 'comments' | 'news' | 'holders'
 
@@ -78,7 +79,10 @@ export function EventInfoTabs({ event }: Props) {
           <Placeholder text="News aggregator — feed dedicato in MA6 (Decrypt, Coindesk, Reuters per categoria)." />
         )}
         {active === 'holders' && (
-          <Placeholder text="Top holders — query positions on-chain per outcome, in MA6." />
+          <EventHolders
+            conditionId={conditionId || null}
+            outcomes={event.markets[0]?.outcomes.map((o) => o.name) ?? ['Yes', 'No']}
+          />
         )}
       </div>
     </section>

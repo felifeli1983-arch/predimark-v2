@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Flame } from 'lucide-react'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { LiveBadge, EventActions, formatLong } from './HeroCommon'
+import { OpenInterestBadge } from '../OpenInterestBadge'
 
 interface Props {
   event: AuktoraEvent
@@ -134,6 +135,8 @@ export function HeroDefault({ event }: Props) {
             </strong>{' '}
             Vol
           </span>
+          <span>·</span>
+          <OpenInterestBadge conditionId={event.markets[0]?.conditionId} />
           <span>·</span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <Flame size={11} />
