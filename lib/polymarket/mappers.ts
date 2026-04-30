@@ -66,6 +66,13 @@ export interface AuktoraMarket {
    * Stringa vuota se non presente (mercati binary standard).
    */
   groupItemTitle: string
+  /**
+   * URL sorgente di risoluzione UMA (es. data.chain.link/streams/btc-usd
+   * per crypto, ESPN per sport, press release per politics).
+   * Polymarket "Resolution" doc: l'utente DEVE leggere le rules prima
+   * di tradare. Mostriamo questo link in EventRules come chip esterno.
+   */
+  resolutionSource: string
 }
 
 export interface AuktoraEvent {
@@ -202,6 +209,7 @@ export function mapGammaMarket(raw: GammaMarket): AuktoraMarket {
     orderPriceMinTickSize: raw.orderPriceMinTickSize ?? 0.01,
     orderMinSize: raw.orderMinSize ?? 1,
     groupItemTitle: raw.groupItemTitle ?? '',
+    resolutionSource: raw.resolutionSource ?? '',
   }
 }
 

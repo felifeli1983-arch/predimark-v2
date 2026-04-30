@@ -154,7 +154,12 @@ export function EventPageShell({ event }: Props) {
             <CryptoRoundNav seriesSlug={event.seriesSlug} currentSlug={event.slug} />
           )}
           <EventProbabilities event={event} onTrade={openTradeWidget} />
-          <EventRules description={event.description} />
+          <EventRules
+            description={event.description}
+            resolutionSource={event.markets[0]?.resolutionSource}
+            isResolved={isResolved}
+            resolvedAt={isResolved ? event.endDate : null}
+          />
           {/* Sidebar inline su mobile + tablet portrait (<1024px) — Sentiment + Related,
             Trade Widget mobile arriva via bottom sheet */}
           <div className="lg:hidden">

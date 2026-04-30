@@ -30,6 +30,15 @@ export const POLYGON_V2 = {
   ctfCollateralAdapter: '0xADa100874d00e3331D00F2007a9c336a65009718',
   /** Adapter ERC-1155 ↔ ERC-20 collateral neg-risk. */
   negRiskCtfCollateralAdapter: '0xAdA200001000ef00D07553cEE7006808F895c6F1',
+  /**
+   * UMA Optimistic Oracle Adapters — gestiscono proposal/dispute/resolve
+   * dei market. Polymarket back-office propone via UMA, no interazione
+   * diretta dalla nostra app, ma logghiamo gli address per audit/reference.
+   * Doc: https://docs.polymarket.com/concepts/resolution
+   */
+  umaCtfAdapterV3: '0x157Ce2d672854c848c9b79C49a8Cc6cc89176a49',
+  umaCtfAdapterV2: '0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74',
+  umaCtfAdapterV1: '0xCB1822859cEF82Cd2Eb4E6276C7916e692995130',
 } as const
 
 /** Decimals di pUSD (uguali a USDC.e). */
