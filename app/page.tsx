@@ -8,6 +8,7 @@ import {
 } from '@/lib/polymarket/queries'
 import { mapGammaEvent } from '@/lib/polymarket/mappers'
 import type { HeroBadge } from '@/components/home/HeroCard'
+import { HeroZone } from '@/components/home/HeroZone'
 import { MarketsSection } from '@/components/home/MarketsSection'
 import { Sidebar } from '@/components/home/Sidebar'
 import { MobileSidebarRails } from '@/components/home/MobileSidebarRails'
@@ -76,6 +77,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <NavTabs />
       </Suspense>
       <PageContainer sidebar={<Sidebar />}>
+        {heroEvents.length > 0 && <HeroZone events={heroEvents} badges={heroBadges} />}
         <MobileSidebarRails />
         <MarketsSection initialEvents={gridEvents} pinnedEvents={heroEvents} badges={heroBadges} />
       </PageContainer>

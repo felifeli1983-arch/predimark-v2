@@ -119,6 +119,15 @@ function isNumericString(value: string): boolean {
 export function classifyEvent(event: GammaEvent): CardKind {
   const markets = event.markets ?? []
 
+  // Crypto round detection FIRST: serie con slug "*-up-or-down-*" è il
+  // signal canonico Polymarket per i round 5m/15m crypto. Gli outcome
+  // sono "Up"/"Down" (non Yes/No), quindi il classifier vecchio li
+  // mancava e li mappava a h2h_sport → render sbagliato.
+  const seriesSlug = event.series?.[0]?.slug?.toLowerCase() ?? ''
+  if (seriesSlug.includes('up-or-down')) {
+    return 'crypto_up_down'
+  }
+
   if (markets.length === 1) {
     const m = markets[0]!
     const outcomes = safeParseJsonArray(m.outcomes)

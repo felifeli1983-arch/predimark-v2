@@ -128,7 +128,10 @@ export async function fetchHeroEvents(): Promise<HeroPick[]> {
     gammaGet<GammaEvent[]>(
       '/events',
       {
-        seriesSlug: 'btc-up-or-down-5m',
+        // IMPORTANTE: Gamma vuole snake_case `series_slug`. La camelCase
+        // `seriesSlug` viene ignorata silenziosamente e ritorna eventi
+        // sbagliati (es. multi-strike MicroStrategy invece del round BTC 5m).
+        series_slug: 'btc-up-or-down-5m',
         active: true,
         closed: false,
         end_date_min: nowIso,
@@ -191,7 +194,8 @@ export async function fetchRelatedRounds(
 ): Promise<GammaEvent[]> {
   const events = await gammaGet<GammaEvent[]>(
     '/events',
-    { seriesSlug, limit, order: 'endDate', ascending: false },
+    // Gamma vuole snake_case (`series_slug`), non camelCase.
+    { series_slug: seriesSlug, limit, order: 'endDate', ascending: false },
     { revalidate: 60 }
   )
   return Array.isArray(events) ? events : []
