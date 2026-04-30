@@ -124,8 +124,11 @@ export function RedeemAutoPrompt() {
     void redeemBatch(tasks)
   }
 
-  if (!open || pending.length === 0) return null
+  if (!open) return null
 
+  // Stato vuoto = utente clicka sul Gift icon senza vincite → mostra
+  // modale informativo "Cos'è" invece di non renderizzare nulla.
+  const isEmpty = pending.length === 0
   const totalPayout = pending.reduce(
     (sum, p) => sum + (p.currentValue ?? p.shares * (p.currentPrice ?? 1)),
     0
@@ -167,7 +170,12 @@ export function RedeemAutoPrompt() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Trophy size={24} style={{ color: 'var(--color-success)' }} />
+          <Trophy
+            size={24}
+            style={{
+              color: isEmpty ? 'var(--color-text-muted)' : 'var(--color-success)',
+            }}
+          />
           <div style={{ flex: 1, minWidth: 0 }}>
             <h2
               style={{
@@ -177,7 +185,11 @@ export function RedeemAutoPrompt() {
                 color: 'var(--color-text-primary)',
               }}
             >
-              {allDone ? 'Vincite incassate!' : 'Hai vincite da incassare'}
+              {isEmpty
+                ? 'Vincite & Redeem'
+                : allDone
+                  ? 'Vincite incassate!'
+                  : 'Hai vincite da incassare'}
             </h2>
             <p
               style={{
@@ -186,9 +198,11 @@ export function RedeemAutoPrompt() {
                 color: 'var(--color-text-muted)',
               }}
             >
-              {allDone
-                ? `${completedCount}/${pending.length} posizioni redente`
-                : `${pending.length} ${pending.length === 1 ? 'posizione' : 'posizioni'} risolte vincenti`}
+              {isEmpty
+                ? 'Cosa è e come funziona'
+                : allDone
+                  ? `${completedCount}/${pending.length} posizioni redente`
+                  : `${pending.length} ${pending.length === 1 ? 'posizione' : 'posizioni'} risolte vincenti`}
             </p>
           </div>
           {!isRunning && (
@@ -211,38 +225,42 @@ export function RedeemAutoPrompt() {
           )}
         </div>
 
-        <div
-          style={{
-            padding: '14px 16px',
-            background: 'color-mix(in srgb, var(--color-success) 8%, transparent)',
-            borderRadius: 'var(--radius-md)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
-          }}
-        >
-          <span
+        {isEmpty ? (
+          <EmptyExplainer />
+        ) : (
+          <div
             style={{
-              fontSize: 'var(--font-xs)',
-              color: 'var(--color-text-muted)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
+              padding: '14px 16px',
+              background: 'color-mix(in srgb, var(--color-success) 8%, transparent)',
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
             }}
           >
-            Totale da incassare
-          </span>
-          <span
-            style={{
-              fontSize: 26,
-              fontWeight: 700,
-              color: 'var(--color-success)',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            ${totalPayout.toFixed(2)}
-          </span>
-        </div>
+            <span
+              style={{
+                fontSize: 'var(--font-xs)',
+                color: 'var(--color-text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Totale da incassare
+            </span>
+            <span
+              style={{
+                fontSize: 26,
+                fontWeight: 700,
+                color: 'var(--color-success)',
+                fontVariantNumeric: 'tabular-nums',
+                lineHeight: 1,
+              }}
+            >
+              ${totalPayout.toFixed(2)}
+            </span>
+          </div>
+        )}
 
         {isRunning && (
           <div
@@ -278,20 +296,40 @@ export function RedeemAutoPrompt() {
           </div>
         )}
 
-        <p
-          style={{
-            margin: 0,
-            fontSize: 'var(--font-xs)',
-            color: 'var(--color-text-muted)',
-            lineHeight: 1.5,
-          }}
-        >
-          Conferma per ricevere USDC sul tuo wallet. Una firma per posizione
-          (gas Polygon ~$0.01 per tx).
-        </p>
+        {!isEmpty && (
+          <p
+            style={{
+              margin: 0,
+              fontSize: 'var(--font-xs)',
+              color: 'var(--color-text-muted)',
+              lineHeight: 1.5,
+            }}
+          >
+            Conferma per ricevere USDC sul tuo wallet. Una firma per posizione
+            (gas Polygon ~$0.01 per tx).
+          </p>
+        )}
 
         <div style={{ display: 'flex', gap: 8 }}>
-          {!allDone ? (
+          {isEmpty ? (
+            <button
+              type="button"
+              onClick={handleDismiss}
+              style={{
+                flex: 1,
+                padding: '10px 14px',
+                background: 'var(--color-cta)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-sm)',
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Capito
+            </button>
+          ) : !allDone ? (
             <>
               <button
                 type="button"
@@ -363,6 +401,69 @@ export function RedeemAutoPrompt() {
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * Spiegazione redeem flow per quando l'utente clicka il Gift icon
+ * senza vincite ancora — informativa, no actionable.
+ */
+function EmptyExplainer() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 'var(--font-sm)',
+          color: 'var(--color-text-secondary)',
+          lineHeight: 1.5,
+        }}
+      >
+        Quando un mercato in cui hai una posizione si <strong>risolve a tuo favore</strong>,
+        i tuoi token vincenti restano sul wallet ma non sono ancora USDC liquido.
+        Questo pacchettino diventa <strong style={{ color: 'var(--color-success)' }}>verde</strong>
+        {' '}e mostra un badge col valore da incassare.
+      </p>
+
+      <ol
+        style={{
+          margin: 0,
+          padding: '0 0 0 18px',
+          fontSize: 'var(--font-xs)',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.7,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}
+      >
+        <li>
+          Compri <strong>Yes</strong> o <strong>No</strong> su un mercato → ricevi
+          token ERC1155 sul wallet
+        </li>
+        <li>
+          Mercato risolto → token vincenti valgono $1 cad. ma sono ancora token
+        </li>
+        <li>
+          Click qui sul pacchettino → 1 firma → token bruciati, USDC sul wallet
+        </li>
+      </ol>
+
+      <p
+        style={{
+          margin: 0,
+          padding: '8px 12px',
+          background: 'var(--color-bg-secondary)',
+          borderRadius: 'var(--radius-sm)',
+          fontSize: 'var(--font-xs)',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.5,
+        }}
+      >
+        Per ora <strong style={{ color: 'var(--color-text-secondary)' }}>nessuna posizione</strong>
+        {' '}vincente da incassare. Quando tradi e vinci, ti notifichiamo qui automaticamente.
+      </p>
     </div>
   )
 }
