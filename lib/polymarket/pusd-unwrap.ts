@@ -3,7 +3,8 @@
  *
  * Flow on-chain (richiede gas MATIC, paga utente):
  *   1. ERC-20 approve(pUSD, offramp, amount) — solo prima volta o se allowance bassa
- *   2. Offramp.unwrap(amount) → burns pUSD, restituisce USDC.e all'utente
+ *   2. Offramp.unwrap(USDC.e, recipient, amount) → burns pUSD, restituisce
+ *      USDC.e al recipient (di solito = funderAddress)
  *
  * Offramp address: 0x2957922Eb93258b93368531d39fAcCA3B4dC5854
  * Speculare al wrap (lib/polymarket/pusd-wrap.ts).
@@ -12,6 +13,7 @@
 import { encodeFunctionData, parseUnits, type WalletClient, type Address } from 'viem'
 
 import { POLYGON_V2, PUSD_DECIMALS } from './contracts'
+import { USDCE_TOKEN } from './pusd-wrap'
 
 const ERC20_APPROVE_ABI = [
   {
@@ -26,12 +28,23 @@ const ERC20_APPROVE_ABI = [
   },
 ] as const
 
+/**
+ * Offramp unwrap function ABI — 3 args secondo doc Polymarket "pUSD":
+ *   unwrap(address _asset, address _to, uint256 _amount)
+ *
+ * BUGFIX: la versione precedente passava solo (amount) → selector
+ * mismatch + tx revert. Ora aderente al deployed contract.
+ */
 const OFFRAMP_UNWRAP_ABI = [
   {
     name: 'unwrap',
     type: 'function',
     stateMutability: 'nonpayable',
-    inputs: [{ name: 'amount', type: 'uint256' }],
+    inputs: [
+      { name: '_asset', type: 'address' },
+      { name: '_to', type: 'address' },
+      { name: '_amount', type: 'uint256' },
+    ],
     outputs: [],
   },
 ] as const
@@ -73,10 +86,12 @@ export async function unwrapPusdToUsdc(input: UnwrapInput): Promise<UnwrapResult
     data: approveData,
   })
 
+  // unwrap(_asset, _to, _amount): _asset = USDC.e, _to = funderAddress
+  // (l'utente riceve i USDC.e sul proprio wallet).
   const unwrapData = encodeFunctionData({
     abi: OFFRAMP_UNWRAP_ABI,
     functionName: 'unwrap',
-    args: [amountWei],
+    args: [USDCE_TOKEN, input.funderAddress, amountWei],
   })
 
   const unwrapTxHash = await input.signer.sendTransaction({

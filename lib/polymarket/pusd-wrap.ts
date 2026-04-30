@@ -34,13 +34,26 @@ const ERC20_APPROVE_ABI = [
   },
 ] as const
 
-/** Onramp wrap function ABI minimal. */
+/**
+ * Onramp wrap function ABI — 3 args secondo doc Polymarket "pUSD":
+ *   wrap(address _asset, address _to, uint256 _amount)
+ * `_asset` = USDC.e address (richiesto dal contract perché Onramp può
+ * supportare più underlying assets in futuro). `_to` = recipient pUSD,
+ * non necessariamente msg.sender.
+ *
+ * BUGFIX: la versione precedente passava solo (amount) → selector
+ * mismatch + tx revert. Ora aderente al deployed contract.
+ */
 const ONRAMP_WRAP_ABI = [
   {
     name: 'wrap',
     type: 'function',
     stateMutability: 'nonpayable',
-    inputs: [{ name: 'amount', type: 'uint256' }],
+    inputs: [
+      { name: '_asset', type: 'address' },
+      { name: '_to', type: 'address' },
+      { name: '_amount', type: 'uint256' },
+    ],
     outputs: [],
   },
 ] as const
@@ -85,11 +98,12 @@ export async function wrapUsdcToPusd(input: WrapInput): Promise<WrapResult> {
     data: approveData,
   })
 
-  // Step 2: wrap
+  // Step 2: wrap(_asset, _to, _amount). `_to = funderAddress` perché
+  // l'utente vuole pUSD sul proprio wallet.
   const wrapData = encodeFunctionData({
     abi: ONRAMP_WRAP_ABI,
     functionName: 'wrap',
-    args: [amountWei],
+    args: [USDCE_TOKEN, input.funderAddress, amountWei],
   })
 
   const wrapTxHash = await input.signer.sendTransaction({
