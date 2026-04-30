@@ -5,6 +5,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import { ListOrdered, Loader2, Trash2, X } from 'lucide-react'
 
 import { fetchOpenOrders, deleteOrder, type OpenOrderRow } from '@/lib/api/orders-client'
+import { useHeartbeat } from '@/lib/hooks/useHeartbeat'
 
 /**
  * Lista ordini live (resting on book) con bottone Cancel per riga.
@@ -23,6 +24,11 @@ export function OpenOrdersList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [cancellingId, setCancellingId] = useState<string | null>(null)
+
+  // Heartbeat ogni 5s mentre l'utente ha open orders attivi.
+  // Senza questo, Polymarket auto-cancella tutti gli orders dopo 10s
+  // di inattività (Doc Orders Overview).
+  useHeartbeat(authenticated && items.length > 0)
 
   useEffect(() => {
     if (!ready || !authenticated) {

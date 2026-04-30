@@ -6,6 +6,7 @@ import { X, CheckCircle2, AlertCircle, Loader2, PenLine } from 'lucide-react'
 import { useTradeWidget } from '@/lib/stores/useTradeWidget'
 import { useTradeSubmit } from '@/lib/hooks/useTradeSubmit'
 import { useThemeStore } from '@/lib/stores/themeStore'
+import { translateOrderError } from '@/lib/polymarket/order-errors'
 
 interface Props {
   open: boolean
@@ -149,7 +150,7 @@ export function TradeConfirmModal({ open, onClose }: Props) {
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
               <AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
-              <span>{error.message}</span>
+              <span>{translateOrderError(error.message)}</span>
             </div>
             {error.code === 'NOT_ONBOARDED' && (
               <Link

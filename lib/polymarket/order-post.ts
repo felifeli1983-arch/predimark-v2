@@ -154,6 +154,28 @@ export async function getOpenOrders(
 }
 
 /**
+ * Heartbeat — Polymarket cancella automaticamente TUTTI gli open orders
+ * dell'API key se non riceve heartbeat entro 10s (+5s buffer = 15s).
+ * Doc Orders Overview: "If a valid heartbeat is not received within 10
+ * seconds, all of your open orders will be cancelled".
+ *
+ * Pattern: la prima call passa undefined, le successive l'`heartbeat_id`
+ * ritornato dalla precedente. Il server invalida heartbeat_id stale
+ * con 400 + provides il corretto nel response.
+ *
+ * Caller responsibility: setInterval ogni 5s finché user ha open orders.
+ */
+export async function postHeartbeat(
+  creds: ApiKeyCreds,
+  heartbeatId?: string
+): Promise<{ heartbeatId: string }> {
+  const res = (await authClient(creds).postHeartbeat(heartbeatId)) as {
+    heartbeat_id?: string
+  }
+  return { heartbeatId: res.heartbeat_id ?? '' }
+}
+
+/**
  * Status snapshot di un singolo ordine (per polling live → matched/
  * cancelled/expired). Returns null se non trovato.
  */
