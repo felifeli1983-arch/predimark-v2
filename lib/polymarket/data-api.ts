@@ -153,3 +153,86 @@ export async function fetchUserActivity(
   )
   return Array.isArray(data) ? data : []
 }
+
+// ----------------------- CLOSED POSITIONS / VALUE -----------------------
+
+export interface OnchainClosedPosition {
+  proxyWallet: string
+  asset: string
+  conditionId: string
+  /** Avg entry price 0-1. */
+  avgPrice: number
+  totalBought: number
+  realizedPnl: number
+  curPrice: number
+  title: string
+}
+
+/**
+ * Posizioni chiuse on-chain di un user (con realized PnL). Comp
+ * dell'attivo in fetchUserPositions, mostra storico vincite/losses.
+ */
+export async function fetchUserClosedPositions(
+  userAddress: string,
+  limit: number = 50
+): Promise<OnchainClosedPosition[]> {
+  const data = await dataApiGet<OnchainClosedPosition[]>(
+    '/closed-positions',
+    { user: userAddress, limit },
+    { cache: 'no-store' }
+  )
+  return Array.isArray(data) ? data : []
+}
+
+/**
+ * Total position value USD di un user (sum di tutti i conditional
+ * tokens × current price). Usato per dashboard `/me/portfolio`
+ * summary card "Portfolio Value".
+ */
+export async function fetchUserValue(userAddress: string): Promise<number | null> {
+  try {
+    const data = await dataApiGet<Array<{ user: string; value: number }>>(
+      '/value',
+      { user: userAddress },
+      { cache: 'no-store' }
+    )
+    if (!Array.isArray(data) || data.length === 0) return null
+    return Number(data[0]!.value)
+  } catch {
+    return null
+  }
+}
+
+// ----------------------- MARKET-WIDE TRADES -----------------------
+
+export interface OnchainMarketTrade {
+  proxyWallet: string
+  side: 'BUY' | 'SELL'
+  asset: string
+  conditionId: string
+  size: number
+  price: number
+  /** Unix timestamp ms. */
+  timestamp: number
+  title: string
+  outcome?: string
+}
+
+/**
+ * Trade history GLOBALE di un market (tutti gli utenti, non solo nostri).
+ * Differente da useLiveActivity (WS, solo trades NEW da quando subscribed):
+ * questo è un fetch storico HTTP del backlog degli ultimi N trades.
+ *
+ * Usato in EventActivity tab "Activity" per mostrare anche trades passati.
+ */
+export async function fetchMarketTrades(
+  conditionId: string,
+  limit: number = 50
+): Promise<OnchainMarketTrade[]> {
+  const data = await dataApiGet<OnchainMarketTrade[]>(
+    '/trades',
+    { market: conditionId, limit },
+    { revalidate: 10 }
+  )
+  return Array.isArray(data) ? data : []
+}

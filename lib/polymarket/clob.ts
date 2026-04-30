@@ -60,6 +60,67 @@ export async function getOrderBook(tokenId: string): Promise<OrderBookSummary> {
   return createReadOnlyClient().getOrderBook(tokenId)
 }
 
+/**
+ * Spread official di un token CLOB. Polymarket restituisce best_ask -
+ * best_bid in cents (0.01 unità), già aggiornato real-time. Più
+ * accurato che calcolare client-side dalla nostra orderbook snapshot
+ * (che è top-5 con depth bars, non sempre best level rappresentato).
+ *
+ * Doc: GET https://clob.polymarket.com/spread?token_id=<id>
+ */
+export async function getSpread(tokenId: string): Promise<number | null> {
+  try {
+    const url = new URL('/spread', CLOB_URL)
+    url.searchParams.set('token_id', tokenId)
+    const res = await fetch(url.toString(), { next: { revalidate: 5 } })
+    if (!res.ok) return null
+    const data = (await res.json()) as { spread?: string | number }
+    const v = typeof data?.spread === 'string' ? Number(data.spread) : (data?.spread ?? NaN)
+    return Number.isFinite(v) ? v : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Prezzi batch per N token IDs in una singola request (vs N calls
+ * sequenziali). Body POST con array `[{token_id, side}]`. Polymarket
+ * supporta sia BUY (best ask) che SELL (best bid).
+ *
+ * Critical perf: MultiOutcomeCard / MultiStrikeCard hanno N outcomes
+ * (3-10 tipicamente). Polling individuale = N×30s requests; batch =
+ * 1×30s request. Doc: POST /prices.
+ */
+export async function getPricesBatch(
+  tokenIds: string[],
+  side: 'BUY' | 'SELL' = 'BUY'
+): Promise<Record<string, number>> {
+  if (tokenIds.length === 0) return {}
+  const url = new URL('/prices', CLOB_URL)
+  const body = tokenIds.map((token_id) => ({ token_id, side }))
+  try {
+    const res = await fetch(url.toString(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      next: { revalidate: 5 },
+    })
+    if (!res.ok) return {}
+    const data = (await res.json()) as Record<string, Record<string, string>>
+    const out: Record<string, number> = {}
+    for (const [tokenId, bySide] of Object.entries(data)) {
+      const price = bySide?.[side]
+      if (price !== undefined) {
+        const n = Number(price)
+        if (Number.isFinite(n)) out[tokenId] = n
+      }
+    }
+    return out
+  } catch {
+    return {}
+  }
+}
+
 /** Dettagli market per `conditionId` (Polymarket). */
 export async function getMarket(conditionId: string): Promise<unknown> {
   return createReadOnlyClient().getMarket(conditionId)

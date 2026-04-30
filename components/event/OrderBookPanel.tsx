@@ -1,10 +1,49 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useLiveOrderbook } from '@/lib/ws/hooks/useLiveOrderbook'
 
 interface Props {
   /** YES asset id (clobTokenIds[0]). Se null, panel mostra empty state. */
   assetId: string | null
+}
+
+/**
+ * Polymarket /spread endpoint — official spread aggiornato 5s.
+ * Più accurato del calcolo client-side dalla nostra orderbook snapshot
+ * (top-5 levels) perché Polymarket usa il book completo per il best.
+ */
+function useOfficialSpread(assetId: string | null): number | null {
+  const [spread, setSpread] = useState<number | null>(null)
+  useEffect(() => {
+    if (!assetId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSpread(null)
+      return
+    }
+    let cancelled = false
+    async function refresh() {
+      try {
+        const url = new URL('/spread', 'https://clob.polymarket.com')
+        url.searchParams.set('token_id', assetId!)
+        const res = await fetch(url.toString())
+        if (!res.ok) return
+        const data = (await res.json()) as { spread?: string | number }
+        const v =
+          typeof data?.spread === 'string' ? Number(data.spread) : (data?.spread ?? NaN)
+        if (!cancelled && Number.isFinite(v)) setSpread(v)
+      } catch {
+        /* fallback: client-side calc dal book */
+      }
+    }
+    void refresh()
+    const id = setInterval(refresh, 5_000)
+    return () => {
+      cancelled = true
+      clearInterval(id)
+    }
+  }, [assetId])
+  return spread
 }
 
 /**
@@ -14,6 +53,7 @@ interface Props {
  */
 export function OrderBookPanel({ assetId }: Props) {
   const book = useLiveOrderbook(assetId)
+  const officialSpread = useOfficialSpread(assetId)
   // Polymarket book API: bids ordinati ASC (peggio→meglio) e asks DESC
   // (peggio→meglio). Il BEST level è sempre l'ultimo (index -1) dell'array.
   // slice(0, 5) prendeva i 5 PEGGIORI → spread fittizio enorme (es. 98¢ su
@@ -108,9 +148,13 @@ export function OrderBookPanel({ assetId }: Props) {
           borderBottom: '1px dashed var(--color-border-subtle)',
         }}
       >
-        {topAsks.length > 0 && topBids.length > 0
-          ? `Spread ${(((topAsks[topAsks.length - 1]?.price ?? 0) - (topBids[0]?.price ?? 0)) * 100).toFixed(2)}¢`
-          : '—'}
+        {/* Spread official Polymarket /spread se disponibile, altrimenti
+            calcolo client-side dal book top-5. */}
+        {officialSpread !== null
+          ? `Spread ${(officialSpread * 100).toFixed(2)}¢`
+          : topAsks.length > 0 && topBids.length > 0
+            ? `Spread ${(((topAsks[topAsks.length - 1]?.price ?? 0) - (topBids[0]?.price ?? 0)) * 100).toFixed(2)}¢`
+            : '—'}
       </div>
 
       {/* BIDS (buys) */}

@@ -1,5 +1,5 @@
 import { gammaGet } from './client'
-import type { GammaEvent, GammaEventsParams } from './types'
+import type { GammaEvent, GammaEventsParams, GammaMarket } from './types'
 
 type ParamRecord = Record<string, string | number | boolean | undefined>
 
@@ -239,4 +239,168 @@ export async function fetchRelatedRounds(
     { revalidate: 60 }
   )
   return Array.isArray(events) ? events : []
+}
+
+// ============================================================
+//  Gamma /markets — standalone single-market endpoints
+// ============================================================
+
+/**
+ * Fetch standalone markets list (singolo binary market = 1 entry,
+ * indipendente dall'event grouping). Usato quando serve un market
+ * specifico per condizione/slug senza il wrapper event.
+ */
+export async function fetchMarkets(params?: {
+  active?: boolean
+  closed?: boolean
+  limit?: number
+  order?: string
+  ascending?: boolean
+}): Promise<GammaMarket[]> {
+  return gammaGet<GammaMarket[]>(
+    '/markets',
+    params
+      ? {
+          ...(params.active !== undefined && { active: params.active }),
+          ...(params.closed !== undefined && { closed: params.closed }),
+          ...(params.limit !== undefined && { limit: params.limit }),
+          ...(params.order && { order: params.order }),
+          ...(params.ascending !== undefined && { ascending: params.ascending }),
+        }
+      : undefined,
+    { revalidate: 30 }
+  )
+}
+
+/** Singolo market by id (Polymarket internal id, NON conditionId). */
+export async function fetchMarketById(id: string): Promise<GammaMarket | null> {
+  try {
+    return await gammaGet<GammaMarket>(`/markets/${encodeURIComponent(id)}`, undefined, {
+      revalidate: 60,
+    })
+  } catch {
+    return null
+  }
+}
+
+// ============================================================
+//  Gamma /public-search — cross-entity search (events+markets+profiles)
+// ============================================================
+
+export interface PublicSearchProfile {
+  proxyWallet: string
+  name: string
+  pseudonym: string
+  bio: string
+  profileImage: string
+  verified: boolean
+}
+
+export interface PublicSearchResult {
+  events: GammaEvent[]
+  /** Profiles top traders (presenti se la query matcha un username). */
+  profiles?: PublicSearchProfile[]
+  pagination?: {
+    hasMore: boolean
+  }
+}
+
+/**
+ * Cross-entity search: events + profili user. Più potente di
+ * `/events?search=` perché ritorna anche profili creator/holder.
+ */
+export async function publicSearch(
+  query: string,
+  limitPerType: number = 10
+): Promise<PublicSearchResult> {
+  if (!query.trim()) return { events: [] }
+  return gammaGet<PublicSearchResult>(
+    '/public-search',
+    { q: query.trim(), limit_per_type: limitPerType },
+    { revalidate: 15 }
+  )
+}
+
+// ============================================================
+//  Gamma /tags + /series + /sports + /teams — metadata
+// ============================================================
+
+export interface GammaTag {
+  id: string
+  label: string
+  slug: string
+  forceShow?: boolean
+}
+
+/** Lista tag rankati per popolarità — usabile per chips dinamici. */
+export async function fetchTags(limit: number = 50): Promise<GammaTag[]> {
+  const data = await gammaGet<GammaTag[]>('/tags', { limit }, { revalidate: 600 })
+  return Array.isArray(data) ? data : []
+}
+
+export interface GammaSeriesItem {
+  id: string
+  slug: string
+  ticker: string
+  title: string
+  /** "single" | "weekly" | "monthly" etc. */
+  seriesType: string
+  recurrence: string
+  image?: string
+  icon?: string
+}
+
+/** Lista series (gruppi ricorrenti come btc-up-or-down-5m). */
+export async function fetchSeries(params?: {
+  recurrence?: string
+  limit?: number
+}): Promise<GammaSeriesItem[]> {
+  const data = await gammaGet<GammaSeriesItem[]>(
+    '/series',
+    params
+      ? {
+          ...(params.recurrence && { recurrence: params.recurrence }),
+          ...(params.limit !== undefined && { limit: params.limit }),
+        }
+      : { limit: 50 },
+    { revalidate: 600 }
+  )
+  return Array.isArray(data) ? data : []
+}
+
+export interface GammaSport {
+  id: number
+  sport: string
+  image: string
+  resolution: string
+  ordering: string
+  /** Comma-separated tag IDs. */
+  tags: string
+}
+
+/** Sports metadata — leghe sportive supportate da Polymarket. */
+export async function fetchSports(): Promise<GammaSport[]> {
+  const data = await gammaGet<GammaSport[]>('/sports', undefined, { revalidate: 3600 })
+  return Array.isArray(data) ? data : []
+}
+
+export interface GammaTeam {
+  id: string
+  name: string
+  shortName?: string
+  league: string
+  logo?: string
+}
+
+/** Lista team per una specifica lega (es. NFL, NBA, Premier League). */
+export async function fetchTeams(
+  league: string,
+  limit: number = 100
+): Promise<GammaTeam[]> {
+  const data = await gammaGet<GammaTeam[]>(
+    '/teams',
+    { league, limit },
+    { revalidate: 3600 }
+  )
+  return Array.isArray(data) ? data : []
 }

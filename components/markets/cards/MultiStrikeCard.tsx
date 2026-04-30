@@ -1,15 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { mapGammaEvent, type AuktoraEvent, type AuktoraMarket } from '@/lib/polymarket/mappers'
-import { fetchEventById } from '@/lib/polymarket/queries'
+import type { AuktoraEvent, AuktoraMarket } from '@/lib/polymarket/mappers'
+import { useBatchPrices } from '@/lib/ws/hooks/useBatchPrices'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 import { StarToggle } from '../StarToggle'
 
 const TOP_N = 4
-const REFRESH_INTERVAL_MS = 30_000
+const REFRESH_INTERVAL_MS = 15_000
 
 interface Props {
   event: AuktoraEvent
@@ -42,25 +42,28 @@ function compareStrikes(a: AuktoraMarket, b: AuktoraMarket): number {
   return sb - sa
 }
 
-export function MultiStrikeCard({ event: initialEvent, onBookmark }: Props) {
+export function MultiStrikeCard({ event, onBookmark }: Props) {
   const router = useRouter()
-  const [event, setEvent] = useState(initialEvent)
 
-  // Polling refresh ogni 30s — multi-strike ha N tokenIds, polling
-  // fetchEventById riprende prezzi aggiornati di tutti gli strikes.
-  useEffect(() => {
-    const id = setInterval(async () => {
-      try {
-        const fresh = await fetchEventById(event.id)
-        if (fresh) setEvent(mapGammaEvent(fresh))
-      } catch {
-        /* silenzioso */
-      }
-    }, REFRESH_INTERVAL_MS)
-    return () => clearInterval(id)
-  }, [event.id])
+  // Live midpoint batch via CLOB /prices — fetch prezzi di tutti gli
+  // strike in 1 request, polling 15s. Sostituisce fetchEventById.
+  const yesTokenIds = useMemo(
+    () =>
+      event.markets
+        .map((m) => m.clobTokenIds?.[0])
+        .filter((t): t is string => typeof t === 'string'),
+    [event.markets]
+  )
+  const livePrices = useBatchPrices(yesTokenIds, REFRESH_INTERVAL_MS)
 
-  const sorted = [...event.markets].sort(compareStrikes)
+  const sorted = useMemo(() => {
+    return [...event.markets]
+      .map((m): AuktoraMarket => {
+        const live = m.clobTokenIds?.[0] ? livePrices[m.clobTokenIds[0]] : undefined
+        return live !== undefined ? { ...m, yesPrice: live, noPrice: 1 - live } : m
+      })
+      .sort(compareStrikes)
+  }, [event.markets, livePrices])
   const top = sorted.slice(0, TOP_N)
   const remaining = sorted.length - top.length
 
