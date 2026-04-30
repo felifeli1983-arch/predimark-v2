@@ -8,6 +8,7 @@ import { fetchEventById, fetchNextRoundInSeries } from '@/lib/polymarket/queries
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
+import { MiniSparkline } from '../charts/MiniSparkline'
 import { EventCardHeader } from '../EventCardHeader'
 import { StarToggle } from '../StarToggle'
 
@@ -198,6 +199,17 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
               {change24h.toFixed(2)}%
             </span>
           )}
+          {/* Mini sparkline 1h della Up probability — mostra la direzione
+              del trade flow live, complementare al delta 24h del prezzo
+              crypto. Lazy via IntersectionObserver. */}
+          <div style={{ flex: 1, minWidth: 0, marginLeft: 'auto' }}>
+            <MiniSparkline
+              tokenId={market?.clobTokenIds?.[0]}
+              period="1h"
+              width={120}
+              height={28}
+            />
+          </div>
         </div>
 
         {/* Probability bar Up/Down + Up/Down buttons */}
