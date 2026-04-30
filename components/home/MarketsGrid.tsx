@@ -3,10 +3,19 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
+import type { HeroBadge } from '@/components/home/HeroCard'
 import { EventCard } from '@/components/markets/EventCard'
 
 interface Props {
   initialEvents: AuktoraEvent[]
+  /**
+   * Eventi "curati" sempre fissi in cima al grid, nell'ordine fornito,
+   * non riordinati dal sort. Hidden quando l'utente filtra per search/tag
+   * (così il search funziona davvero).
+   */
+  pinnedEvents?: AuktoraEvent[]
+  /** Badge per gli eventi pinned (es. "New market" / "Live now"), keyed per id. */
+  badges?: Record<string, HeroBadge>
   /** Pagina iniziale visibile, default 20 */
   pageSize?: number
   /** Layout grid (default 'grid') | 'list' */
@@ -27,7 +36,13 @@ function sortEvents(events: AuktoraEvent[], sort: SortKey): AuktoraEvent[] {
   return arr
 }
 
-export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: Props) {
+export function MarketsGrid({
+  initialEvents,
+  pinnedEvents = [],
+  badges,
+  pageSize = 20,
+  layout = 'grid',
+}: Props) {
   const searchParams = useSearchParams()
   const sort = (searchParams.get('sort') as SortKey) ?? 'volume24h'
   const q = searchParams.get('q')?.toLowerCase().trim() ?? ''
@@ -49,6 +64,11 @@ export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: P
   const visibleEvents = sorted.slice(0, visible)
   const hasMore = visible < sorted.length
 
+  // Pinned visibili solo quando l'utente NON sta filtrando — search/tag
+  // attivi nascondono i pinned così le query mostrano risultati onesti.
+  const showPinned = !q && activeTag === 'all' && pinnedEvents.length > 0
+  const totalCount = (showPinned ? pinnedEvents.length : 0) + sorted.length
+
   // Grid: 3 colonne desktop, 2 tablet (sm), 1 mobile.
   // 'list': 1 colonna su tutti i breakpoint.
   const gridClass =
@@ -56,7 +76,7 @@ export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: P
 
   return (
     <section style={{ flex: 1, minWidth: 0 }}>
-      {sorted.length === 0 ? (
+      {totalCount === 0 ? (
         <div
           style={{
             padding: '40px 16px',
@@ -72,6 +92,10 @@ export function MarketsGrid({ initialEvents, pageSize = 20, layout = 'grid' }: P
       ) : (
         <>
           <div className={gridClass} style={{ gap: 12, padding: '12px 16px' }}>
+            {showPinned &&
+              pinnedEvents.map((event) => (
+                <EventCard key={`pinned-${event.id}`} event={event} badge={badges?.[event.id]} />
+              ))}
             {visibleEvents.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
