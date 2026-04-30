@@ -12,6 +12,7 @@ import {
   Users,
 } from 'lucide-react'
 import { HeroFinanziario } from '@/components/me/HeroFinanziario'
+import { PolymarketOnboardBanner } from '@/components/onboarding/PolymarketOnboardBanner'
 
 const SECTIONS = [
   {
@@ -60,6 +61,7 @@ export default function MeDashboardPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 'var(--space-3)' }}>
       <HeroFinanziario />
+      <PolymarketOnboardBanner />
       <header>
         <h1
           style={{
