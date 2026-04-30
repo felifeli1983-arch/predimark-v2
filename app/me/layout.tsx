@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { MeSubnav } from '@/components/me/MeSubnav'
+import { RedeemAutoPrompt } from '@/components/me/RedeemAutoPrompt'
 
 // /me/* tutte richiedono autenticazione e Privy hooks → niente prerender SSG.
 export const dynamic = 'force-dynamic'
@@ -31,6 +32,9 @@ export default function MeLayout({ children }: { children: ReactNode }) {
         }}
       >
         <MeSubnav />
+        {/* Auto-prompt redeem: appare in modal se ci sono vincite non
+            claimate. Non-intrusive — single dismiss per session. */}
+        <RedeemAutoPrompt />
         {children}
       </div>
     </PageContainer>

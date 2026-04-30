@@ -138,12 +138,12 @@ export function RedeemSection() {
 }
 
 function RedeemRow({ position, onClaimed }: { position: PositionItem; onClaimed: () => void }) {
-  const { state, txHash, error, redeem } = useRedeem()
+  const { state, progress, error, redeem } = useRedeem()
   const payout = position.currentValue ?? position.shares * (position.currentPrice ?? 1)
+  const txHash = progress.currentTxHash ?? progress.completed[0]?.txHash ?? null
 
   async function handleClaim() {
     try {
-      // Fetch conditionId + neg_risk on-demand da Gamma — non in DB schema.
       const res = await fetch(
         `https://gamma-api.polymarket.com/markets/${encodeURIComponent(position.polymarketMarketId)}`,
         { cache: 'no-store' }
@@ -161,9 +161,6 @@ function RedeemRow({ position, onClaimed }: { position: PositionItem; onClaimed:
     }
   }
 
-  // Quando il tx è done, marca optimistic claimed così la riga sparisce
-  // subito (senza dover aspettare un refetch). Il DB è già stato updato
-  // in useRedeem, prossimo refetch confermerà.
   useEffect(() => {
     if (state === 'done') onClaimed()
   }, [state, onClaimed])
