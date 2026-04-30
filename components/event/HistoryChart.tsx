@@ -6,8 +6,12 @@ import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 import {
   CenteredBox,
   Container,
+  LastUpdateTicker,
   PeriodTabs,
+  PulsingDot,
   SectionTitle,
+  useChartHover,
+  useFlashOnChange,
   type Period,
   type PricePoint,
 } from './chart/ChartShell'
@@ -18,17 +22,23 @@ interface Props {
   showBothLines?: boolean
 }
 
+const CHART_HEIGHT = 320
+
 /**
- * Sprint 3.5.5 — History chart single o dual-line, dati da CLOB V2.
- * `marketId` = clobTokenIds[0] (YES token).
+ * History chart full-interactive (sprint 3.5.6 — UX live):
+ *  - 3 sorgenti midpoint (REST + WS book + WS trades) via useLiveMidpoint
+ *  - PulsingDot animato sul punto finale di ogni linea
+ *  - Hover crosshair + tooltip con timestamp e prezzo
+ *  - Flash sul label valore quando cambia
+ *  - "Last update Xs fa" ticker accanto al badge LIVE
  */
 export function HistoryChart({ marketId, showBothLines = false }: Props) {
   const [period, setPeriod] = useState<Period>('7d')
   const [points, setPoints] = useState<PricePoint[]>([])
   const [loading, setLoading] = useState(true)
-  // Real-time: midpoint live via WS CLOB. Quando arriva, appendiamo un punto
-  // con timestamp now al chart → la linea si muove davanti agli occhi.
+  const [lastUpdateMs, setLastUpdateMs] = useState<number | null>(null)
   const { midpoint } = useLiveMidpoint(marketId || null)
+  const hover = useChartHover()
 
   useEffect(() => {
     if (!marketId) return
@@ -45,7 +55,10 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
           return
         }
         const data = (await res.json()) as { items: PricePoint[] }
-        if (!cancelled) setPoints(data.items ?? [])
+        if (!cancelled) {
+          setPoints(data.items ?? [])
+          setLastUpdateMs(Date.now())
+        }
       } catch {
         if (!cancelled) setPoints([])
       } finally {
@@ -57,8 +70,6 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
     }
   }, [marketId, period])
 
-  // Quando arriva un nuovo midpoint via WS, appendiamo (o aggiorniamo l'ultimo)
-  // così la linea si estende in tempo reale senza rifare fetch REST.
   useEffect(() => {
     if (midpoint === null) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -73,12 +84,12 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
         yes_price: midpoint,
         no_price: 1 - midpoint,
       }
-      // Se l'ultimo punto è < 60s fa, sovrascrivi (evita affollamento)
       if (now - lastTs < 60_000) {
         return [...prev.slice(0, -1), fresh]
       }
       return [...prev, fresh].slice(-500)
     })
+    setLastUpdateMs(Date.now())
   }, [midpoint])
 
   const chartData = useMemo(() => {
@@ -111,6 +122,12 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
     const lastNo = noArr[noArr.length - 1] ?? 0
     const firstNo = noArr[0] ?? 0
 
+    // Posizione SVG dell'ultimo punto (per pulsing dot)
+    const lastIdx = points.length - 1
+    const lastX = width
+    const lastYesY = height - ((lastYes - min) / range) * height
+    const lastNoY = height - ((lastNo - min) / range) * height
+
     return {
       yesPath,
       noPath,
@@ -118,12 +135,22 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
       yesDelta: lastYes - firstYes,
       lastNo,
       noDelta: lastNo - firstNo,
+      lastIdx,
+      lastX,
+      lastYesY,
+      lastNoY,
       min,
       max,
       width,
       height,
     }
   }, [points, showBothLines])
+
+  // Hover index → punto sotto il cursore
+  const hoveredPoint =
+    chartData && hover.xRatio !== null
+      ? points[Math.min(points.length - 1, Math.round(hover.xRatio * (points.length - 1)))]
+      : null
 
   return (
     <Container>
@@ -138,7 +165,7 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
                   marginLeft: 6,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 2,
+                  gap: 4,
                   padding: '1px 6px',
                   borderRadius: 'var(--radius-full)',
                   background: 'color-mix(in srgb, var(--color-success) 18%, transparent)',
@@ -149,6 +176,7 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
                 }}
               >
                 <Radio size={8} /> LIVE
+                <LastUpdateTicker lastUpdateMs={lastUpdateMs} />
               </span>
             )}
           </SectionTitle>
@@ -181,7 +209,15 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
         </CenteredBox>
       ) : (
         <div style={{ position: 'relative', width: '100%' }}>
-          <div style={{ position: 'relative', height: 320, paddingRight: 70 }}>
+          <div
+            style={{
+              position: 'relative',
+              height: CHART_HEIGHT,
+              paddingRight: 70,
+              cursor: 'crosshair',
+            }}
+            {...hover.bind}
+          >
             <svg
               viewBox={`0 0 ${chartData.width} ${chartData.height}`}
               preserveAspectRatio="none"
@@ -189,7 +225,7 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
                 position: 'absolute',
                 inset: 0,
                 width: 'calc(100% - 70px)',
-                height: 320,
+                height: CHART_HEIGHT,
               }}
               role="img"
               aria-label="Probability history chart"
@@ -233,7 +269,44 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
                   vectorEffect="non-scaling-stroke"
                 />
               )}
+
+              {/* Crosshair verticale on hover */}
+              {hover.xRatio !== null && (
+                <line
+                  x1={hover.xRatio * chartData.width}
+                  y1={0}
+                  x2={hover.xRatio * chartData.width}
+                  y2={chartData.height}
+                  stroke="var(--color-text-muted)"
+                  strokeWidth={0.3}
+                  strokeDasharray="0.5,0.5"
+                />
+              )}
+
+              {/* Pulsing dots punti finali */}
+              <PulsingDot
+                cx={chartData.lastX}
+                cy={chartData.lastYesY}
+                color={showBothLines ? 'var(--color-success)' : 'var(--color-cta)'}
+              />
+              {chartData.noPath && (
+                <PulsingDot
+                  cx={chartData.lastX}
+                  cy={chartData.lastNoY}
+                  color="var(--color-danger)"
+                />
+              )}
             </svg>
+
+            {/* Tooltip on hover */}
+            {hoveredPoint && hover.yPx !== null && (
+              <ChartTooltip
+                point={hoveredPoint}
+                xRatio={hover.xRatio ?? 0}
+                yPx={hover.yPx}
+                showBoth={showBothLines}
+              />
+            )}
 
             {/* Y-axis label % a destra */}
             <div
@@ -267,8 +340,17 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
               })}
             </div>
 
-            {/* End-of-line YES label */}
-            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 50 }}>
+            {/* End-of-line YES/NO labels */}
+            <div
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: 50,
+                pointerEvents: 'none',
+              }}
+            >
               <EndLabel
                 value={chartData.lastYes}
                 color={showBothLines ? 'var(--color-success)' : 'var(--color-cta)'}
@@ -308,6 +390,7 @@ function EndLabel({
   yMax: number
   label: string
 }) {
+  const flash = useFlashOnChange(Math.round(value * 1000))
   const topPct = (1 - (value - yMin) / (yMax - yMin)) * 100
   return (
     <div
@@ -322,6 +405,9 @@ function EndLabel({
         fontSize: 10,
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
+        padding: '1px 4px',
+        borderRadius: 'var(--radius-sm)',
+        animation: flash ? 'auktora-chart-flash 280ms ease-out' : undefined,
       }}
     >
       <span
@@ -335,6 +421,77 @@ function EndLabel({
       />
       <span style={{ color: 'var(--color-text-muted)' }}>{label}</span>
       <span style={{ color, fontWeight: 700 }}>{(value * 100).toFixed(1)}%</span>
+    </div>
+  )
+}
+
+function ChartTooltip({
+  point,
+  xRatio,
+  yPx,
+  showBoth,
+}: {
+  point: PricePoint
+  xRatio: number
+  yPx: number
+  showBoth: boolean
+}) {
+  const date = new Date(point.timestamp)
+  // Posiziona tooltip vicino al cursore — flip a sinistra se troppo a destra
+  const flipLeft = xRatio > 0.7
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: `calc(${xRatio * 100}% + ${flipLeft ? -12 : 12}px)`,
+        top: Math.max(8, Math.min(yPx - 40, CHART_HEIGHT - 80)),
+        transform: flipLeft ? 'translateX(-100%)' : undefined,
+        background: 'var(--color-bg-primary)',
+        border: '1px solid var(--color-border-subtle)',
+        borderRadius: 'var(--radius-md)',
+        padding: '6px 8px',
+        fontSize: 'var(--font-xs)',
+        color: 'var(--color-text-primary)',
+        pointerEvents: 'none',
+        whiteSpace: 'nowrap',
+        zIndex: 10,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+      }}
+    >
+      <div style={{ color: 'var(--color-text-muted)', marginBottom: 2 }}>
+        {date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}{' '}
+        {date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: 'var(--color-success)',
+            display: 'inline-block',
+          }}
+        />
+        <span style={{ color: 'var(--color-success)', fontWeight: 700 }}>
+          YES {(point.yes_price * 100).toFixed(1)}%
+        </span>
+      </div>
+      {showBoth && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: 'var(--color-danger)',
+              display: 'inline-block',
+            }}
+          />
+          <span style={{ color: 'var(--color-danger)', fontWeight: 700 }}>
+            NO {(point.no_price * 100).toFixed(1)}%
+          </span>
+        </div>
+      )}
     </div>
   )
 }

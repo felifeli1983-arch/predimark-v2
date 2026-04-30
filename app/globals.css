@@ -356,6 +356,30 @@
   }
 }
 
+@keyframes auktora-chart-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  60% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes auktora-chart-flash {
+  0% {
+    background: color-mix(in srgb, var(--color-cta) 35%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
 @keyframes shimmer {
   from {
     background-position: -200% 0;

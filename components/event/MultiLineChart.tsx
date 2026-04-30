@@ -6,12 +6,17 @@ import { subscribeToPriceChange } from '@/lib/ws/clob'
 import {
   CenteredBox,
   Container,
+  LastUpdateTicker,
   PERIOD_OPTIONS,
   PeriodTabs,
+  PulsingDot,
   SectionTitle,
+  useChartHover,
   type Period,
   type PricePoint,
 } from './chart/ChartShell'
+
+const CHART_HEIGHT = 320
 
 const OUTCOME_COLORS = [
   'var(--color-cta)',
@@ -46,10 +51,10 @@ export function MultiLineChart({ markets }: Props) {
   const [series, setSeries] = useState<SeriesData[]>([])
   const [loading, setLoading] = useState(true)
   const [liveConnected, setLiveConnected] = useState(false)
+  const [lastUpdateMs, setLastUpdateMs] = useState<number | null>(null)
   // Set di label da NASCONDERE. Click sulla legenda per toggle.
-  // Permette di escludere una serie dominante (es. "No change" 96%) per
-  // vedere meglio la dinamica delle altre 4 minori.
   const [hidden, setHidden] = useState<Set<string>>(new Set())
+  const hover = useChartHover()
 
   useEffect(() => {
     if (markets.length === 0) return
@@ -79,6 +84,7 @@ export function MultiLineChart({ markets }: Props) {
       if (!cancelled) {
         setSeries(results.filter((r): r is SeriesData => r !== null && r.points.length >= 2))
         setLoading(false)
+        setLastUpdateMs(Date.now())
       }
     })()
     return () => {
@@ -95,6 +101,7 @@ export function MultiLineChart({ markets }: Props) {
       const price = parseFloat(event.price)
       if (!Number.isFinite(price)) return
       setLiveConnected(true)
+      setLastUpdateMs(Date.now())
       setSeries((prev) =>
         prev.map((s, i) => {
           const tokenId = markets[i]?.tokenId
@@ -170,7 +177,7 @@ export function MultiLineChart({ markets }: Props) {
                   marginLeft: 6,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 2,
+                  gap: 4,
                   padding: '1px 6px',
                   borderRadius: 'var(--radius-full)',
                   background: 'color-mix(in srgb, var(--color-success) 18%, transparent)',
@@ -181,6 +188,7 @@ export function MultiLineChart({ markets }: Props) {
                 }}
               >
                 <Radio size={8} /> LIVE
+                <LastUpdateTicker lastUpdateMs={lastUpdateMs} />
               </span>
             )}
           </SectionTitle>
@@ -221,10 +229,17 @@ export function MultiLineChart({ markets }: Props) {
         </CenteredBox>
       ) : (
         <>
-          {/* Chart area con SVG + overlay HTML per label (no preserveAspectRatio
-              fa stretchare il testo SVG, quindi label sono HTML assoluti) */}
+          {/* Chart area con SVG + overlay HTML per label */}
           <div style={{ position: 'relative', width: '100%' }}>
-            <div style={{ position: 'relative', height: 320, paddingRight: 110 }}>
+            <div
+              style={{
+                position: 'relative',
+                height: CHART_HEIGHT,
+                paddingRight: 110,
+                cursor: 'crosshair',
+              }}
+              {...hover.bind}
+            >
               <svg
                 viewBox={`0 0 ${width} ${height}`}
                 preserveAspectRatio="none"
@@ -232,12 +247,11 @@ export function MultiLineChart({ markets }: Props) {
                   position: 'absolute',
                   inset: 0,
                   width: 'calc(100% - 110px)',
-                  height: 320,
+                  height: CHART_HEIGHT,
                 }}
                 role="img"
                 aria-label="Multi-outcome probability chart"
               >
-                {/* Grid Y orizzontale (4 step) */}
                 {[0, 0.25, 0.5, 0.75, 1].map((y) => {
                   const yVal = yMin + y * (yMax - yMin)
                   const yPos = height - ((yVal - yMin) / (yMax - yMin)) * height
@@ -264,7 +278,37 @@ export function MultiLineChart({ markets }: Props) {
                     vectorEffect="non-scaling-stroke"
                   />
                 ))}
+
+                {/* Crosshair verticale on hover */}
+                {hover.xRatio !== null && (
+                  <line
+                    x1={hover.xRatio * width}
+                    y1={0}
+                    x2={hover.xRatio * width}
+                    y2={height}
+                    stroke="var(--color-text-muted)"
+                    strokeWidth={0.3}
+                    strokeDasharray="0.5,0.5"
+                  />
+                )}
+
+                {/* Pulsing dot a fine di ogni serie visibile */}
+                {paths.map((p) => {
+                  const s = series.find((x) => x.label === p.label)
+                  const last = s?.points[s.points.length - 1]?.yes_price ?? 0
+                  const lastY = height - ((last - yMin) / (yMax - yMin || 1)) * height
+                  return <PulsingDot key={`dot-${p.label}`} cx={width} cy={lastY} color={p.color} />
+                })}
               </svg>
+
+              {/* Tooltip multi-serie on hover */}
+              {hover.xRatio !== null && hover.yPx !== null && series.length > 0 && (
+                <MultiSeriesTooltip
+                  series={series.filter((s) => !hidden.has(s.label))}
+                  xRatio={hover.xRatio}
+                  yPx={hover.yPx}
+                />
+              )}
 
               {/* Y-axis labels (% sulla destra, allineati alla griglia) */}
               <div
@@ -415,6 +459,91 @@ export function MultiLineChart({ markets }: Props) {
         </>
       )}
     </Container>
+  )
+}
+
+function MultiSeriesTooltip({
+  series,
+  xRatio,
+  yPx,
+}: {
+  series: SeriesData[]
+  xRatio: number
+  yPx: number
+}) {
+  // Trova il timestamp e i valori al cursore (interpola sul max range comune)
+  const flipLeft = xRatio > 0.7
+  // Tutte le serie sono allineate sullo stesso period range, prendi il primo
+  // come timeline reference
+  const refPoints = series[0]?.points ?? []
+  if (refPoints.length === 0) return null
+  const idx = Math.min(refPoints.length - 1, Math.round(xRatio * (refPoints.length - 1)))
+  const refTimestamp = refPoints[idx]?.timestamp
+  if (!refTimestamp) return null
+  const date = new Date(refTimestamp)
+
+  // Per ogni serie ritrova il punto allo stesso indice (approx: stessa griglia
+  // temporale per tutti — Polymarket V2 ritorna punti aggregati per period
+  // quindi sono sincroni)
+  const rows = series
+    .map((s) => {
+      const pt = s.points[Math.min(s.points.length - 1, idx)]
+      if (!pt) return null
+      return { label: s.label, color: s.color, value: pt.yes_price }
+    })
+    .filter((r): r is { label: string; color: string; value: number } => r !== null)
+    .sort((a, b) => b.value - a.value) // descendente per UX (alto in alto)
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: `calc(${xRatio * 100}% + ${flipLeft ? -12 : 12}px)`,
+        top: Math.max(8, Math.min(yPx - rows.length * 14 - 30, CHART_HEIGHT - 200)),
+        transform: flipLeft ? 'translateX(-100%)' : undefined,
+        background: 'var(--color-bg-primary)',
+        border: '1px solid var(--color-border-subtle)',
+        borderRadius: 'var(--radius-md)',
+        padding: '6px 8px',
+        fontSize: 'var(--font-xs)',
+        color: 'var(--color-text-primary)',
+        pointerEvents: 'none',
+        whiteSpace: 'nowrap',
+        zIndex: 10,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+      }}
+    >
+      <div style={{ color: 'var(--color-text-muted)', marginBottom: 4 }}>
+        {date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}{' '}
+        {date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
+      </div>
+      {rows.map((r) => (
+        <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 1 }}>
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: r.color,
+              display: 'inline-block',
+            }}
+          />
+          <span
+            style={{
+              maxWidth: 100,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
+            {r.label}
+          </span>
+          <span style={{ color: r.color, fontWeight: 700, marginLeft: 'auto' }}>
+            {(r.value * 100).toFixed(1)}%
+          </span>
+        </div>
+      ))}
+    </div>
   )
 }
 
