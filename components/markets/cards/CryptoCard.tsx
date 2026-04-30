@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Clock, TrendingUp, TrendingDown } from 'lucide-react'
 import { mapGammaEvent, type AuktoraEvent } from '@/lib/polymarket/mappers'
-import { fetchEventById } from '@/lib/polymarket/queries'
+import { fetchEventById, fetchNextRoundInSeries } from '@/lib/polymarket/queries'
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
@@ -20,6 +20,7 @@ const SHORT_ROUND_MS = 30 * 60 * 1000 // ≤30min → Chainlink, oltre → Binan
 const REFRESH_INTERVAL_MS = 30_000
 const URGENT_COUNTDOWN_S = 30 // <30s → countdown rosso pulsante
 const WARN_COUNTDOWN_S = 120 // <2min → warning ambra
+const NEXT_ROUND_POLL_MS = 5_000 // 5s polling quando expired finché next round arriva
 
 const SYMBOL_HINTS: Array<[RegExp, string]> = [
   [/\b(btc|bitcoin)\b/i, 'btcusdt'],
@@ -68,7 +69,12 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
   const upPct = Math.round(upProb * 100)
   const downPct = Math.round(downProb * 100)
 
+  // Polling refresh dello STESSO round mentre è attivo — cattura
+  // closed=true / acceptingOrders=false / lastTradePrice changes che il
+  // WS non sempre propaga. Si ferma quando expired (vedi useEffect sotto
+  // per la transition al next round).
   useEffect(() => {
+    if (expired) return
     const id = setInterval(async () => {
       try {
         const fresh = await fetchEventById(event.id)
@@ -78,7 +84,31 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
       }
     }, REFRESH_INTERVAL_MS)
     return () => clearInterval(id)
-  }, [event.id])
+  }, [event.id, expired])
+
+  // Auto-transition al PROSSIMO round della stessa serie quando il countdown
+  // arriva a zero. Polling 5s perché Polymarket pubblica il next round con
+  // qualche secondo di ritardo dopo la chiusura del precedente.
+  // Pattern 1 di refresh — Doc 4 page-1: "card cambia identità all'occorrenza
+  // successiva quando si risolve". Solo per crypto round (seriesSlug
+  // contiene 'up-or-down'), non per ogni evento expired.
+  useEffect(() => {
+    if (!expired || !event.seriesSlug) return
+    if (!event.seriesSlug.includes('up-or-down')) return
+    let cancelled = false
+    const tryNext = async () => {
+      const next = await fetchNextRoundInSeries(event.seriesSlug!)
+      if (!cancelled && next && next.id !== event.id) {
+        setEvent(mapGammaEvent(next))
+      }
+    }
+    tryNext()
+    const id = setInterval(tryNext, NEXT_ROUND_POLL_MS)
+    return () => {
+      cancelled = true
+      clearInterval(id)
+    }
+  }, [expired, event.seriesSlug, event.id])
 
   const isLive = !expired && event.active
 
@@ -275,7 +305,7 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
           className={countdownPulse ? 'live-dot' : undefined}
         >
           <Clock size={12} />
-          {expired ? 'Round terminato' : countdownText}
+          {expired ? 'Prossimo round in arrivo…' : countdownText}
         </span>
         {symbol && (
           <span

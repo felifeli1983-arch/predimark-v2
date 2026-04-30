@@ -35,20 +35,20 @@ const HERO_BADGES: Record<HeroPickKind, HeroBadge> = {
 
 async function fetchEventsForCategory(category: string | undefined) {
   if (!category || category === 'all' || category === 'for-you') {
-    // Default: top 20 per volume 24h (featured)
-    return fetchFeaturedEvents(20)
+    // Default: top 200 per volume 24h (no featured filter — c'erano
+    // solo 21 featured su 500+ attivi, l'utente vedeva 23 card totali).
+    return fetchFeaturedEvents(200)
   }
   if (category === 'live') {
-    // LIVE: 100 attivi attraverso TUTTE le categorie (no filtro featured →
-    // include crypto round, sport in corso, ecc).
-    return fetchLiveEvents(100)
+    // LIVE: 200 attivi end_date_min=NOW, ordinati per scadenza più imminente.
+    return fetchLiveEvents(200)
   }
   if (NON_TAG_SLUGS.has(category)) {
-    // mentions/creators → MA5+ feature, per ora mostra featured
-    return fetchFeaturedEvents(20)
+    // mentions/creators → MA5+ feature, per ora mostra top attivi.
+    return fetchFeaturedEvents(200)
   }
-  // Categoria reale → fetch dedicato per quel tag (fino a 100 eventi)
-  return fetchEventsByTag(category, 100)
+  // Categoria reale → fetch dedicato per quel tag (fino a 200 eventi).
+  return fetchEventsByTag(category, 200)
 }
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<SearchParams> }) {

@@ -19,12 +19,20 @@ export async function fetchEventById(id: string): Promise<GammaEvent | null> {
   return events[0] ?? null
 }
 
-export async function fetchFeaturedEvents(limit: number = 10): Promise<GammaEvent[]> {
+/**
+ * Top eventi attivi ordinati per volume 24h. Storicamente filtrava
+ * `featured=true` ma quel flag viene curato a mano da Polymarket e
+ * include solo ~20 eventi mentre Gamma ne serve 500+ attivi. L'utente
+ * vede 23 card totali (20 featured + 3 hero) → "elimina il blocco":
+ * via il filtro featured, default limit alzato a 200 (con cap 500
+ * server-side di Gamma).
+ */
+export async function fetchFeaturedEvents(limit: number = 200): Promise<GammaEvent[]> {
   return gammaGet<GammaEvent[]>(
     '/events',
     {
-      featured: true,
       active: true,
+      closed: false,
       order: 'volume24hr',
       ascending: false,
       limit,
@@ -181,6 +189,38 @@ export async function fetchHeroEvents(): Promise<HeroPick[]> {
   push(sportPick ?? sport[0], 'upcoming')
 
   return out
+}
+
+/**
+ * Fetch del PROSSIMO round attivo nella stessa serie crypto (es. quando
+ * il round corrente è scaduto, recupera quello successivo).
+ *
+ * Filtri: `series_slug + active=true + closed=false + end_date_min=NOW`,
+ * ordinati ASC per endDate. Il primo è il next.
+ *
+ * `cache: 'no-store'` perché chiamata client-side ad ogni 5s tick — non
+ * vogliamo browser cache che ci ridia il round appena scaduto.
+ */
+export async function fetchNextRoundInSeries(
+  seriesSlug: string
+): Promise<GammaEvent | null> {
+  const nowIso = new Date().toISOString()
+  const url = new URL('/events', 'https://gamma-api.polymarket.com')
+  url.searchParams.set('series_slug', seriesSlug)
+  url.searchParams.set('active', 'true')
+  url.searchParams.set('closed', 'false')
+  url.searchParams.set('end_date_min', nowIso)
+  url.searchParams.set('order', 'endDate')
+  url.searchParams.set('ascending', 'true')
+  url.searchParams.set('limit', '1')
+  try {
+    const res = await fetch(url.toString(), { cache: 'no-store' })
+    if (!res.ok) return null
+    const data = (await res.json()) as GammaEvent[]
+    return Array.isArray(data) && data[0] ? data[0] : null
+  } catch {
+    return null
+  }
 }
 
 /**
