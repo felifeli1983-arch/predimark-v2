@@ -6,9 +6,8 @@ import { Trophy, Loader2, X, CheckCircle2 } from 'lucide-react'
 
 import { fetchResolvedPositions, type PositionItem } from '@/lib/api/positions-client'
 import { useThemeStore } from '@/lib/stores/themeStore'
+import { useRedeemPromptStore } from '@/lib/stores/useRedeemPrompt'
 import { useRedeem, type RedeemTask } from '@/lib/hooks/useRedeem'
-
-const DISMISSED_KEY = 'auktora.redeem-prompt-dismissed-session'
 
 interface PendingRedemption extends PositionItem {
   conditionId: string
@@ -16,43 +15,38 @@ interface PendingRedemption extends PositionItem {
 }
 
 /**
- * Auto-prompt modal — appare automaticamente quando l'utente apre la
- * sezione /me e ha vincite non-claimate. UX più vicino a "auto-redeem"
- * possibile senza dare le chiavi al server (Privy embedded EOA non
- * supporta gasless relay come i Proxy/Safe wallets di Polymarket
- * native — vedi memory project_polymarket_redeem_gap.md).
+ * Modal redeem — visibile globalmente (montato in root layout).
+ * Apertura controllata da `useRedeemPromptStore.open`:
+ *  - Auto-open: quando il fetch trova vincite non-claimate la prima volta
+ *  - Manual: click sul Gift icon in HeaderActions → setOpen(true)
  *
  * Flow:
- *  1. Mount → fetch resolved positions winning + redeemed_at IS NULL
- *  2. Per ognuna, fetch conditionId + neg_risk da Gamma in parallelo
- *  3. Modal "Hai $X.XX da incassare" con CTA "Reclama tutto"
- *  4. Click → redeemBatch loop sequenziale (1 firma per posizione)
- *  5. Progress UI mostra task corrente / N totali
- *  6. Done → close + refetch parent (RedeemSection in /me/positions)
+ *  1. Mount → polling 60s su resolved positions winning + redeemed_at NULL
+ *  2. Aggiorna `unclaimedCount`/`unclaimedTotal` nello store (per badge)
+ *  3. Auto-open al primo discovery (controllato via flag locale)
+ *  4. Click "Reclama tutto" → redeemBatch loop sequenziale
+ *  5. Done → modal close + store reset count
  *
- * Dismiss session-only (sessionStorage) — se l'utente chiude, non
- * riappare nella stessa session ma riapparirà al prossimo login.
+ * UX: l'utente vede il badge sull'icona Gift sempre, anche fuori da /me.
+ * Click apre il modal → 1 batch di firme → USDC sul wallet.
  */
+const POLL_INTERVAL_MS = 60_000
+
 export function RedeemAutoPrompt() {
   const { ready, authenticated, getAccessToken } = usePrivy()
   const isDemo = useThemeStore((s) => s.isDemo)
+  const open = useRedeemPromptStore((s) => s.open)
+  const setOpen = useRedeemPromptStore((s) => s.setOpen)
+  const setUnclaimed = useRedeemPromptStore((s) => s.setUnclaimed)
   const [pending, setPending] = useState<PendingRedemption[]>([])
-  const [loading, setLoading] = useState(true)
-  const [open, setOpen] = useState(false)
+  const [autoOpened, setAutoOpened] = useState(false)
   const { state, progress, error, redeemBatch, reset } = useRedeem()
 
   useEffect(() => {
-    if (!ready || !authenticated || isDemo) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoading(false)
-      return
-    }
-    if (typeof window !== 'undefined' && window.sessionStorage.getItem(DISMISSED_KEY) === '1') {
-      setLoading(false)
-      return
-    }
+    if (!ready || !authenticated || isDemo) return
     let cancelled = false
-    ;(async () => {
+
+    async function fetchUnclaimed() {
       try {
         const token = await getAccessToken()
         if (!token) return
@@ -66,10 +60,10 @@ export function RedeemAutoPrompt() {
             p.redeemedAt === null
         )
         if (winning.length === 0) {
-          setLoading(false)
+          setUnclaimed(0, 0)
+          setPending([])
           return
         }
-
         // Fetch conditionId + negRisk per ognuna in parallelo.
         const enriched = await Promise.all(
           winning.map(async (p): Promise<PendingRedemption | null> => {
@@ -91,24 +85,32 @@ export function RedeemAutoPrompt() {
           })
         )
         if (cancelled) return
-        const ready = enriched.filter((p): p is PendingRedemption => p !== null)
-        setPending(ready)
-        if (ready.length > 0) setOpen(true)
+        const readyList = enriched.filter((p): p is PendingRedemption => p !== null)
+        const total = readyList.reduce(
+          (sum, p) => sum + (p.currentValue ?? p.shares * (p.currentPrice ?? 1)),
+          0
+        )
+        setPending(readyList)
+        setUnclaimed(readyList.length, total)
+        // Auto-open SOLO la prima volta che troviamo wins, non a ogni polling.
+        if (readyList.length > 0 && !autoOpened) {
+          setOpen(true)
+          setAutoOpened(true)
+        }
       } catch {
         /* silenzioso */
-      } finally {
-        if (!cancelled) setLoading(false)
       }
-    })()
+    }
+
+    void fetchUnclaimed()
+    const id = setInterval(fetchUnclaimed, POLL_INTERVAL_MS)
     return () => {
       cancelled = true
+      clearInterval(id)
     }
-  }, [ready, authenticated, getAccessToken, isDemo])
+  }, [ready, authenticated, getAccessToken, isDemo, autoOpened, setOpen, setUnclaimed])
 
   function handleDismiss() {
-    if (typeof window !== 'undefined') {
-      window.sessionStorage.setItem(DISMISSED_KEY, '1')
-    }
     setOpen(false)
     reset()
   }
@@ -122,7 +124,7 @@ export function RedeemAutoPrompt() {
     void redeemBatch(tasks)
   }
 
-  if (!open || loading || pending.length === 0) return null
+  if (!open || pending.length === 0) return null
 
   const totalPayout = pending.reduce(
     (sum, p) => sum + (p.currentValue ?? p.shares * (p.currentPrice ?? 1)),

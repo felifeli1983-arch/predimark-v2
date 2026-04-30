@@ -11,6 +11,7 @@ import { DemoModeBanner } from '@/components/layout/DemoModeBanner'
 import { OnboardingModal } from '@/components/onboarding/OnboardingModal'
 import { WatchlistHydrator } from '@/components/WatchlistHydrator'
 import { BalanceHydrator } from '@/components/BalanceHydrator'
+import { RedeemAutoPrompt } from '@/components/me/RedeemAutoPrompt'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -110,6 +111,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <WatchlistHydrator />
                 <BalanceHydrator />
                 <OnboardingModal />
+                {/* Redeem prompt globale — modal + polling unclaimed wins.
+                    Apertura via auto-detect o click sul Gift icon header. */}
+                <RedeemAutoPrompt />
               </div>
             </ThemeProvider>
           </PrivyProvider>

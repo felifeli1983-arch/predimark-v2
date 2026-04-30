@@ -8,6 +8,7 @@ import { polygon } from 'viem/chains'
 import type { AuthUser } from '@/lib/hooks/useAuth'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { useBalance } from '@/lib/stores/useBalance'
+import { useRedeemPromptStore } from '@/lib/stores/useRedeemPrompt'
 import { ProfileDropdown } from './ProfileDropdown'
 import { RealDemoToggle } from './RealDemoToggle'
 
@@ -30,6 +31,10 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
   const cashAvailable = isDemo ? demoBalance : usdcBalance
   const portfolioValue = isDemo ? demoPortfolioValue : realPortfolioValue
   const accent = isDemo ? 'var(--color-warning)' : 'var(--color-cta)'
+  // Redeem prompt — Gift icon mostra badge quando ci sono vincite non claimate.
+  const unclaimedCount = useRedeemPromptStore((s) => s.unclaimedCount)
+  const unclaimedTotal = useRedeemPromptStore((s) => s.unclaimedTotal)
+  const setRedeemOpen = useRedeemPromptStore((s) => s.setOpen)
 
   // Privy fund wallet (Apple Pay / Google Pay / Card / MoonPay)
   const { fundWallet } = useFundWallet()
@@ -183,8 +188,48 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
       </button>
 
       {authenticated && (
-        <button className="hidden md:flex" aria-label="Referral" style={iconBtnStyle}>
-          <Gift size={15} />
+        <button
+          type="button"
+          onClick={() => setRedeemOpen(true)}
+          className="hidden md:flex"
+          aria-label={
+            unclaimedCount > 0
+              ? `${unclaimedCount} vincite da incassare ($${unclaimedTotal.toFixed(2)})`
+              : 'Vincite'
+          }
+          title={
+            unclaimedCount > 0
+              ? `Hai $${unclaimedTotal.toFixed(2)} da incassare`
+              : 'Nessuna vincita da incassare'
+          }
+          style={{ ...iconBtnStyle, position: 'relative' }}
+        >
+          <Gift
+            size={15}
+            style={{ color: unclaimedCount > 0 ? 'var(--color-success)' : undefined }}
+          />
+          {unclaimedCount > 0 && (
+            <span
+              style={{
+                position: 'absolute',
+                top: 2,
+                right: 2,
+                minWidth: 14,
+                height: 14,
+                padding: '0 4px',
+                borderRadius: 7,
+                background: 'var(--color-success)',
+                color: '#fff',
+                fontSize: 9,
+                fontWeight: 700,
+                lineHeight: '14px',
+                textAlign: 'center',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {unclaimedCount > 9 ? '9+' : unclaimedCount}
+            </span>
+          )}
         </button>
       )}
 
