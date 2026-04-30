@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   ScrollText,
   Settings,
+  Hammer,
 } from 'lucide-react'
 
 const NAV_GROUPS = [
@@ -29,6 +30,10 @@ const NAV_GROUPS = [
   {
     label: 'Fees',
     items: [{ href: '/admin/fees', label: 'Configuration', icon: DollarSign }],
+  },
+  {
+    label: 'Builder',
+    items: [{ href: '/admin/builder', label: 'Analytics', icon: Hammer }],
   },
   {
     label: 'Creators',
