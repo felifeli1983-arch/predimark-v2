@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import type { AuktoraEvent, AuktoraOutcome } from '@/lib/polymarket/mappers'
 import { LiveBadge, EventActions, formatLong } from './HeroCommon'
+import { OpenInterestBadge } from '../OpenInterestBadge'
 
 interface Props {
   event: AuktoraEvent
@@ -160,6 +161,8 @@ export function HeroH2H({ event }: Props) {
           </strong>{' '}
           Vol
         </span>
+        <span>·</span>
+        <OpenInterestBadge conditionId={event.markets[0]?.conditionId} />
         <span>·</span>
         <span>Closes {formatLong(event.endDate)}</span>
       </div>

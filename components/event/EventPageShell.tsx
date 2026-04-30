@@ -136,7 +136,8 @@ export function EventPageShell({ event }: Props) {
             </span>
           </nav>
 
-          {isResolved && <ResolvedBanner />}
+          {/* Banner risolto è ora dentro EventRules (con date + UMA Portal link).
+              Mostriamo qui solo il SportLimitWarning per pre-game UX. */}
           {event.kind === 'h2h_sport' && !isResolved && <SportLimitWarning />}
 
           <EventHero event={event} />
@@ -218,26 +219,6 @@ function buildDraft(event: AuktoraEvent, market: AuktoraMarket, side: string): T
     clobTokenIds: market.clobTokenIds,
     conditionId: market.conditionId,
   }
-}
-
-function ResolvedBanner() {
-  return (
-    <div
-      style={{
-        padding: '10px 14px',
-        borderRadius: 'var(--radius-md)',
-        background: 'var(--color-warning-bg)',
-        border: '1px solid var(--color-warning)',
-        color: 'var(--color-warning)',
-        fontSize: 'var(--font-sm)',
-        fontWeight: 700,
-        letterSpacing: '0.05em',
-        textTransform: 'uppercase',
-      }}
-    >
-      Resolved · mercato chiuso
-    </div>
-  )
 }
 
 /**

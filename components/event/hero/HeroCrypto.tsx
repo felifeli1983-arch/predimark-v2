@@ -8,6 +8,7 @@ import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { LiveBadge, EventActions, formatLong } from './HeroCommon'
+import { OpenInterestBadge } from '../OpenInterestBadge'
 
 interface Props {
   event: AuktoraEvent
@@ -206,6 +207,10 @@ export function HeroCrypto({ event }: Props) {
             </span>
           )}
 
+          <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>·</span>
+          <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
+            <OpenInterestBadge conditionId={event.markets[0]?.conditionId} />
+          </span>
           <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>·</span>
           <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
             Closes {formatLong(event.endDate)}
