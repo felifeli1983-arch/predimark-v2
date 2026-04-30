@@ -38,17 +38,26 @@ const cardStyle: React.CSSProperties = {
 }
 
 export function EventCard({ event, onBookmark, badge }: EventCardProps) {
-  // Badge curato: bordo sx 1px sottile + micro-pill bottom-right.
-  // Era 3px (troppo), poi 2px, ora 1px → linea sottile come accent
-  // visivo ma non invadente.
-  const styleWithBadge: React.CSSProperties = badge
-    ? {
-        ...cardStyle,
-        boxShadow: `inset 1px 0 0 0 ${badge.color}`,
-      }
-    : cardStyle
   return (
-    <Link href={`/event/${event.slug}`} style={styleWithBadge} className="hover-lift">
+    <Link href={`/event/${event.slug}`} style={cardStyle} className="hover-lift">
+      {/* Stripe colorato 1px full-height in absolute, z-index 5 sopra
+          all'image (z-index 1 in EventCardHeader). Era box-shadow inset
+          ma veniva coperto dall'image flush top-left. */}
+      {badge && (
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: 1,
+            height: '100%',
+            background: badge.color,
+            zIndex: 5,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       {event.kind === 'binary' && <BinaryCard event={event} onBookmark={onBookmark} />}
       {event.kind === 'multi_outcome' && <MultiOutcomeCard event={event} onBookmark={onBookmark} />}
       {event.kind === 'multi_strike' && <MultiStrikeCard event={event} onBookmark={onBookmark} />}
