@@ -3,12 +3,13 @@ import {
   Chain,
   PriceHistoryInterval,
   Side,
+  SignatureTypeV2,
   type OrderBookSummary,
   type MarketPrice,
   type MarketTradeEvent,
 } from '@polymarket/clob-client-v2'
 
-export { PriceHistoryInterval }
+export { PriceHistoryInterval, SignatureTypeV2 }
 export type { MarketPrice, MarketTradeEvent }
 
 /**
@@ -62,6 +63,62 @@ export async function getOrderBook(tokenId: string): Promise<OrderBookSummary> {
 /** Dettagli market per `conditionId` (Polymarket). */
 export async function getMarket(conditionId: string): Promise<unknown> {
   return createReadOnlyClient().getMarket(conditionId)
+}
+
+/**
+ * tickSize + negRisk reali per un market. Quickstart Polymarket dice di NON
+ * usare default 0.01/false: i mercati neg-risk hanno tick 0.001 e gli ordini
+ * con tick sbagliato vengono rifiutati dal CLOB.
+ *
+ * Due varianti:
+ *  - by conditionId → fa una sola chiamata getMarket()
+ *  - by tokenId → due chiamate getTickSize() + getNegRisk() (più rapide)
+ *
+ * Cache 60s per evitare chiamate ripetute in uno stesso trade flow.
+ */
+const _detailsCache = new Map<string, { tickSize: string; negRisk: boolean; ts: number }>()
+const DETAILS_TTL_MS = 60_000
+
+export async function getMarketDetails(
+  conditionId: string
+): Promise<{ tickSize: string; negRisk: boolean }> {
+  const cached = _detailsCache.get(`c:${conditionId}`)
+  if (cached && Date.now() - cached.ts < DETAILS_TTL_MS) {
+    return { tickSize: cached.tickSize, negRisk: cached.negRisk }
+  }
+  const raw = (await getMarket(conditionId)) as {
+    minimum_tick_size?: string | number
+    neg_risk?: boolean
+  } | null
+  const tickSize = String(raw?.minimum_tick_size ?? '0.01')
+  const negRisk = Boolean(raw?.neg_risk ?? false)
+  _detailsCache.set(`c:${conditionId}`, { tickSize, negRisk, ts: Date.now() })
+  return { tickSize, negRisk }
+}
+
+/**
+ * Variante by tokenId: usa /tick-size e /neg-risk endpoints CLOB diretti.
+ * Utile per sell flow dove abbiamo solo position.tokenId, non conditionId.
+ */
+export async function getMarketDetailsByToken(
+  tokenId: string
+): Promise<{ tickSize: string; negRisk: boolean }> {
+  const cached = _detailsCache.get(`t:${tokenId}`)
+  if (cached && Date.now() - cached.ts < DETAILS_TTL_MS) {
+    return { tickSize: cached.tickSize, negRisk: cached.negRisk }
+  }
+  const client = createReadOnlyClient()
+  try {
+    const [tickSize, negRisk] = await Promise.all([
+      client.getTickSize(tokenId),
+      client.getNegRisk(tokenId),
+    ])
+    const result = { tickSize: String(tickSize), negRisk: Boolean(negRisk) }
+    _detailsCache.set(`t:${tokenId}`, { ...result, ts: Date.now() })
+    return result
+  } catch {
+    return { tickSize: '0.01', negRisk: false }
+  }
 }
 
 /**

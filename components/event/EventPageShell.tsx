@@ -209,6 +209,7 @@ function buildDraft(event: AuktoraEvent, market: AuktoraMarket, side: string): T
     outcomeLabel,
     tokenId,
     clobTokenIds: market.clobTokenIds,
+    conditionId: market.conditionId,
   }
 }
 

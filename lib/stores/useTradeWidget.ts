@@ -25,6 +25,11 @@ export interface TradeDraft {
    * posizione, anche se diverso dal side aperto).
    */
   clobTokenIds: [string, string] | null
+  /**
+   * Polymarket conditionId del market — usato per fetch tickSize + negRisk
+   * reali da getMarket() prima del signing (Quickstart Polymarket).
+   */
+  conditionId: string
 }
 
 export type TradeMode = 'market' | 'limit'

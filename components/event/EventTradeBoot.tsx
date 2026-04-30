@@ -118,5 +118,6 @@ function buildDraft(
     outcomeLabel,
     tokenId,
     clobTokenIds: market.clobTokenIds,
+    conditionId: market.conditionId,
   }
 }

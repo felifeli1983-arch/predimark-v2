@@ -23,6 +23,8 @@ export interface PositionItem {
   closedAt: string | null
   /** Token id specifico del side della posizione (per sell REAL via CLOB). */
   tokenId: string | null
+  /** Polymarket conditionId — fetchato al sell per tickSize/negRisk reali. */
+  conditionId: string | null
 }
 
 interface ListOptions {
@@ -93,6 +95,9 @@ export async function listUserPositions(
       openedAt: row.opened_at,
       closedAt: row.closed_at,
       tokenId,
+      // conditionId non in DB schema — SellConfirmModal usa tokenId per
+      // getTickAndRiskByToken (lookup tickSize+negRisk diretto).
+      conditionId: null,
     }
   })
 

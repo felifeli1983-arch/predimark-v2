@@ -105,9 +105,12 @@ export function useTradeSubmit(): UseTradeSubmitResult {
           signer: walletClient,
           funderAddress: embedded.address,
           tokenId: draft.tokenId,
+          conditionId: draft.conditionId,
           side: draft.side,
           pricePerShare: draft.pricePerShare,
           amountUsdc,
+          // walletKind default 'eoa' — Privy embedded wallet è EOA. Path A
+          // (Polymarket import) imposterà 'poly_proxy' quando wired.
         })
         payload = {
           ...basePayload,

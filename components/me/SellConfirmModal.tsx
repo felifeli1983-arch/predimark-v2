@@ -80,8 +80,10 @@ export function SellConfirmModal({ position, onClose, onSold }: Props) {
         signer: walletClient,
         funderAddress: embedded.address,
         tokenId: position.tokenId,
+        conditionId: position.conditionId,
         pricePerShare: currentPrice,
         sharesToSell,
+        // walletKind default 'eoa' — Privy embedded
       })
       setSigning(false)
       const res = await submit({

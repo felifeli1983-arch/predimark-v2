@@ -13,6 +13,7 @@ const mockDraft: TradeDraft = {
   outcomeLabel: 'Finland',
   tokenId: null,
   clobTokenIds: null,
+  conditionId: '',
 }
 
 describe('useTradeWidget store', () => {
