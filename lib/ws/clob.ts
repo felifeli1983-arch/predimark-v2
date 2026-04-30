@@ -42,6 +42,36 @@ export interface PriceChangeEvent {
   timestamp: string
 }
 
+/**
+ * Tick size change — emesso quando il market muove a tick più fine
+ * (price hits >0.96 o <0.04). Doc Polymarket WARNING:
+ * "If the tick size changes and you continue using the old tick size,
+ * your orders will be rejected."
+ */
+export interface TickSizeChangeEvent {
+  event_type: 'tick_size_change'
+  asset_id: string
+  market: string
+  old_tick_size: string
+  new_tick_size: string
+  timestamp: string
+}
+
+/**
+ * Market resolved — emesso quando UMA conferma la risoluzione.
+ * Più veloce del polling 30s, perfetto per auto-transition crypto
+ * round + redeem prompt.
+ */
+export interface MarketResolvedEvent {
+  event_type: 'market_resolved'
+  market: string
+  /** Token id dell'outcome vincente (clobTokenIds[0] o [1]). */
+  winning_asset_id: string
+  /** Label outcome es. "Yes", "Up". */
+  winning_outcome: string
+  timestamp: string
+}
+
 // ============================================================
 //  Aggregator pattern per evitare init message overwrite
 // ============================================================
@@ -63,10 +93,19 @@ export interface PriceChangeEvent {
 const subscribedAssetCounts = new Map<string, number>()
 let lastInitJson = ''
 
-function getCurrentInitMessage(): { type: string; assets_ids: string[] } {
+function getCurrentInitMessage(): {
+  type: string
+  assets_ids: string[]
+  custom_feature_enabled: boolean
+} {
   return {
     type: 'market',
     assets_ids: [...subscribedAssetCounts.keys()],
+    // Doc Polymarket Orderbook: abilita events extra
+    // (best_bid_ask, new_market, market_resolved, tick_size_change più
+    // affidabile). Required per market_resolved che usiamo per
+    // auto-transition crypto round.
+    custom_feature_enabled: true,
   }
 }
 
@@ -160,6 +199,78 @@ export function subscribeToBook(
   }
 
   const unsubBase = subscribe(CLOB_WS_URL, 'book', wrapped)
+  return () => {
+    unsubBase()
+    updateSubscription(filtered, -1)
+  }
+}
+
+/**
+ * Subscribe a `tick_size_change` per uno o più asset CLOB. Doc Polymarket
+ * Orderbook WARNING: tick può cambiare quando il price hits >0.96 o <0.04,
+ * e ordini con tick vecchio vengono RIFIUTATI dal CLOB. Listener deve
+ * invalidare cache lato client (lib/polymarket/clob.ts _detailsCache).
+ */
+export function subscribeToTickSizeChange(
+  assetIds: string[],
+  callback: (event: TickSizeChangeEvent) => void
+): () => void {
+  const filtered = assetIds.filter(Boolean)
+  if (filtered.length === 0) return () => undefined
+
+  updateSubscription(filtered, 1)
+
+  const wrapped: WsListener = (data) => {
+    if (
+      data &&
+      typeof data === 'object' &&
+      (data as { event_type?: string }).event_type === 'tick_size_change'
+    ) {
+      const ev = data as TickSizeChangeEvent
+      if (filtered.includes(ev.asset_id)) callback(ev)
+    }
+  }
+
+  const unsubBase = subscribe(CLOB_WS_URL, 'tick_size_change', wrapped)
+  return () => {
+    unsubBase()
+    updateSubscription(filtered, -1)
+  }
+}
+
+/**
+ * Subscribe a `market_resolved` per N markets. L'event arriva quando
+ * UMA conferma resolution → più veloce del polling 30s. Usato per
+ * auto-transition crypto round (next round invece di "Round terminato")
+ * + auto-trigger redeem prompt globale.
+ *
+ * Filter applied via `market` (conditionId), non asset_id come gli
+ * altri events. Per attivare il subscription set però usiamo gli asset_id
+ * passed da caller (le card hanno tokenId, non conditionId pronto).
+ */
+export function subscribeToMarketResolved(
+  assetIds: string[],
+  callback: (event: MarketResolvedEvent) => void
+): () => void {
+  const filtered = assetIds.filter(Boolean)
+  if (filtered.length === 0) return () => undefined
+
+  updateSubscription(filtered, 1)
+
+  const wrapped: WsListener = (data) => {
+    if (
+      data &&
+      typeof data === 'object' &&
+      (data as { event_type?: string }).event_type === 'market_resolved'
+    ) {
+      const ev = data as MarketResolvedEvent
+      // No filter per asset_id qui — il caller decide se rilevante
+      // (ev.market è il conditionId).
+      callback(ev)
+    }
+  }
+
+  const unsubBase = subscribe(CLOB_WS_URL, 'market_resolved', wrapped)
   return () => {
     unsubBase()
     updateSubscription(filtered, -1)

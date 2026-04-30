@@ -138,6 +138,19 @@ export async function getMarket(conditionId: string): Promise<unknown> {
  * Cache 60s per evitare chiamate ripetute in uno stesso trade flow.
  */
 const _detailsCache = new Map<string, { tickSize: string; negRisk: boolean; ts: number }>()
+
+/**
+ * Invalida cache tickSize/negRisk per un tokenId — invocato dal
+ * `tick_size_change` WS listener (Doc Polymarket Orderbook: tick può
+ * cambiare al raggiungimento di price extremi >0.96 o <0.04, e ordini
+ * con tick vecchio vengono rifiutati dal CLOB).
+ */
+export function invalidateMarketDetailsCache(tokenId: string): void {
+  _detailsCache.delete(`t:${tokenId}`)
+  // Non sappiamo il conditionId associato a un tokenId senza fetch,
+  // ma il caso d'uso comune è la cache by-token (sell flow). Quella
+  // by-condition viene refetchata al prossimo trade.
+}
 const DETAILS_TTL_MS = 60_000
 
 export async function getMarketDetails(

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import type { AuktoraMarket } from '@/lib/polymarket/mappers'
+import { subscribeToTickInvalidation } from '@/lib/ws/global-effects'
 import { OrderBookPanel } from './OrderBookPanel'
 
 interface Props {
@@ -16,6 +17,14 @@ interface Props {
 
 export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
   const [expanded, setExpanded] = useState(false)
+
+  // WS tick_size_change listener — invalida la cache _detailsCache di
+  // clob.ts non appena Polymarket cambia il tick (es. price > 0.96 ora
+  // tick = 0.001 invece di 0.01). Senza questo, ordini con tick vecchio
+  // vengono REJECTED dal CLOB. Doc Orderbook WARNING.
+  useEffect(() => {
+    return subscribeToTickInvalidation(market.clobTokenIds?.[0] ?? null)
+  }, [market.clobTokenIds])
   const yesCents = Math.round(market.yesPrice * 100)
   const noCents = 100 - yesCents
   const pct = yesCents

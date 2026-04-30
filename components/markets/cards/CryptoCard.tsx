@@ -8,6 +8,7 @@ import { fetchEventById, fetchNextRoundInSeries } from '@/lib/polymarket/queries
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
+import { subscribeToMarketResolvedBroadcast } from '@/lib/ws/global-effects'
 import { fetchReferencePrice } from '@/lib/crypto/reference-price'
 import { DonutChart } from '../charts/DonutChart'
 import { EventCardHeader } from '../EventCardHeader'
@@ -113,8 +114,7 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
   // arriva a zero. Polling 5s perché Polymarket pubblica il next round con
   // qualche secondo di ritardo dopo la chiusura del precedente.
   // Pattern 1 di refresh — Doc 4 page-1: "card cambia identità all'occorrenza
-  // successiva quando si risolve". Solo per crypto round (seriesSlug
-  // contiene 'up-or-down'), non per ogni evento expired.
+  // successiva quando si risolve".
   useEffect(() => {
     if (!expired || !event.seriesSlug) return
     if (!event.seriesSlug.includes('up-or-down')) return
@@ -132,6 +132,28 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
       clearInterval(id)
     }
   }, [expired, event.seriesSlug, event.id])
+
+  // WS market_resolved listener — trigger INSTANT auto-transition non
+  // appena UMA conferma resolution (più veloce del polling 5s + del
+  // countdown locale). Doc Polymarket Orderbook: event richiede
+  // `custom_feature_enabled: true` nell'init message (già abilitato
+  // nell'aggregator subscription set).
+  useEffect(() => {
+    const tokenId = market?.clobTokenIds?.[0]
+    if (!tokenId || !event.seriesSlug?.includes('up-or-down')) return
+    const unsub = subscribeToMarketResolvedBroadcast(tokenId, async (resolvedEvent) => {
+      // Filter manuale per market — dispatch è broadcast, ma vogliamo
+      // reagire solo se è il NOSTRO market che si è risolto.
+      const ourConditionId = market.conditionId?.toLowerCase()
+      if (resolvedEvent.market?.toLowerCase() !== ourConditionId) return
+      // Fetch + swap immediato del next round.
+      if (event.seriesSlug) {
+        const next = await fetchNextRoundInSeries(event.seriesSlug)
+        if (next && next.id !== event.id) setEvent(mapGammaEvent(next))
+      }
+    })
+    return unsub
+  }, [market, event.seriesSlug, event.id])
 
   const isLive = !expired && event.active
 
