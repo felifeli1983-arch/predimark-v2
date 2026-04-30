@@ -1,19 +1,12 @@
 'use client'
 
 import { Suspense, useState, useEffect } from 'react'
-import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search as SearchIcon, Loader2 } from 'lucide-react'
 
-interface MarketResult {
-  id: string
-  slug: string
-  question: string
-  volume: number
-  active: boolean
-  closed: boolean
-  endDate?: string
-}
+import { EventCard } from '@/components/markets/EventCard'
+import { mapGammaEvent, type AuktoraEvent } from '@/lib/polymarket/mappers'
+import type { GammaEvent } from '@/lib/polymarket/types'
 
 export default function SearchPage() {
   return (
@@ -38,7 +31,7 @@ function SearchPageInner() {
   const params = useSearchParams()
   const initialQ = params.get('q') ?? ''
   const [query, setQuery] = useState(initialQ)
-  const [results, setResults] = useState<MarketResult[]>([])
+  const [results, setResults] = useState<AuktoraEvent[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -51,13 +44,16 @@ function SearchPageInner() {
     setLoading(true)
     const t = setTimeout(async () => {
       try {
-        // Search direct via Polymarket Gamma API (markets are live there, not in Supabase)
+        // Search direct via Polymarket Gamma API + map ad AuktoraEvent
+        // così possiamo renderizzare EventCard live (probabilità via WS).
         const res = await fetch(
           `https://gamma-api.polymarket.com/events?search=${encodeURIComponent(query)}&limit=20&active=true`
         )
         if (!res.ok) return
-        const data = (await res.json()) as MarketResult[]
-        if (!cancelled) setResults(Array.isArray(data) ? data : [])
+        const data = (await res.json()) as GammaEvent[]
+        if (!cancelled) {
+          setResults(Array.isArray(data) ? data.map(mapGammaEvent) : [])
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -144,38 +140,14 @@ function SearchPageInner() {
       )}
 
       {!loading && results.length > 0 && (
-        <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 8 }}>
-          {results.map((m) => (
-            <li key={m.id}>
-              <Link
-                href={`/event/${m.slug}`}
-                style={{
-                  display: 'block',
-                  padding: 'var(--space-3)',
-                  background: 'var(--color-bg-secondary)',
-                  border: '1px solid var(--color-border-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  textDecoration: 'none',
-                  color: 'var(--color-text-primary)',
-                }}
-              >
-                <strong style={{ fontSize: 'var(--font-md)' }}>{m.question}</strong>
-                <p
-                  style={{
-                    margin: '4px 0 0',
-                    fontSize: 'var(--font-xs)',
-                    color: 'var(--color-text-muted)',
-                  }}
-                >
-                  Volume: $
-                  {Number(m.volume ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
-                  {' · '}
-                  {m.closed ? 'Chiuso' : m.active ? 'Attivo' : 'Inattivo'}
-                </p>
-              </Link>
-            </li>
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+          style={{ gap: 12 }}
+        >
+          {results.map((event) => (
+            <EventCard key={event.id} event={event} />
           ))}
-        </ul>
+        </div>
       )}
     </div>
   )

@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Loader2, Sparkles } from 'lucide-react'
 
+import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
+
 interface GammaTag {
   slug: string
 }
@@ -13,6 +15,7 @@ interface GammaMarketLite {
   outcomes?: string
   outcomePrices?: string
   groupItemTitle?: string
+  clobTokenIds?: string
 }
 
 interface GammaEventLite {
@@ -32,7 +35,20 @@ interface RelatedItem {
   slug: string
   image: string
   yesProb: number | null
+  /** Yes token id per WS subscription live midpoint. */
+  tokenId: string | null
   volume24h: number
+}
+
+function parseTokenId(raw: string | undefined): string | null {
+  if (!raw) return null
+  try {
+    const arr = JSON.parse(raw) as unknown
+    if (Array.isArray(arr) && typeof arr[0] === 'string') return arr[0]
+  } catch {
+    /* ignore */
+  }
+  return null
 }
 
 interface Props {
@@ -88,12 +104,14 @@ export function RelatedMarkets({ primaryTag, excludeId, limit = 4 }: Props) {
           .map((e) => {
             const m = e.markets?.[0]
             const yesProb = m ? parsePrice(m.outcomePrices) : null
+            const tokenId = m ? parseTokenId(m.clobTokenIds) : null
             return {
               id: e.id,
               title: e.title,
               slug: e.slug,
               image: e.icon || e.image || '',
               yesProb,
+              tokenId,
               volume24h: Number(e.volume24hr ?? 0),
             }
           })
@@ -153,79 +171,93 @@ export function RelatedMarkets({ primaryTag, excludeId, limit = 4 }: Props) {
         <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 8 }}>
           {items?.map((it) => (
             <li key={it.id}>
-              <Link
-                href={`/event/${it.slug}`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: 6,
-                  borderRadius: 'var(--radius-md)',
-                  textDecoration: 'none',
-                  color: 'var(--color-text-primary)',
-                  background: 'var(--color-bg-tertiary)',
-                }}
-              >
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 'var(--radius-md)',
-                    overflow: 'hidden',
-                    flexShrink: 0,
-                    background: 'var(--color-bg-secondary)',
-                  }}
-                >
-                  {it.image ? (
-                    <Image
-                      src={it.image}
-                      alt=""
-                      width={28}
-                      height={28}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  ) : null}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 'var(--font-xs)',
-                      fontWeight: 600,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {it.title}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      color: 'var(--color-text-muted)',
-                      marginTop: 2,
-                      display: 'flex',
-                      gap: 6,
-                    }}
-                  >
-                    {it.yesProb !== null && (
-                      <span
-                        style={{
-                          color: 'var(--color-cta)',
-                          fontWeight: 700,
-                          fontVariantNumeric: 'tabular-nums',
-                        }}
-                      >
-                        {(it.yesProb * 100).toFixed(0)}%
-                      </span>
-                    )}
-                    <span>· {formatMoney(it.volume24h)} 24h</span>
-                  </div>
-                </div>
-              </Link>
+              <RelatedRow item={it} />
             </li>
           ))}
         </ul>
       )}
     </section>
+  )
+}
+
+/**
+ * Riga singola correlata — subscribe live midpoint via WS.
+ * Estratta come component separato così ogni riga ha il proprio
+ * `useLiveMidpoint` hook (1 hook per row → N subscriptions aggregate
+ * gestite dall'aggregator subscription-set in lib/ws/clob.ts).
+ */
+function RelatedRow({ item }: { item: RelatedItem }) {
+  const { midpoint } = useLiveMidpoint(item.tokenId)
+  const yesProb = midpoint ?? item.yesProb
+  return (
+    <Link
+      href={`/event/${item.slug}`}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: 6,
+        borderRadius: 'var(--radius-md)',
+        textDecoration: 'none',
+        color: 'var(--color-text-primary)',
+        background: 'var(--color-bg-tertiary)',
+      }}
+    >
+      <div
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: 'var(--radius-md)',
+          overflow: 'hidden',
+          flexShrink: 0,
+          background: 'var(--color-bg-secondary)',
+        }}
+      >
+        {item.image ? (
+          <Image
+            src={item.image}
+            alt=""
+            width={28}
+            height={28}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : null}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 'var(--font-xs)',
+            fontWeight: 600,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {item.title}
+        </div>
+        <div
+          style={{
+            fontSize: 9,
+            color: 'var(--color-text-muted)',
+            marginTop: 2,
+            display: 'flex',
+            gap: 6,
+          }}
+        >
+          {yesProb !== null && (
+            <span
+              style={{
+                color: 'var(--color-cta)',
+                fontWeight: 700,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {(yesProb * 100).toFixed(0)}%
+            </span>
+          )}
+          <span>· {formatMoney(item.volume24h)} 24h</span>
+        </div>
+      </div>
+    </Link>
   )
 }
