@@ -67,6 +67,14 @@ export interface BuildOrderInput {
   tickSize?: TickSize
   /** Override manuale negRisk (skip fetch). */
   negRisk?: boolean
+  /**
+   * Unix seconds della scadenza ordine (GTD only).
+   * IMPORTANTE: Polymarket richiede security threshold di 60s — per
+   * effective lifetime di N secondi passa `now + 60 + N`. Es. per 5min:
+   * `Math.floor(Date.now()/1000) + 60 + 300`.
+   * Se omesso → ordine GTC (good-till-cancelled).
+   */
+  expiration?: number
 }
 
 export interface BuildSellOrderInput {
@@ -102,6 +110,9 @@ export async function buildAndSignOrder(input: BuildOrderInput): Promise<SignedO
     size,
     side: Side.BUY,
     builderCode: BUILDER_CODE,
+    // GTD expiration unix seconds — caller deve già includere il
+    // security threshold +60s (vedi BuildOrderInput.expiration doc).
+    ...(input.expiration !== undefined && { expiration: input.expiration }),
   }
 
   const options: CreateOrderOptions = { tickSize: resolved.tickSize, negRisk: resolved.negRisk }

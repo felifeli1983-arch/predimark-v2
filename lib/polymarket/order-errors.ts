@@ -47,3 +47,35 @@ export function translateOrderError(rawMessage: string | undefined | null): stri
   }
   return trimmed
 }
+
+/**
+ * Insert status (success path, doc Create Order response):
+ *  - live      → ordine resta sul book (limit GTC/GTD)
+ *  - matched   → match immediato con un resting order
+ *  - delayed   → marketable, in coda 1s (sport markets)
+ *  - unmatched → marketable ma fallito il delay → comunque on book
+ */
+const STATUS_LABELS: Record<string, string> = {
+  live: '✓ Ordine in attesa sul libro',
+  matched: '✓ Ordine eseguito immediatamente',
+  delayed: '⏱ Ordine in coda di matching (sport delay 1s)',
+  unmatched: '⚠ Ordine sul libro (matching fallito, riprova)',
+}
+
+export function translateInsertStatus(status: string | undefined | null): string {
+  if (!status) return ''
+  return STATUS_LABELS[status.toLowerCase()] ?? `Stato: ${status}`
+}
+
+/**
+ * Helper GTD: ritorna unix seconds expiration con security threshold
+ * 60s incluso. Esempio: gtdExpiration({ seconds: 300 }) → ora + 360.
+ *
+ * Doc Create Order: "There is a security threshold of one minute. If
+ * you need the order to expire in 90 seconds, the correct expiration
+ * value is `now + 1 minute + 30 seconds`."
+ */
+export function gtdExpiration(opts: { seconds?: number; minutes?: number; hours?: number }): number {
+  const sec = (opts.seconds ?? 0) + (opts.minutes ?? 0) * 60 + (opts.hours ?? 0) * 3600
+  return Math.floor(Date.now() / 1000) + 60 + sec
+}

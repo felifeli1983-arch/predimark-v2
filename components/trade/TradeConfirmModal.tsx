@@ -6,7 +6,7 @@ import { X, CheckCircle2, AlertCircle, Loader2, PenLine } from 'lucide-react'
 import { useTradeWidget } from '@/lib/stores/useTradeWidget'
 import { useTradeSubmit } from '@/lib/hooks/useTradeSubmit'
 import { useThemeStore } from '@/lib/stores/themeStore'
-import { translateOrderError } from '@/lib/polymarket/order-errors'
+import { translateOrderError, translateInsertStatus } from '@/lib/polymarket/order-errors'
 
 interface Props {
   open: boolean
@@ -115,8 +115,8 @@ export function TradeConfirmModal({ open, onClose }: Props) {
           <div
             style={{
               display: 'flex',
-              alignItems: 'center',
-              gap: 10,
+              flexDirection: 'column',
+              gap: 6,
               padding: '10px 12px',
               background: 'var(--color-success-bg)',
               border: '1px solid var(--color-success)',
@@ -125,11 +125,25 @@ export function TradeConfirmModal({ open, onClose }: Props) {
               fontSize: 'var(--font-base)',
             }}
           >
-            <CheckCircle2 size={16} />
-            <span>
-              Trade eseguito · ${amountUsdc.toFixed(2)} per {result.sharesAcquired.toFixed(2)}{' '}
-              shares
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <CheckCircle2 size={16} />
+              <span>
+                Trade eseguito · ${amountUsdc.toFixed(2)} per {result.sharesAcquired.toFixed(2)}{' '}
+                shares
+              </span>
+            </div>
+            {result.status && (
+              <div
+                style={{
+                  fontSize: 'var(--font-xs)',
+                  color: 'var(--color-success)',
+                  opacity: 0.85,
+                  paddingLeft: 26,
+                }}
+              >
+                {translateInsertStatus(result.status)}
+              </div>
+            )}
           </div>
         )}
 
