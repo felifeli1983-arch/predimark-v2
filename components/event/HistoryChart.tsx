@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, TrendingUp } from 'lucide-react'
+import { Loader2, Radio, TrendingUp } from 'lucide-react'
+import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 import {
   CenteredBox,
   Container,
@@ -25,6 +26,9 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
   const [period, setPeriod] = useState<Period>('7d')
   const [points, setPoints] = useState<PricePoint[]>([])
   const [loading, setLoading] = useState(true)
+  // Real-time: midpoint live via WS CLOB. Quando arriva, appendiamo un punto
+  // con timestamp now al chart → la linea si muove davanti agli occhi.
+  const { midpoint } = useLiveMidpoint(marketId || null)
 
   useEffect(() => {
     if (!marketId) return
@@ -52,6 +56,30 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
       cancelled = true
     }
   }, [marketId, period])
+
+  // Quando arriva un nuovo midpoint via WS, appendiamo (o aggiorniamo l'ultimo)
+  // così la linea si estende in tempo reale senza rifare fetch REST.
+  useEffect(() => {
+    if (midpoint === null) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPoints((prev) => {
+      if (prev.length === 0) return prev
+      const last = prev[prev.length - 1]
+      if (!last) return prev
+      const lastTs = new Date(last.timestamp).getTime()
+      const now = Date.now()
+      const fresh: PricePoint = {
+        timestamp: new Date(now).toISOString(),
+        yes_price: midpoint,
+        no_price: 1 - midpoint,
+      }
+      // Se l'ultimo punto è < 60s fa, sovrascrivi (evita affollamento)
+      if (now - lastTs < 60_000) {
+        return [...prev.slice(0, -1), fresh]
+      }
+      return [...prev, fresh].slice(-500)
+    })
+  }, [midpoint])
 
   const chartData = useMemo(() => {
     if (points.length < 2) return null
@@ -104,6 +132,25 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
           <SectionTitle>
             <TrendingUp size={12} style={{ display: 'inline', marginRight: 4 }} />
             {showBothLines ? 'Storia probabilità YES / NO' : 'Storia probabilità YES'}
+            {midpoint !== null && (
+              <span
+                style={{
+                  marginLeft: 6,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  padding: '1px 6px',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'color-mix(in srgb, var(--color-success) 18%, transparent)',
+                  color: 'var(--color-success)',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: '0.04em',
+                }}
+              >
+                <Radio size={8} /> LIVE
+              </span>
+            )}
           </SectionTitle>
           {chartData && <ChartStats data={chartData} period={period} dual={showBothLines} />}
         </div>

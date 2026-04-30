@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, TrendingUp } from 'lucide-react'
+import { Loader2, Radio, TrendingUp } from 'lucide-react'
+import { subscribeToPriceChange } from '@/lib/ws/clob'
 import {
   CenteredBox,
   Container,
@@ -44,6 +45,7 @@ export function MultiLineChart({ markets }: Props) {
   const [period, setPeriod] = useState<Period>('7d')
   const [series, setSeries] = useState<SeriesData[]>([])
   const [loading, setLoading] = useState(true)
+  const [liveConnected, setLiveConnected] = useState(false)
 
   useEffect(() => {
     if (markets.length === 0) return
@@ -80,6 +82,39 @@ export function MultiLineChart({ markets }: Props) {
     }
   }, [markets, period])
 
+  // Real-time: subscribe a price_change su tutti i tokenId. Aggiorna l'ultimo
+  // punto della relativa serie ogni volta che arriva un trade.
+  useEffect(() => {
+    const tokenIds = markets.map((m) => m.tokenId).filter(Boolean)
+    if (tokenIds.length === 0) return
+    const unsubscribe = subscribeToPriceChange(tokenIds, (event) => {
+      const price = parseFloat(event.price)
+      if (!Number.isFinite(price)) return
+      setLiveConnected(true)
+      setSeries((prev) =>
+        prev.map((s, i) => {
+          const tokenId = markets[i]?.tokenId
+          if (tokenId !== event.asset_id) return s
+          const last = s.points[s.points.length - 1]
+          if (!last) return s
+          const now = Date.now()
+          const lastTs = new Date(last.timestamp).getTime()
+          const fresh: PricePoint = {
+            timestamp: new Date(now).toISOString(),
+            yes_price: price,
+            no_price: 1 - price,
+          }
+          const newPoints =
+            now - lastTs < 60_000
+              ? [...s.points.slice(0, -1), fresh]
+              : [...s.points, fresh].slice(-500)
+          return { ...s, points: newPoints }
+        })
+      )
+    })
+    return unsubscribe
+  }, [markets])
+
   const width = 100
   const height = 60
 
@@ -105,6 +140,25 @@ export function MultiLineChart({ markets }: Props) {
           <SectionTitle>
             <TrendingUp size={12} style={{ display: 'inline', marginRight: 4 }} />
             Storia probabilità — {markets.length} candidati
+            {liveConnected && (
+              <span
+                style={{
+                  marginLeft: 6,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  padding: '1px 6px',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'color-mix(in srgb, var(--color-success) 18%, transparent)',
+                  color: 'var(--color-success)',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: '0.04em',
+                }}
+              >
+                <Radio size={8} /> LIVE
+              </span>
+            )}
           </SectionTitle>
           <p
             style={{

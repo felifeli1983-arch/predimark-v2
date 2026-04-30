@@ -33,6 +33,50 @@ export async function fetchFeaturedEvents(limit: number = 10): Promise<GammaEven
   )
 }
 
+/**
+ * Fetch eventi attivi di una specifica categoria (tag slug).
+ * Usato dai filtri Crypto/Sport/Politics ecc — vanno dritti su Gamma con
+ * `tag_slug=...` invece di filtrare client-side i 20 eventi della home.
+ *
+ * Ritorna fino a `limit` eventi attivi (default 100), ordinati per volume 24h.
+ */
+export async function fetchEventsByTag(
+  tagSlug: string,
+  limit: number = 100
+): Promise<GammaEvent[]> {
+  return gammaGet<GammaEvent[]>(
+    '/events',
+    {
+      tag_slug: tagSlug,
+      active: true,
+      closed: false,
+      order: 'volume24hr',
+      ascending: false,
+      limit,
+    },
+    { revalidate: 30 }
+  )
+}
+
+/**
+ * Fetch eventi LIVE (active=true, closed=false), ordinati per volume.
+ * Senza filtro tag — pesca attraverso TUTTE le categorie (crypto round, sport,
+ * politics ecc) per mostrare ciò che si sta tradando proprio adesso.
+ */
+export async function fetchLiveEvents(limit: number = 100): Promise<GammaEvent[]> {
+  return gammaGet<GammaEvent[]>(
+    '/events',
+    {
+      active: true,
+      closed: false,
+      order: 'volume24hr',
+      ascending: false,
+      limit,
+    },
+    { revalidate: 15 }
+  )
+}
+
 export async function searchEvents(query: string, limit: number = 20): Promise<GammaEvent[]> {
   return gammaGet<GammaEvent[]>(
     '/events',

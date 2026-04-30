@@ -33,6 +33,7 @@ const eslintConfig = defineConfig([
     'out/**',
     'build/**',
     'node_modules/**',
+    'clob-client-v2-main/**',
     'next-env.d.ts',
     '*.config.mjs',
     '*.config.js',

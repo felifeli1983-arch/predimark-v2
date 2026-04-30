@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
       globals: true,
       css: false,
       include: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
-      exclude: ['node_modules', '.next', 'out'],
+      exclude: ['node_modules', '.next', 'out', 'clob-client-v2-main/**'],
       coverage: {
         provider: 'v8',
         reporter: ['text', 'lcov'],

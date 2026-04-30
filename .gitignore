@@ -41,3 +41,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Polymarket SDK reference — solo materiale di studio, non build asset
+clob-client-v2-main/
