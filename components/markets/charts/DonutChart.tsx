@@ -21,14 +21,18 @@ export function DonutChart({
   const clamped = Math.max(0, Math.min(1, probability))
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
-  const dashOffset = circumference * (1 - clamped)
   const center = size / 2
 
+  // Mostra sempre il LATO DOMINANTE (probability più alta), con colore
+  // ed etichetta corrispondenti. Se Up=16% / Down=84% → renderizza
+  // "84% Down" rosso (non "16% Down" che era buggato e fuorviante).
   const isYes = clamped >= 0.5
+  const dominantProb = isYes ? clamped : 1 - clamped
+  const dashOffset = circumference * (1 - dominantProb)
   const arcColor = color ?? (isYes ? 'var(--color-success)' : 'var(--color-danger)')
   const labelColor = arcColor
   const label = isYes ? labels[0] : labels[1]
-  const percent = Math.round(clamped * 100)
+  const percent = Math.round(dominantProb * 100)
 
   // Font ridotti di 2 punti per evitare che debordino dal cerchio
   // (size 80 → percentuale 18px, label 9px)
