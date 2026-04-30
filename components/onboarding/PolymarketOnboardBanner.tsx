@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { CheckCircle2, Loader2, Wallet, X } from 'lucide-react'
 import { useOnboardPolymarket, type OnboardStep } from '@/lib/hooks/useOnboardPolymarket'
+import { getOnboardPath } from '@/lib/onboarding/path'
 
 interface OnboardStatusResponse {
   onboarded: boolean
@@ -64,6 +65,11 @@ export function PolymarketOnboardBanner() {
   if (status?.onboarded) return null
   if (dismissed) return null
   if (onboard.step === 'success') return null
+
+  // Path 'cash' (no-crypto): l'utente non ha ancora pUSD on-chain, l'onboarding
+  // (allowances) non ha senso ora. Mostriamo il banner SOLO dopo che ha
+  // depositato — quel banner sarà gestito da /me/wallet, non qui.
+  if (getOnboardPath() === 'cash') return null
 
   const inProgress = onboard.step !== 'idle' && onboard.step !== 'error'
 
