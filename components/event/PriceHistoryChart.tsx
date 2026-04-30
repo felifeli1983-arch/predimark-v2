@@ -28,14 +28,16 @@ interface Props {
 /**
  * Router CardKind-aware per il chart event-page.
  *
+ *  - crypto_up_down (con marketSlug) → PolymarketEmbed con liveactivity=true
+ *    (round 5m/15m, mostra anche feed trade live sotto il chart)
  *  - binary | h2h_sport (non-live, con marketSlug) → PolymarketEmbed iframe
  *    ufficiale (chart identico a polymarket.com — niente da reinventare)
  *  - multi_outcome (con multiMarkets) → MultiLineChart custom (Polymarket
  *    embed iframe non supporta multi-event, dobbiamo costruirlo noi)
  *  - multi_strike → HistoryChart single-line YES
- *  - crypto_up_down → LiveSpotView (Chainlink spot price + Binance candles)
+ *  - crypto_up_down (senza marketSlug) → LiveSpotView (Chainlink + Binance)
  *  - h2h_sport (live) → LiveScoreStub (sport-data MA6+)
- *  - fallback senza marketSlug → HistoryChart custom
+ *  - fallback → HistoryChart custom
  */
 export function PriceHistoryChart({
   marketId,
@@ -45,18 +47,23 @@ export function PriceHistoryChart({
   isLive,
   multiMarkets,
 }: Props) {
+  if (cardKind === 'crypto_up_down' && marketSlug) {
+    // liveactivity=true → trade feed real-time sotto il chart Polymarket
+    return <PolymarketEmbed marketSlug={marketSlug} liveActivity height={420} />
+  }
   if (cardKind === 'crypto_up_down') {
+    // Fallback: nessuno slug → spot price Chainlink
     return <LiveSpotView cryptoSymbol={cryptoSymbol ?? ''} />
   }
-  if (cardKind === 'h2h_sport' && isLive) {
+  if (cardKind === 'h2h_sport' && isLive && !marketSlug) {
     return <LiveScoreStub />
   }
   if (cardKind === 'multi_outcome' && multiMarkets && multiMarkets.length > 0) {
     return <MultiLineChart markets={multiMarkets} />
   }
-  // Binary o h2h_sport non-live: usa l'embed Polymarket se abbiamo lo slug
+  // Binary o h2h_sport (anche live se abbiamo slug): embed Polymarket
   if ((cardKind === 'binary' || cardKind === 'h2h_sport') && marketSlug) {
-    return <PolymarketEmbed marketSlug={marketSlug} />
+    return <PolymarketEmbed marketSlug={marketSlug} liveActivity={isLive} />
   }
   // Fallback custom (multi_strike o cardKind senza slug)
   const dualLine = cardKind === 'binary' || cardKind === 'h2h_sport'
