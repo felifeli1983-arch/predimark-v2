@@ -23,7 +23,8 @@ export async function listWatchlist(
           slug,
           title,
           image_url,
-          current_yes_price
+          current_yes_price,
+          clob_token_ids
         )
       `
     )
@@ -32,19 +33,24 @@ export async function listWatchlist(
 
   if (error) return { error: error.message }
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    polymarketMarketId: row.markets?.polymarket_market_id ?? '',
-    polymarketEventId: row.markets?.polymarket_event_id ?? null,
-    slug: row.markets?.slug ?? null,
-    title: row.markets?.title ?? '',
-    image: row.markets?.image_url ?? null,
-    currentYesPrice: row.markets?.current_yes_price ?? null,
-    notifyPriceChangePct: row.notify_price_change_pct,
-    notifySignal: row.notify_signal ?? true,
-    notifyResolution: row.notify_resolution ?? true,
-    addedAt: row.added_at ?? new Date().toISOString(),
-  }))
+  return (data ?? []).map((row) => {
+    const tokenIds = (row.markets?.clob_token_ids ?? null) as [string, string] | null
+    return {
+      id: row.id,
+      polymarketMarketId: row.markets?.polymarket_market_id ?? '',
+      polymarketEventId: row.markets?.polymarket_event_id ?? null,
+      slug: row.markets?.slug ?? null,
+      title: row.markets?.title ?? '',
+      image: row.markets?.image_url ?? null,
+      currentYesPrice: row.markets?.current_yes_price ?? null,
+      // Yes token id per WS subscription live midpoint nelle row UI.
+      tokenId: tokenIds?.[0] ?? null,
+      notifyPriceChangePct: row.notify_price_change_pct,
+      notifySignal: row.notify_signal ?? true,
+      notifyResolution: row.notify_resolution ?? true,
+      addedAt: row.added_at ?? new Date().toISOString(),
+    }
+  })
 }
 
 interface AddToWatchlistInput {

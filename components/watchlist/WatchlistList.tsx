@@ -7,6 +7,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import { Star } from 'lucide-react'
 import { fetchWatchlist } from '@/lib/api/watchlist-client'
 import { useWatchlistActions } from '@/lib/hooks/useWatchlistActions'
+import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 import type { WatchlistItem } from '@/app/api/v1/watchlist/route'
 
 /**
@@ -111,98 +112,121 @@ export function WatchlistList() {
       }}
     >
       {items.map((it) => (
-        <li
+        <WatchlistRow
           key={it.id}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: 12,
-            background: 'var(--color-bg-secondary)',
-            border: '1px solid var(--color-border-subtle)',
-            borderRadius: 'var(--radius-md)',
+          item={it}
+          onRemove={async () => {
+            await remove(it.polymarketMarketId)
+            setItems((prev) => prev?.filter((x) => x.id !== it.id) ?? null)
           }}
-        >
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: '50%',
-              overflow: 'hidden',
-              background: 'var(--color-bg-tertiary)',
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-text-secondary)',
-              fontWeight: 700,
-            }}
-          >
-            {it.image ? (
-              <Image src={it.image} alt="" width={40} height={40} style={{ objectFit: 'cover' }} />
-            ) : (
-              (it.title?.[0]?.toUpperCase() ?? '?')
-            )}
-          </div>
-
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 'var(--font-base)',
-                fontWeight: 600,
-                color: 'var(--color-text-primary)',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {it.slug ? (
-                <Link
-                  href={`/event/${it.slug}`}
-                  style={{ color: 'inherit', textDecoration: 'none' }}
-                >
-                  {it.title}
-                </Link>
-              ) : (
-                it.title
-              )}
-            </div>
-            {it.currentYesPrice !== null && (
-              <div
-                style={{
-                  fontSize: 'var(--font-xs)',
-                  color: 'var(--color-text-muted)',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                Yes {Math.round(it.currentYesPrice * 100)}%
-              </div>
-            )}
-          </div>
-
-          <button
-            type="button"
-            aria-label={`Rimuovi ${it.title} dalla watchlist`}
-            onClick={async () => {
-              await remove(it.polymarketMarketId)
-              setItems((prev) => prev?.filter((x) => x.id !== it.id) ?? null)
-            }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 6,
-              cursor: 'pointer',
-              color: 'var(--color-warning)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Star size={16} fill="var(--color-warning)" strokeWidth={0} />
-          </button>
-        </li>
+        />
       ))}
     </ul>
+  )
+}
+
+/**
+ * Riga watchlist con live midpoint via WS — il `Yes X%` ticchetta in
+ * tempo reale ad ogni trade, come le card della home. Estratto come
+ * subcomponent così ogni riga ha il proprio hook (gestito
+ * dall'aggregator subscription-set in lib/ws/clob.ts).
+ */
+function WatchlistRow({
+  item,
+  onRemove,
+}: {
+  item: WatchlistItem
+  onRemove: () => Promise<void>
+}) {
+  const { midpoint } = useLiveMidpoint(item.tokenId)
+  const yesPrice = midpoint ?? item.currentYesPrice
+  return (
+    <li
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: 12,
+        background: 'var(--color-bg-secondary)',
+        border: '1px solid var(--color-border-subtle)',
+        borderRadius: 'var(--radius-md)',
+      }}
+    >
+      <div
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: '50%',
+          overflow: 'hidden',
+          background: 'var(--color-bg-tertiary)',
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--color-text-secondary)',
+          fontWeight: 700,
+        }}
+      >
+        {item.image ? (
+          <Image src={item.image} alt="" width={40} height={40} style={{ objectFit: 'cover' }} />
+        ) : (
+          (item.title?.[0]?.toUpperCase() ?? '?')
+        )}
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 'var(--font-base)',
+            fontWeight: 600,
+            color: 'var(--color-text-primary)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {item.slug ? (
+            <Link
+              href={`/event/${item.slug}`}
+              style={{ color: 'inherit', textDecoration: 'none' }}
+            >
+              {item.title}
+            </Link>
+          ) : (
+            item.title
+          )}
+        </div>
+        {yesPrice !== null && (
+          <div
+            style={{
+              fontSize: 'var(--font-xs)',
+              color: 'var(--color-text-muted)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            Yes {Math.round(yesPrice * 100)}%
+          </div>
+        )}
+      </div>
+
+      <button
+        type="button"
+        aria-label={`Rimuovi ${item.title} dalla watchlist`}
+        onClick={onRemove}
+        style={{
+          background: 'transparent',
+          border: 'none',
+          padding: 6,
+          cursor: 'pointer',
+          color: 'var(--color-warning)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          flexShrink: 0,
+        }}
+      >
+        <Star size={16} fill="var(--color-warning)" strokeWidth={0} />
+      </button>
+    </li>
   )
 }
 

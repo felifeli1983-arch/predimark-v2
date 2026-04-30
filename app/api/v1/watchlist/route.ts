@@ -12,6 +12,8 @@ export interface WatchlistItem {
   title: string
   image: string | null
   currentYesPrice: number | null
+  /** Yes token id (clob_token_ids[0]) per subscription live midpoint via WS. */
+  tokenId: string | null
   notifyPriceChangePct: number | null
   notifySignal: boolean
   notifyResolution: boolean
