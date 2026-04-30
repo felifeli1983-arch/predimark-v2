@@ -10,6 +10,12 @@ interface Props {
    * round 5m/15m e sport in corso — mostra trade live in tempo reale).
    */
   liveActivity?: boolean
+  /**
+   * Tipo di endpoint Polymarket. Default 'market' (chart standard).
+   * 'sports' è specifico per eventi sport con layout dedicato (team
+   * affiancati + win probability + score).
+   */
+  kind?: 'market' | 'sports'
 }
 
 /**
@@ -35,7 +41,12 @@ const BUILDER_CODE = process.env.NEXT_PUBLIC_POLYMARKET_BUILDER_CODE ?? ''
  *
  * Limite: funziona solo per market SINGOLO (no event multi-outcome).
  */
-export function PolymarketEmbed({ marketSlug, height = 360, liveActivity }: Props) {
+export function PolymarketEmbed({
+  marketSlug,
+  height = 360,
+  liveActivity,
+  kind = 'market',
+}: Props) {
   const params = new URLSearchParams({
     market: marketSlug,
     theme: 'dark',
@@ -43,7 +54,8 @@ export function PolymarketEmbed({ marketSlug, height = 360, liveActivity }: Prop
   })
   if (liveActivity) params.set('liveactivity', 'true')
   if (BUILDER_CODE) params.set('creator', BUILDER_CODE)
-  const src = `https://embed.polymarket.com/market?${params.toString()}`
+  const endpoint = kind === 'sports' ? 'sports' : 'market'
+  const src = `https://embed.polymarket.com/${endpoint}?${params.toString()}`
   return (
     <div
       style={{

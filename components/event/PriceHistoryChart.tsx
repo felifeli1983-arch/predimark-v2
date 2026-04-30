@@ -55,14 +55,21 @@ export function PriceHistoryChart({
     // Fallback: nessuno slug → spot price Chainlink
     return <LiveSpotView cryptoSymbol={cryptoSymbol ?? ''} />
   }
-  if (cardKind === 'h2h_sport' && isLive && !marketSlug) {
+  if (cardKind === 'h2h_sport' && marketSlug) {
+    // Endpoint /sports dedicato: layout team affiancati + win probability +
+    // (per i live) score real-time. Funziona anche per partite future.
+    return (
+      <PolymarketEmbed marketSlug={marketSlug} kind="sports" liveActivity={isLive} height={420} />
+    )
+  }
+  if (cardKind === 'h2h_sport' && isLive) {
     return <LiveScoreStub />
   }
   if (cardKind === 'multi_outcome' && multiMarkets && multiMarkets.length > 0) {
     return <MultiLineChart markets={multiMarkets} />
   }
-  // Binary o h2h_sport (anche live se abbiamo slug): embed Polymarket
-  if ((cardKind === 'binary' || cardKind === 'h2h_sport') && marketSlug) {
+  // Binary: embed standard Polymarket
+  if (cardKind === 'binary' && marketSlug) {
     return <PolymarketEmbed marketSlug={marketSlug} liveActivity={isLive} />
   }
   // Fallback custom (multi_strike o cardKind senza slug)
