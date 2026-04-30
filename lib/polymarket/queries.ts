@@ -53,24 +53,49 @@ export async function fetchFeaturedEvents(
  * Ritorna fino a `limit` eventi attivi, ordinati per volume 24h.
  * Supporta `offset` per pagination server-side.
  */
+export interface EventsByTagOpts {
+  /** Default 100. */
+  limit?: number
+  /** Default 0. Pagination server-side. */
+  offset?: number
+  /**
+   * Doc Polymarket "Fetching Markets": include events di tag correlati
+   * (es. tag "Politics" → include anche "Trump", "Election" markets).
+   * Più copertura ma meno preciso. Default false.
+   */
+  relatedTags?: boolean
+  /**
+   * Esclude un tag specifico dai risultati (es. tag_slug='sports' +
+   * exclude='nfl' → tutti gli sport tranne NFL). Accetta tag_id
+   * numerico o slug.
+   */
+  excludeTag?: string
+}
+
 export async function fetchEventsByTag(
   tagSlug: string,
-  limit: number = 100,
-  offset: number = 0
+  limitOrOpts: number | EventsByTagOpts = 100,
+  offsetArg: number = 0
 ): Promise<GammaEvent[]> {
-  return gammaGet<GammaEvent[]>(
-    '/events',
-    {
-      tag_slug: tagSlug,
-      active: true,
-      closed: false,
-      order: 'volume24hr',
-      ascending: false,
-      limit,
-      offset,
-    },
-    { revalidate: 30 }
-  )
+  // Backward compat: chiamata con (tagSlug, limit, offset) numerica
+  // come prima OR con (tagSlug, opts) per il pattern nuovo con
+  // relatedTags/excludeTag.
+  const opts: EventsByTagOpts =
+    typeof limitOrOpts === 'number'
+      ? { limit: limitOrOpts, offset: offsetArg }
+      : limitOrOpts
+  const params: ParamRecord = {
+    tag_slug: tagSlug,
+    active: true,
+    closed: false,
+    order: 'volume24hr',
+    ascending: false,
+    limit: opts.limit ?? 100,
+    offset: opts.offset ?? 0,
+  }
+  if (opts.relatedTags) params.related_tags = true
+  if (opts.excludeTag) params.exclude_tag_id = opts.excludeTag
+  return gammaGet<GammaEvent[]>('/events', params, { revalidate: 30 })
 }
 
 /**
