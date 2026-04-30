@@ -118,17 +118,24 @@ export function MultiLineChart({ markets }: Props) {
   const width = 100
   const height = 60
 
-  const paths = useMemo(() => {
-    return series.map((s) => {
+  // Auto-scale Y: prendi min/max delle serie reali con padding 5%.
+  // Senza questo, una serie a 96% schiaccia le altre 4 in basso → illeggibile.
+  const { yMin, yMax, paths } = useMemo(() => {
+    const allPrices = series.flatMap((s) => s.points.map((p) => p.yes_price))
+    const min = allPrices.length > 0 ? Math.max(0, Math.min(...allPrices) - 0.05) : 0
+    const max = allPrices.length > 0 ? Math.min(1, Math.max(...allPrices) + 0.05) : 1
+    const range = max - min || 1
+    const built = series.map((s) => {
       const path = s.points
         .map((p, i) => {
           const x = (i / (s.points.length - 1)) * width
-          const y = height - p.yes_price * height
+          const y = height - ((p.yes_price - min) / range) * height
           return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`
         })
         .join(' ')
       return { label: s.label, color: s.color, d: path }
     })
+    return { yMin: min, yMax: max, paths: built }
   }, [series])
 
   const periodLabel = PERIOD_OPTIONS.find((o) => o.value === period)?.label ?? period.toUpperCase()
@@ -204,18 +211,22 @@ export function MultiLineChart({ markets }: Props) {
             role="img"
             aria-label="Multi-outcome probability chart"
           >
-            {[0, 0.25, 0.5, 0.75, 1].map((y) => (
-              <line
-                key={y}
-                x1={0}
-                y1={height - y * height}
-                x2={width}
-                y2={height - y * height}
-                stroke="var(--color-border-subtle)"
-                strokeWidth={0.2}
-                strokeDasharray="1,1"
-              />
-            ))}
+            {[0, 0.25, 0.5, 0.75, 1].map((y) => {
+              const yPos = height - ((y - yMin) / (yMax - yMin)) * height
+              if (yPos < 0 || yPos > height) return null
+              return (
+                <line
+                  key={y}
+                  x1={0}
+                  y1={yPos}
+                  x2={width}
+                  y2={yPos}
+                  stroke="var(--color-border-subtle)"
+                  strokeWidth={0.2}
+                  strokeDasharray="1,1"
+                />
+              )
+            })}
             {paths.map((p) => (
               <path
                 key={p.label}

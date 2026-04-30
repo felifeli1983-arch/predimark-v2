@@ -55,11 +55,11 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
+      "eslint --max-warnings=999",
+      "prettier --check"
     ],
     "*.{json,md,css}": [
-      "prettier --write"
+      "prettier --check"
     ]
   }
 }

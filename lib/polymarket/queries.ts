@@ -59,18 +59,24 @@ export async function fetchEventsByTag(
 }
 
 /**
- * Fetch eventi LIVE (active=true, closed=false), ordinati per volume.
- * Senza filtro tag — pesca attraverso TUTTE le categorie (crypto round, sport,
- * politics ecc) per mostrare ciò che si sta tradando proprio adesso.
+ * Fetch eventi LIVE (active=true, closed=false, end_date_min=NOW), ordinati per
+ * scadenza (i più imminenti prima). Pesca attraverso TUTTE le categorie:
+ * crypto round 5m/15m, sport in corso, politics, ecc.
+ *
+ * IMPORTANTE: il filtro `end_date_min=NOW` esclude rounds vecchi che Gamma
+ * lascia con `active=true` ma scaduti settimane fa. Senza questo, la home
+ * Live si riempiva di crypto round del 2025 che non sono live.
  */
 export async function fetchLiveEvents(limit: number = 100): Promise<GammaEvent[]> {
+  const nowIso = new Date().toISOString()
   return gammaGet<GammaEvent[]>(
     '/events',
     {
       active: true,
       closed: false,
-      order: 'volume24hr',
-      ascending: false,
+      end_date_min: nowIso,
+      order: 'endDate',
+      ascending: true,
       limit,
     },
     { revalidate: 15 }
