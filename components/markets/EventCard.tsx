@@ -38,13 +38,13 @@ const cardStyle: React.CSSProperties = {
 }
 
 export function EventCard({ event, onBookmark, badge }: EventCardProps) {
-  // Badge curato: bordo sx 1.5px (era 3px, troppo spesso) + micro-pill
-  // bottom-right. Border-left con esplicito 1.5px tramite outline negativo
-  // non funziona — usiamo box-shadow inset per ottenere ~half-pixel feel.
+  // Badge curato: bordo sx 1px sottile + micro-pill bottom-right.
+  // Era 3px (troppo), poi 2px, ora 1px → linea sottile come accent
+  // visivo ma non invadente.
   const styleWithBadge: React.CSSProperties = badge
     ? {
         ...cardStyle,
-        boxShadow: `inset 2px 0 0 0 ${badge.color}`,
+        boxShadow: `inset 1px 0 0 0 ${badge.color}`,
       }
     : cardStyle
   return (
