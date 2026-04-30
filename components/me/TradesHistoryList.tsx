@@ -2,13 +2,20 @@
 
 import { useEffect, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
-import { History, Download } from 'lucide-react'
+import { History, Download, Globe } from 'lucide-react'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { fetchTradesHistory, type TradeHistoryItem } from '@/lib/api/positions-client'
 import { TradeHistoryRow } from './TradeHistoryRow'
+import { OnchainTradesList } from './OnchainTradesList'
 
 type TypeFilter = 'all' | 'open' | 'close' | 'resolution'
 type PeriodFilter = 'today' | '7d' | '30d' | 'all'
+type SourceTab = 'auktora' | 'onchain'
+
+const SOURCE_TABS: Array<{ value: SourceTab; label: string; icon: typeof History }> = [
+  { value: 'auktora', label: 'Auktora trades', icon: History },
+  { value: 'onchain', label: 'On-chain Polymarket', icon: Globe },
+]
 
 const TYPE_TABS: Array<{ value: TypeFilter; label: string }> = [
   { value: 'all', label: 'Tutti' },
@@ -32,6 +39,7 @@ export function TradesHistoryList() {
   const [error, setError] = useState<string | null>(null)
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('30d')
+  const [sourceTab, setSourceTab] = useState<SourceTab>('auktora')
 
   useEffect(() => {
     if (!ready) return
@@ -98,58 +106,104 @@ export function TradesHistoryList() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {/* Source toggle: Auktora trades (DB) vs On-chain Polymarket (data-api) */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 8,
-          flexWrap: 'wrap',
+          gap: 6,
+          padding: 4,
+          background: 'var(--color-bg-secondary)',
+          border: '1px solid var(--color-border-subtle)',
+          borderRadius: 'var(--radius-md)',
+          width: 'fit-content',
         }}
       >
-        <FilterBar
-          typeFilter={typeFilter}
-          periodFilter={periodFilter}
-          onTypeChange={setTypeFilter}
-          onPeriodChange={setPeriodFilter}
-        />
-        {items.length > 0 && (
-          <button
-            type="button"
-            onClick={exportCsv}
-            aria-label="Export CSV"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '6px 12px',
-              background: 'var(--color-bg-tertiary)',
-              border: '1px solid var(--color-border-subtle)',
-              borderRadius: 'var(--radius-md)',
-              color: 'var(--color-text-secondary)',
-              fontSize: 'var(--font-xs)',
-              cursor: 'pointer',
-            }}
-          >
-            <Download size={12} /> Export CSV
-          </button>
-        )}
+        {SOURCE_TABS.map(({ value, label, icon: Icon }) => {
+          const active = sourceTab === value
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setSourceTab(value)}
+              style={{
+                padding: '6px 12px',
+                background: active ? 'var(--color-bg-tertiary)' : 'transparent',
+                color: active ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: 'var(--font-sm)',
+                fontWeight: active ? 700 : 500,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+              }}
+            >
+              <Icon size={12} />
+              {label}
+            </button>
+          )
+        })}
       </div>
 
-      {error ? (
-        <p style={{ color: 'var(--color-danger)', fontSize: 'var(--font-base)' }}>{error}</p>
-      ) : loading ? (
-        <SkeletonList />
-      ) : items.length === 0 ? (
-        <EmptyState />
+      {sourceTab === 'auktora' ? (
+        <>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 8,
+              flexWrap: 'wrap',
+            }}
+          >
+            <FilterBar
+              typeFilter={typeFilter}
+              periodFilter={periodFilter}
+              onTypeChange={setTypeFilter}
+              onPeriodChange={setPeriodFilter}
+            />
+            {items.length > 0 && (
+              <button
+                type="button"
+                onClick={exportCsv}
+                aria-label="Export CSV"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '6px 12px',
+                  background: 'var(--color-bg-tertiary)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--color-text-secondary)',
+                  fontSize: 'var(--font-xs)',
+                  cursor: 'pointer',
+                }}
+              >
+                <Download size={12} /> Export CSV
+              </button>
+            )}
+          </div>
+
+          {error ? (
+            <p style={{ color: 'var(--color-danger)', fontSize: 'var(--font-base)' }}>{error}</p>
+          ) : loading ? (
+            <SkeletonList />
+          ) : items.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 8 }}>
+              {items.map((t) => (
+                <li key={t.id}>
+                  <TradeHistoryRow trade={t} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       ) : (
-        <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 8 }}>
-          {items.map((t) => (
-            <li key={t.id}>
-              <TradeHistoryRow trade={t} />
-            </li>
-          ))}
-        </ul>
+        <OnchainTradesList />
       )}
     </div>
   )
