@@ -46,6 +46,10 @@ export function MultiLineChart({ markets }: Props) {
   const [series, setSeries] = useState<SeriesData[]>([])
   const [loading, setLoading] = useState(true)
   const [liveConnected, setLiveConnected] = useState(false)
+  // Set di label da NASCONDERE. Click sulla legenda per toggle.
+  // Permette di escludere una serie dominante (es. "No change" 96%) per
+  // vedere meglio la dinamica delle altre 4 minori.
+  const [hidden, setHidden] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (markets.length === 0) return
@@ -118,25 +122,38 @@ export function MultiLineChart({ markets }: Props) {
   const width = 100
   const height = 60
 
-  // Auto-scale Y: prendi min/max delle serie reali con padding 5%.
-  // Senza questo, una serie a 96% schiaccia le altre 4 in basso → illeggibile.
+  // Auto-scale Y: prendi min/max SOLO delle serie visibili (escludi hidden)
+  // con padding 5%. Hidden serie escluse dal calcolo range → escludendo il
+  // dominante, le minori si espandono e diventano leggibili.
   const { yMin, yMax, paths } = useMemo(() => {
-    const allPrices = series.flatMap((s) => s.points.map((p) => p.yes_price))
+    const visibleSeries = series.filter((s) => !hidden.has(s.label))
+    const allPrices = visibleSeries.flatMap((s) => s.points.map((p) => p.yes_price))
     const min = allPrices.length > 0 ? Math.max(0, Math.min(...allPrices) - 0.05) : 0
     const max = allPrices.length > 0 ? Math.min(1, Math.max(...allPrices) + 0.05) : 1
     const range = max - min || 1
-    const built = series.map((s) => {
-      const path = s.points
-        .map((p, i) => {
-          const x = (i / (s.points.length - 1)) * width
-          const y = height - ((p.yes_price - min) / range) * height
-          return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`
-        })
-        .join(' ')
-      return { label: s.label, color: s.color, d: path }
-    })
+    const built = series
+      .filter((s) => !hidden.has(s.label))
+      .map((s) => {
+        const path = s.points
+          .map((p, i) => {
+            const x = (i / (s.points.length - 1)) * width
+            const y = height - ((p.yes_price - min) / range) * height
+            return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`
+          })
+          .join(' ')
+        return { label: s.label, color: s.color, d: path }
+      })
     return { yMin: min, yMax: max, paths: built }
-  }, [series])
+  }, [series, hidden])
+
+  function toggleSeries(label: string) {
+    setHidden((prev) => {
+      const next = new Set(prev)
+      if (next.has(label)) next.delete(label)
+      else next.add(label)
+      return next
+    })
+  }
 
   const periodLabel = PERIOD_OPTIONS.find((o) => o.value === period)?.label ?? period.toUpperCase()
 
@@ -207,7 +224,7 @@ export function MultiLineChart({ markets }: Props) {
           <svg
             viewBox={`0 0 ${width} ${height}`}
             preserveAspectRatio="none"
-            style={{ width: '100%', height: 120 }}
+            style={{ width: '100%', height: 320, display: 'block' }}
             role="img"
             aria-label="Multi-outcome probability chart"
           >
@@ -243,21 +260,32 @@ export function MultiLineChart({ markets }: Props) {
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: 'var(--space-2)',
-              marginTop: 4,
+              gap: 'var(--space-3)',
+              marginTop: 8,
             }}
           >
             {series.map((s) => {
               const last = s.points[s.points.length - 1]?.yes_price ?? 0
+              const isHidden = hidden.has(s.label)
               return (
-                <span
+                <button
                   key={s.label}
+                  type="button"
+                  onClick={() => toggleSeries(s.label)}
+                  title={isHidden ? 'Mostra serie' : 'Nascondi serie (auto-zoom)'}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 4,
+                    gap: 6,
+                    padding: '4px 8px',
+                    background: 'var(--color-bg-tertiary)',
+                    border: 'none',
+                    borderRadius: 'var(--radius-sm)',
                     fontSize: 'var(--font-xs)',
                     color: 'var(--color-text-secondary)',
+                    cursor: 'pointer',
+                    opacity: isHidden ? 0.4 : 1,
+                    textDecoration: isHidden ? 'line-through' : 'none',
                   }}
                 >
                   <span
@@ -271,7 +299,7 @@ export function MultiLineChart({ markets }: Props) {
                   />
                   <span
                     style={{
-                      maxWidth: 120,
+                      maxWidth: 140,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -282,7 +310,7 @@ export function MultiLineChart({ markets }: Props) {
                   <span style={{ color: s.color, fontWeight: 700 }}>
                     {(last * 100).toFixed(0)}%
                   </span>
-                </span>
+                </button>
               )
             })}
           </div>

@@ -183,7 +183,7 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
         <svg
           viewBox={`0 0 ${chartData.width} ${chartData.height}`}
           preserveAspectRatio="none"
-          style={{ width: '100%', height: 120 }}
+          style={{ width: '100%', height: 320, display: 'block' }}
           role="img"
           aria-label="Probability history chart"
         >

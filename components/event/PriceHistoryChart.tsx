@@ -105,13 +105,13 @@ function LiveSpotView({ cryptoSymbol }: { cryptoSymbol: string }) {
       </div>
 
       {!cryptoSymbol ? (
-        <CenteredBox>
+        <CenteredBox height={140}>
           <span style={{ fontSize: 'var(--font-sm)', color: 'var(--color-text-muted)' }}>
             Asset non riconosciuto per questo evento.
           </span>
         </CenteredBox>
       ) : loading && !connected ? (
-        <CenteredBox>
+        <CenteredBox height={140}>
           <Loader2
             size={20}
             className="animate-spin"
@@ -135,7 +135,7 @@ function LiveScoreStub() {
         <Activity size={12} style={{ display: 'inline', marginRight: 4 }} />
         Score live
       </SectionTitle>
-      <CenteredBox>
+      <CenteredBox height={180}>
         <span
           style={{
             fontSize: 'var(--font-sm)',

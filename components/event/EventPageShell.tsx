@@ -16,7 +16,8 @@ import { EventTradeBoot } from './EventTradeBoot'
 import { SignalBanner } from './SignalBanner'
 import { PriceHistoryChart } from './PriceHistoryChart'
 import { CryptoRoundNav } from './CryptoRoundNav'
-import { OrderBookExpander } from './OrderBookExpander'
+// OrderBookExpander rimosso: ogni outcome row ha già il proprio orderbook
+// collassabile, l'expander globale era ridondante.
 import { SentimentCard } from './SentimentCard'
 import { RelatedMarkets } from './RelatedMarkets'
 
@@ -149,9 +150,6 @@ export function EventPageShell({ event }: Props) {
           )}
           {event.kind === 'crypto_up_down' && event.seriesSlug && (
             <CryptoRoundNav seriesSlug={event.seriesSlug} currentSlug={event.slug} />
-          )}
-          {event.markets[0]?.clobTokenIds?.[0] && (
-            <OrderBookExpander assetId={event.markets[0].clobTokenIds[0]} />
           )}
           <EventProbabilities event={event} onTrade={openTradeWidget} />
           <EventRules description={event.description} />

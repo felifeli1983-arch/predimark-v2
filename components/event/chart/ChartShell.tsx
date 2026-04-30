@@ -53,11 +53,17 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function CenteredBox({ children }: { children: React.ReactNode }) {
+export function CenteredBox({
+  children,
+  height = 320,
+}: {
+  children: React.ReactNode
+  height?: number
+}) {
   return (
     <div
       style={{
-        height: 120,
+        height,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
