@@ -8,11 +8,8 @@ import { fetchEventById } from '@/lib/polymarket/queries'
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
-import { useLiveActivity } from '@/lib/ws/hooks/useLiveActivity'
 import { EventCardHeader } from '../EventCardHeader'
-import { EventCardFooter } from '../EventCardFooter'
 import { StarToggle } from '../StarToggle'
-import { Thermometer } from '../charts/Thermometer'
 
 interface Props {
   event: AuktoraEvent
@@ -21,6 +18,8 @@ interface Props {
 
 const SHORT_ROUND_MS = 30 * 60 * 1000 // ≤30min → Chainlink, oltre → Binance
 const REFRESH_INTERVAL_MS = 30_000
+const URGENT_COUNTDOWN_S = 30 // <30s → countdown rosso pulsante
+const WARN_COUNTDOWN_S = 120 // <2min → warning ambra
 
 const SYMBOL_HINTS: Array<[RegExp, string]> = [
   [/\b(btc|bitcoin)\b/i, 'btcusdt'],
@@ -36,54 +35,39 @@ function extractSymbol(slug: string, title: string): string | null {
   return null
 }
 
-const TARGET_RX = /\$?([\d,]+(?:\.\d+)?)\s*([kKmMbB])?/
-
-function extractTargetPrice(label: string): number | null {
-  if (!label) return null
-  const m = label.match(TARGET_RX)
-  if (!m || !m[1]) return null
-  const num = parseFloat(m[1].replace(/,/g, ''))
-  if (!Number.isFinite(num)) return null
-  const suffix = m[2]?.toLowerCase()
-  if (suffix === 'k') return num * 1_000
-  if (suffix === 'm') return num * 1_000_000
-  if (suffix === 'b') return num * 1_000_000_000
-  return num
-}
-
-function formatUsd(n: number | null): string {
+function formatUsd(n: number | null, decimals: number = 2): string {
   if (n === null || !Number.isFinite(n)) return '—'
-  return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return `$${n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`
 }
 
+/**
+ * Crypto round card — design pulito, niente Thermometer/Battere/volume.
+ * Layout (260px height fissa, come tutte le card):
+ *  - Header standard (icon + title + LIVE + star)
+ *  - Body: live price compatto + probability bar Up/Down + 2 buttons
+ *  - Footer custom: countdown prominente con colore adattivo (verde→ambra→rosso)
+ */
 export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
   const [event, setEvent] = useState(initialEvent)
   const router = useRouter()
   const market = event.markets[0]
   const symbol = extractSymbol(event.slug, event.title)
-  const target = extractTargetPrice(market?.question ?? event.title)
 
-  // Source selection: durata residua <=30min → Chainlink (più affidabile per round brevi),
-  // oltre → Binance. Date.now() è impuro per definizione, ma qui serve una sola decisione
-  // di quale topic WS aprire — non causa render instabili perché la dep è solo endDate.
   const source = useMemo<'chainlink' | 'binance'>(() => {
     // eslint-disable-next-line react-hooks/purity
     const remainingMs = event.endDate.getTime() - Date.now()
     return remainingMs > 0 && remainingMs <= SHORT_ROUND_MS ? 'chainlink' : 'binance'
   }, [event.endDate])
 
-  const { price: livePrice } = useCryptoLivePrice(symbol ?? '', source)
+  const { price: livePrice, change24h } = useCryptoLivePrice(symbol ?? '', source)
   const { midpoint: upMidpoint } = useLiveMidpoint(market?.clobTokenIds?.[0] ?? null)
-  const activity = useLiveActivity({ marketId: market?.id, limit: 1 })
-  const { display: countdownText, expired } = useCountdown(event.endDate)
+  const { display: countdownText, expired, secondsLeft } = useCountdown(event.endDate)
 
-  // Probabilità live: se WS non connesso → fallback a yesPrice statico
   const upProb = upMidpoint ?? market?.yesPrice ?? 0.5
   const downProb = 1 - upProb
   const upPct = Math.round(upProb * 100)
   const downPct = Math.round(downProb * 100)
 
-  // Auto-refresh round ogni 30s
   useEffect(() => {
     const id = setInterval(async () => {
       try {
@@ -97,8 +81,17 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
   }, [event.id])
 
   const isLive = !expired && event.active
-  const lastTrade = activity[0]
-  const livePriceDelta = livePrice !== null && target !== null ? livePrice - target : null
+
+  // Countdown urgency: <30s rosso pulsante, <2min ambra, altrimenti muted.
+  // Usa `secondsLeft` dal hook (già stateful) invece di Date.now() impuro.
+  const countdownColor = expired
+    ? 'var(--color-text-muted)'
+    : secondsLeft < URGENT_COUNTDOWN_S
+      ? 'var(--color-danger)'
+      : secondsLeft < WARN_COUNTDOWN_S
+        ? 'var(--color-warning)'
+        : 'var(--color-text-secondary)'
+  const countdownPulse = !expired && secondsLeft < URGENT_COUNTDOWN_S
 
   function navigateToEvent(side: 'up' | 'down') {
     if (!market) return
@@ -134,168 +127,170 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
 
       <div
         style={{
-          padding: '8px 12px',
+          padding: '4px 12px 8px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 6,
+          gap: 8,
           flex: 1,
           minHeight: 0,
           overflow: 'hidden',
+          justifyContent: 'space-between',
         }}
       >
-        <div style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0 }}>
-          {/* Sezione sinistra: prezzi + bottoni */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
-            {/* Prezzo target */}
-            <div style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-muted)' }}>
-              Battere:{' '}
-              <strong
-                style={{ color: 'var(--color-text-primary)', fontVariantNumeric: 'tabular-nums' }}
-              >
-                {formatUsd(target)}
-              </strong>
-            </div>
-
-            {/* Prezzo live + delta */}
-            <div
-              style={{
-                fontSize: 'var(--font-base)',
-                fontWeight: 600,
-                color: 'var(--color-text-primary)',
-                fontVariantNumeric: 'tabular-nums',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              {formatUsd(livePrice)}
-              {livePriceDelta !== null && (
-                <span
-                  style={{
-                    fontSize: 'var(--font-xs)',
-                    fontWeight: 600,
-                    color: livePriceDelta >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
-                  }}
-                >
-                  {livePriceDelta >= 0 ? '↗' : '↘'} {livePriceDelta >= 0 ? '+' : ''}
-                  {livePriceDelta.toFixed(2)}
-                </span>
-              )}
-            </div>
-
-            {/* Bottoni Up/Down */}
-            <div style={{ display: 'flex', gap: 6 }}>
-              <ActionButton
-                label="Up"
-                icon={<TrendingUp size={11} />}
-                percent={upPct}
-                variant="up"
-                lastAmount={lastTrade?.side === 'BUY' ? lastTrade.amount : null}
-                onClick={() => navigateToEvent('up')}
-              />
-              <ActionButton
-                label="Down"
-                icon={<TrendingDown size={11} />}
-                percent={downPct}
-                variant="down"
-                lastAmount={lastTrade?.side === 'SELL' ? lastTrade.amount : null}
-                onClick={() => navigateToEvent('down')}
-              />
-            </div>
-          </div>
-
-          {/* Sezione destra: termometro */}
-          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-            <Thermometer upProbability={upProb} />
-          </div>
-        </div>
-
-        {/* Countdown — dentro il body, senza divider proprio */}
+        {/* Live price + delta 24h (compatto, riga unica) */}
         <div
           style={{
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'baseline',
             gap: 6,
-            fontSize: 'var(--font-xs)',
-            color: expired ? 'var(--color-danger)' : 'var(--color-text-muted)',
             fontVariantNumeric: 'tabular-nums',
-            flexShrink: 0,
           }}
         >
-          <Clock size={10} />
-          {expired ? 'Round terminato' : `Round termina in ${countdownText}`}
+          <span
+            style={{
+              fontSize: 'var(--font-lg)',
+              fontWeight: 700,
+              color: 'var(--color-text-primary)',
+              lineHeight: 1,
+            }}
+          >
+            {livePrice !== null ? formatUsd(livePrice, livePrice >= 1000 ? 0 : 2) : '—'}
+          </span>
+          {change24h !== null && Number.isFinite(change24h) && (
+            <span
+              style={{
+                fontSize: 'var(--font-xs)',
+                fontWeight: 600,
+                color: change24h >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
+              }}
+            >
+              {change24h >= 0 ? '↗' : '↘'} {change24h >= 0 ? '+' : ''}
+              {change24h.toFixed(2)}%
+            </span>
+          )}
+        </div>
+
+        {/* Probability bar Up/Down + Up/Down buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div
+            style={{
+              display: 'flex',
+              height: 4,
+              borderRadius: 2,
+              overflow: 'hidden',
+              background: 'var(--color-bg-tertiary)',
+            }}
+          >
+            <div
+              style={{
+                width: `${upPct}%`,
+                background: 'var(--color-success)',
+                transition: 'width 200ms',
+              }}
+            />
+            <div
+              style={{
+                width: `${downPct}%`,
+                background: 'var(--color-danger)',
+                transition: 'width 200ms',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              type="button"
+              className="btn-trade btn-trade-up"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                navigateToEvent('up')
+              }}
+              style={{
+                flex: 1,
+                padding: '8px 4px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-base)',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                cursor: 'pointer',
+              }}
+            >
+              <TrendingUp size={13} /> Up {upPct}%
+            </button>
+            <button
+              type="button"
+              className="btn-trade btn-trade-down"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                navigateToEvent('down')
+              }}
+              style={{
+                flex: 1,
+                padding: '8px 4px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-base)',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                cursor: 'pointer',
+              }}
+            >
+              <TrendingDown size={13} /> Down {downPct}%
+            </button>
+          </div>
         </div>
       </div>
 
-      <EventCardFooter volume={event.totalVolume} endDate={event.endDate} />
-    </div>
-  )
-}
-
-function ActionButton({
-  label,
-  icon,
-  percent,
-  variant,
-  lastAmount,
-  onClick,
-}: {
-  label: string
-  icon: React.ReactNode
-  percent: number
-  variant: 'up' | 'down'
-  lastAmount: number | null
-  onClick?: () => void
-}) {
-  const isUp = variant === 'up'
-  return (
-    <button
-      type="button"
-      className={`btn-trade ${isUp ? 'btn-trade-up' : 'btn-trade-down'}`}
-      onClick={(e) => {
-        if (!onClick) return
-        e.preventDefault()
-        e.stopPropagation()
-        onClick()
-      }}
-      style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 2,
-        padding: '6px 4px',
-        borderRadius: 'var(--radius-md)',
-        cursor: onClick ? 'pointer' : 'default',
-      }}
-    >
-      <span
+      {/* Footer custom: countdown prominente — sostituisce il volume,
+          irrilevante per round 5m che hanno sempre $0. */}
+      <div
         style={{
-          display: 'inline-flex',
+          display: 'flex',
           alignItems: 'center',
-          gap: 4,
-          fontSize: 'var(--font-xs)',
-          fontWeight: 700,
+          justifyContent: 'space-between',
+          padding: '8px 12px',
+          borderTop: '1px solid var(--color-border-subtle)',
+          marginTop: 'auto',
+          flexShrink: 0,
+          gap: 8,
         }}
       >
-        {icon}
-        {label} {percent}%
-      </span>
-      {lastAmount !== null && (
         <span
-          key={lastAmount}
-          className="live-dot"
           style={{
-            fontSize: 'var(--font-xs)',
-            fontWeight: 600,
-            color: isUp ? 'var(--color-success)' : 'var(--color-danger)',
-            opacity: 0.85,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 'var(--font-sm)',
+            fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
+            color: countdownColor,
           }}
+          className={countdownPulse ? 'live-dot' : undefined}
         >
-          {isUp ? '+' : ''}${lastAmount.toFixed(0)} {isUp ? '↗' : '↘'}
+          <Clock size={12} />
+          {expired ? 'Round terminato' : countdownText}
         </span>
-      )}
-    </button>
+        {symbol && (
+          <span
+            style={{
+              fontSize: 'var(--font-xs)',
+              color: 'var(--color-text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              fontWeight: 600,
+            }}
+          >
+            {symbol.replace('usdt', '').toUpperCase()}
+          </span>
+        )}
+      </div>
+    </div>
   )
 }
