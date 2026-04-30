@@ -230,7 +230,7 @@ export function MultiLineChart({ markets }: Props) {
       ) : (
         <>
           {/* Chart area con SVG + overlay HTML per label */}
-          <div style={{ position: 'relative', width: '100%' }}>
+          <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
             <div
               style={{
                 position: 'relative',
@@ -344,12 +344,23 @@ export function MultiLineChart({ markets }: Props) {
 
               {/* End-of-line labels — "Spain 15.5%" allineato a destra
                   in corrispondenza dell'ultimo punto */}
-              <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 90 }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 90,
+                  pointerEvents: 'none',
+                }}
+              >
                 {paths.map((p) => {
                   const s = series.find((x) => x.label === p.label)
                   if (!s) return null
                   const last = s.points[s.points.length - 1]?.yes_price ?? 0
-                  const topPct = (1 - (last - yMin) / (yMax - yMin)) * 100
+                  const rawTopPct = (1 - (last - yMin) / (yMax - yMin)) * 100
+                  // Clamp [2, 92] per non far uscire le label sopra/sotto il chart
+                  const topPct = Math.max(2, Math.min(92, rawTopPct))
                   return (
                     <div
                       key={p.label}

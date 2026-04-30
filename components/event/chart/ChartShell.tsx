@@ -115,9 +115,11 @@ export function useChartHover(): {
 }
 
 /**
- * Pulsing dot SVG keyframe. Da inserire come `<PulsingDot cx={...} cy={...}
- * fill="..." />` dentro un SVG. Doppia animazione: cerchio interno fisso,
- * alone esterno che si espande+fade.
+ * Pulsing dot SVG con animazione native `<animate>` su `r` (radius).
+ * Cresce da cx/cy senza problemi di transformBox/transformOrigin
+ * (CSS transforms su <circle> in SVG con preserveAspectRatio="none"
+ * scalano dal corner del viewBox, non dal centro del cerchio → bug
+ * "wrap dal basso all'alto" che vedeva l'utente).
  */
 export function PulsingDot({
   cx,
@@ -132,18 +134,15 @@ export function PulsingDot({
 }) {
   return (
     <g>
-      <circle
-        cx={cx}
-        cy={cy}
-        r={radius * 2.5}
-        fill={color}
-        opacity={0.35}
-        style={{
-          animation: 'auktora-chart-pulse 1.6s ease-out infinite',
-          transformOrigin: `${cx}px ${cy}px`,
-          transformBox: 'fill-box',
-        }}
-      />
+      <circle cx={cx} cy={cy} r={radius * 2.5} fill={color} opacity={0}>
+        <animate
+          attributeName="r"
+          values={`${radius};${radius * 3}`}
+          dur="1.6s"
+          repeatCount="indefinite"
+        />
+        <animate attributeName="opacity" values="0.55;0" dur="1.6s" repeatCount="indefinite" />
+      </circle>
       <circle cx={cx} cy={cy} r={radius} fill={color} />
     </g>
   )

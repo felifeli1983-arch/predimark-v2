@@ -208,7 +208,7 @@ export function HistoryChart({ marketId, showBothLines = false }: Props) {
           </span>
         </CenteredBox>
       ) : (
-        <div style={{ position: 'relative', width: '100%' }}>
+        <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
           <div
             style={{
               position: 'relative',
@@ -391,7 +391,9 @@ function EndLabel({
   label: string
 }) {
   const flash = useFlashOnChange(Math.round(value * 1000))
-  const topPct = (1 - (value - yMin) / (yMax - yMin)) * 100
+  // Clamp topPct in [2, 92] per evitare label che escono sopra/sotto al chart
+  const rawTopPct = (1 - (value - yMin) / (yMax - yMin)) * 100
+  const topPct = Math.max(2, Math.min(92, rawTopPct))
   return (
     <div
       style={{

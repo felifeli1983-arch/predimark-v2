@@ -174,7 +174,10 @@ export function CryptoCandleChart({ symbol }: Props) {
         </div>
       ) : (
         <>
-          <div style={{ position: 'relative', cursor: 'crosshair' }} {...hover.bind}>
+          <div
+            style={{ position: 'relative', cursor: 'crosshair', overflow: 'hidden' }}
+            {...hover.bind}
+          >
             <svg
               viewBox={`0 0 ${chart.width} ${chart.height}`}
               preserveAspectRatio="none"
