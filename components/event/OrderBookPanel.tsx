@@ -14,8 +14,13 @@ interface Props {
  */
 export function OrderBookPanel({ assetId }: Props) {
   const book = useLiveOrderbook(assetId)
-  const topBids = book.bids.slice(0, 5)
-  const topAsks = book.asks.slice(0, 5).reverse() // ask più alto in alto
+  // Polymarket book API: bids ordinati ASC (peggio→meglio) e asks DESC
+  // (peggio→meglio). Il BEST level è sempre l'ultimo (index -1) dell'array.
+  // slice(0, 5) prendeva i 5 PEGGIORI → spread fittizio enorme (es. 98¢ su
+  // market a 34%). Fix: slice(-5) per i 5 migliori, poi reverse i bids per
+  // mostrare best in alto vicino al divider spread.
+  const topAsks = book.asks.slice(-5) // [worst-of-5, ..., best] — best in basso
+  const topBids = book.bids.slice(-5).reverse() // [best, ..., worst-of-5] — best in alto
 
   if (!assetId) {
     return (
