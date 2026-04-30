@@ -3,9 +3,21 @@ interface DonutChartProps {
   size?: number
   strokeWidth?: number
   color?: string
+  /**
+   * Etichette outcome custom — default ["Yes", "No"]. Es. ["Up", "Down"]
+   * per crypto round, ["Spain","Other"] per multi-outcome focused, ecc.
+   * `labels[0]` mostrato quando probability ≥ 0.5, `labels[1]` altrimenti.
+   */
+  labels?: [string, string]
 }
 
-export function DonutChart({ probability, size = 80, strokeWidth = 10, color }: DonutChartProps) {
+export function DonutChart({
+  probability,
+  size = 80,
+  strokeWidth = 10,
+  color,
+  labels = ['Yes', 'No'],
+}: DonutChartProps) {
   const clamped = Math.max(0, Math.min(1, probability))
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
@@ -15,7 +27,7 @@ export function DonutChart({ probability, size = 80, strokeWidth = 10, color }: 
   const isYes = clamped >= 0.5
   const arcColor = color ?? (isYes ? 'var(--color-success)' : 'var(--color-danger)')
   const labelColor = arcColor
-  const label = isYes ? 'Yes' : 'No'
+  const label = isYes ? labels[0] : labels[1]
   const percent = Math.round(clamped * 100)
 
   // Font ridotti di 2 punti per evitare che debordino dal cerchio

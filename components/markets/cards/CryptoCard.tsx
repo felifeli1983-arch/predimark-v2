@@ -8,7 +8,7 @@ import { fetchEventById, fetchNextRoundInSeries } from '@/lib/polymarket/queries
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
-import { MiniSparkline } from '../charts/MiniSparkline'
+import { DonutChart } from '../charts/DonutChart'
 import { EventCardHeader } from '../EventCardHeader'
 import { StarToggle } from '../StarToggle'
 
@@ -168,77 +168,60 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
           justifyContent: 'space-between',
         }}
       >
-        {/* Live price + delta 24h (compatto, riga unica) */}
+        {/* Top row: live price+delta24h a sx, donut chart Up% a dx.
+            Donut design ispirato Polymarket reale — focal point della
+            card che cambia colore (verde se Up>50%, rosso altrimenti)
+            e ticchetta in real-time via WS midpoint subscription. */}
         <div
           style={{
             display: 'flex',
-            alignItems: 'baseline',
-            gap: 6,
-            fontVariantNumeric: 'tabular-nums',
+            alignItems: 'center',
+            gap: 12,
           }}
         >
-          <span
-            style={{
-              fontSize: 'var(--font-lg)',
-              fontWeight: 700,
-              color: 'var(--color-text-primary)',
-              lineHeight: 1,
-            }}
-          >
-            {livePrice !== null ? formatUsd(livePrice, livePrice >= 1000 ? 0 : 2) : '—'}
-          </span>
-          {change24h !== null && Number.isFinite(change24h) && (
-            <span
-              style={{
-                fontSize: 'var(--font-xs)',
-                fontWeight: 600,
-                color: change24h >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
-              }}
-            >
-              {change24h >= 0 ? '↗' : '↘'} {change24h >= 0 ? '+' : ''}
-              {change24h.toFixed(2)}%
-            </span>
-          )}
-          {/* Mini sparkline 1h della Up probability — mostra la direzione
-              del trade flow live, complementare al delta 24h del prezzo
-              crypto. Lazy via IntersectionObserver. */}
-          <div style={{ flex: 1, minWidth: 0, marginLeft: 'auto' }}>
-            <MiniSparkline
-              tokenId={market?.clobTokenIds?.[0]}
-              period="1h"
-              width={120}
-              height={28}
-            />
-          </div>
-        </div>
-
-        {/* Probability bar Up/Down + Up/Down buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div
             style={{
+              flex: 1,
+              minWidth: 0,
               display: 'flex',
-              height: 4,
-              borderRadius: 2,
-              overflow: 'hidden',
-              background: 'var(--color-bg-tertiary)',
+              flexDirection: 'column',
+              gap: 2,
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
-            <div
+            <span
               style={{
-                width: `${upPct}%`,
-                background: 'var(--color-success)',
-                transition: 'width 200ms',
+                fontSize: 'var(--font-lg)',
+                fontWeight: 700,
+                color: 'var(--color-text-primary)',
+                lineHeight: 1,
               }}
-            />
-            <div
-              style={{
-                width: `${downPct}%`,
-                background: 'var(--color-danger)',
-                transition: 'width 200ms',
-              }}
-            />
+            >
+              {livePrice !== null ? formatUsd(livePrice, livePrice >= 1000 ? 0 : 2) : '—'}
+            </span>
+            {change24h !== null && Number.isFinite(change24h) && (
+              <span
+                style={{
+                  fontSize: 'var(--font-xs)',
+                  fontWeight: 600,
+                  color: change24h >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
+                }}
+              >
+                {change24h >= 0 ? '↗' : '↘'} {change24h >= 0 ? '+' : ''}
+                {change24h.toFixed(2)}% 24h
+              </span>
+            )}
           </div>
+          <DonutChart
+            probability={upProb}
+            size={64}
+            strokeWidth={7}
+            labels={['Up', 'Down']}
+          />
+        </div>
 
+        {/* Up/Down buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', gap: 6 }}>
             <button
               type="button"
