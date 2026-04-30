@@ -8,6 +8,7 @@ import { fetchEventById, fetchNextRoundInSeries } from '@/lib/polymarket/queries
 import { useCountdown } from '@/lib/hooks/useCountdown'
 import { useCryptoLivePrice } from '@/lib/ws/hooks/useCryptoLivePrice'
 import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
+import { fetchReferencePrice } from '@/lib/crypto/reference-price'
 import { DonutChart } from '../charts/DonutChart'
 import { EventCardHeader } from '../EventCardHeader'
 import { StarToggle } from '../StarToggle'
@@ -65,10 +66,31 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
   const { midpoint: upMidpoint } = useLiveMidpoint(market?.clobTokenIds?.[0] ?? null)
   const { display: countdownText, expired, secondsLeft } = useCountdown(event.endDate)
 
+  // "Prezzo da battere" — snapshot Chainlink/Binance al round.startDate.
+  // Cached module-level perché non cambia mai per un round dato.
+  const [referencePrice, setReferencePrice] = useState<number | null>(null)
+  useEffect(() => {
+    if (!symbol || !event.startDate) return
+    let cancelled = false
+    void fetchReferencePrice(symbol, event.startDate).then((p) => {
+      if (!cancelled && p !== null) setReferencePrice(p)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [symbol, event.startDate])
+
   const upProb = upMidpoint ?? market?.yesPrice ?? 0.5
   const downProb = 1 - upProb
   const upPct = Math.round(upProb * 100)
   const downPct = Math.round(downProb * 100)
+  // Delta vs reference (gain/loss del prezzo crypto rispetto allo
+  // snapshot di apertura round). Più rilevante del delta 24h per round
+  // brevi, perché dice "siamo sopra/sotto il punto di pareggio".
+  const referenceDelta =
+    livePrice !== null && referencePrice !== null
+      ? ((livePrice - referencePrice) / referencePrice) * 100
+      : null
 
   // Polling refresh dello STESSO round mentre è attivo — cattura
   // closed=true / acceptingOrders=false / lastTradePrice changes che il
@@ -189,6 +211,7 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
               fontVariantNumeric: 'tabular-nums',
             }}
           >
+            {/* Live price + delta vs reference (round-start snapshot) */}
             <span
               style={{
                 fontSize: 'var(--font-lg)',
@@ -199,7 +222,18 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
             >
               {livePrice !== null ? formatUsd(livePrice, livePrice >= 1000 ? 0 : 2) : '—'}
             </span>
-            {change24h !== null && Number.isFinite(change24h) && (
+            {referenceDelta !== null ? (
+              <span
+                style={{
+                  fontSize: 'var(--font-xs)',
+                  fontWeight: 600,
+                  color: referenceDelta >= 0 ? 'var(--color-success)' : 'var(--color-danger)',
+                }}
+              >
+                {referenceDelta >= 0 ? '↗' : '↘'} {referenceDelta >= 0 ? '+' : ''}
+                {referenceDelta.toFixed(2)}% vs round
+              </span>
+            ) : change24h !== null && Number.isFinite(change24h) ? (
               <span
                 style={{
                   fontSize: 'var(--font-xs)',
@@ -209,6 +243,21 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
               >
                 {change24h >= 0 ? '↗' : '↘'} {change24h >= 0 ? '+' : ''}
                 {change24h.toFixed(2)}% 24h
+              </span>
+            ) : null}
+            {/* Prezzo da battere = snapshot Chainlink al round start */}
+            {referencePrice !== null && (
+              <span
+                style={{
+                  fontSize: 9,
+                  color: 'var(--color-text-muted)',
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                  fontWeight: 600,
+                }}
+                title="Prezzo Chainlink al round start — battere questo per vincere Up"
+              >
+                Battere {formatUsd(referencePrice, referencePrice >= 1000 ? 0 : 2)}
               </span>
             )}
           </div>

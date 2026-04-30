@@ -34,6 +34,8 @@ export interface AuktoraMarket {
   outcomes: AuktoraOutcome[]
   volume: number
   liquidity: number
+  /** Inizio del market — per crypto round = momento dello snapshot Chainlink. */
+  startDate: Date
   endDate: Date
   active: boolean
   closed: boolean
@@ -82,6 +84,8 @@ export interface AuktoraEvent {
   description: string
   image: string
   icon: string
+  /** Inizio evento — per crypto round = momento snapshot Chainlink. */
+  startDate: Date
   endDate: Date
   active: boolean
   closed: boolean
@@ -200,6 +204,7 @@ export function mapGammaMarket(raw: GammaMarket): AuktoraMarket {
     outcomes,
     volume: parseFloat(raw.volume) || 0,
     liquidity: parseFloat(raw.liquidity) || 0,
+    startDate: new Date(raw.startDate),
     endDate: new Date(raw.endDate),
     active: raw.active,
     closed: raw.closed,
@@ -221,6 +226,7 @@ export function mapGammaEvent(raw: GammaEvent): AuktoraEvent {
     description: raw.description,
     image: raw.image,
     icon: raw.icon,
+    startDate: new Date(raw.startDate),
     endDate: new Date(raw.endDate),
     active: raw.active,
     closed: raw.closed,
