@@ -1,12 +1,23 @@
 'use client'
 
-import { Minus, Plus } from 'lucide-react'
+import { Minus, Plus, AlertTriangle, Loader2 } from 'lucide-react'
 import { useTradeWidget } from '@/lib/stores/useTradeWidget'
+import { useMarketImpact } from '@/lib/hooks/useMarketImpact'
 
 const QUICK_AMOUNTS = [1, 5, 10, 100]
+/** Soglia oltre la quale la slippage viene mostrata in giallo. */
+const SLIPPAGE_WARNING_PCT = 1.0
+/** Soglia oltre la quale la slippage diventa critica (rossa). */
+const SLIPPAGE_DANGER_PCT = 3.0
 
 /**
  * Modalità Mercato: importo USDC + quick amounts + payout calcolato live.
+ *
+ * Doc Prices & Orderbook: il "displayed price" è il midpoint del bid-ask
+ * spread, ma il prezzo a cui un BUY market order esegue è l'ASK del top
+ * book. `useMarketImpact` chiama `calculateMarketPrice` SDK e restituisce
+ * il prezzo di fill REALE per quell'amount specifico — utile per ordini
+ * grandi che attraversano più livelli di book (slippage).
  */
 export function TradeMarketTab() {
   const draft = useTradeWidget((s) => s.draft)
@@ -14,11 +25,32 @@ export function TradeMarketTab() {
   const setAmount = useTradeWidget((s) => s.setAmountUsdc)
   const incrementAmount = useTradeWidget((s) => s.incrementAmount)
 
+  const sideUpper = (draft?.side ?? '').toLowerCase()
+  const isBuy = sideUpper === 'yes' || sideUpper === 'up' || sideUpper === 'buy'
+
+  // Live fill-price stimato (vero prezzo di esecuzione, non midpoint snapshot)
+  const { fillPrice, slippagePct, loading } = useMarketImpact(
+    draft?.tokenId ?? null,
+    isBuy ? 'BUY' : 'SELL',
+    amountUsdc,
+    draft?.pricePerShare ?? 0
+  )
+
   if (!draft) return null
 
-  const payout = draft.pricePerShare > 0 ? amountUsdc / draft.pricePerShare : 0
+  // Effective price: usa fillPrice se disponibile, altrimenti midpoint snapshot
+  const effectivePrice = fillPrice ?? draft.pricePerShare
+  const payout = effectivePrice > 0 ? amountUsdc / effectivePrice : 0
   const profit = payout - amountUsdc
-  const priceCents = Math.round(draft.pricePerShare * 100)
+  const priceCents = Math.round(effectivePrice * 100)
+  const midpointCents = Math.round(draft.pricePerShare * 100)
+  const slippageAbs = Math.abs(slippagePct ?? 0)
+  const slippageColor =
+    slippageAbs >= SLIPPAGE_DANGER_PCT
+      ? 'var(--color-danger)'
+      : slippageAbs >= SLIPPAGE_WARNING_PCT
+        ? 'var(--color-warning)'
+        : 'var(--color-text-muted)'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -124,13 +156,62 @@ export function TradeMarketTab() {
           style={{
             display: 'flex',
             justifyContent: 'space-between',
+            alignItems: 'center',
             fontSize: 'var(--font-xs)',
             color: 'var(--color-text-muted)',
           }}
         >
-          <span>Prezzo medio</span>
-          <span style={{ fontVariantNumeric: 'tabular-nums' }}>{priceCents}¢</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            Prezzo di fill stimato
+            {loading && (
+              <Loader2
+                size={10}
+                className="animate-spin"
+                style={{ color: 'var(--color-text-muted)' }}
+              />
+            )}
+          </span>
+          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {priceCents}¢
+            {fillPrice !== null && fillPrice !== draft.pricePerShare && (
+              <span style={{ color: 'var(--color-text-muted)', marginLeft: 4 }}>
+                (mid {midpointCents}¢)
+              </span>
+            )}
+          </span>
         </div>
+        {slippagePct !== null && slippageAbs >= 0.1 && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontSize: 'var(--font-xs)',
+              color: slippageColor,
+            }}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              {slippageAbs >= SLIPPAGE_WARNING_PCT && <AlertTriangle size={10} />}
+              Slippage vs mid
+            </span>
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {slippagePct >= 0 ? '+' : ''}
+              {slippagePct.toFixed(2)}%
+            </span>
+          </div>
+        )}
+        {slippageAbs >= SLIPPAGE_DANGER_PCT && (
+          <div
+            style={{
+              fontSize: 'var(--font-xs)',
+              color: 'var(--color-danger)',
+              lineHeight: 1.4,
+              marginTop: 2,
+            }}
+          >
+            ⚠ Ordine grande rispetto al book. Considera di splittarlo o di usare un limit order.
+          </div>
+        )}
       </div>
 
       {/* Quick amounts */}
