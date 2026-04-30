@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import type { AuktoraEvent, AuktoraOutcome } from '@/lib/polymarket/mappers'
+import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 import { StarToggle } from '../StarToggle'
@@ -46,7 +47,19 @@ function resolveOutcomes(outcomes: AuktoraOutcome[]): ResolvedOutcomes {
 export function H2HCard({ event, onBookmark }: Props) {
   const router = useRouter()
   const market = event.markets[0]
-  const outcomes = market?.outcomes ?? []
+  // Live midpoint sull'asset Yes (= teamA outcome) → quando arriva un trade,
+  // ricalcoliamo le probabilità di entrambi i team applicando il delta proporz.
+  // Per H2H "outcome A vs B" in single market, midpoint del primo outcome
+  // = prob A; prob B = 1 - prob A. Per market 3-way con draw è una
+  // semplificazione (non perfetta), ma meglio di prob statiche.
+  const { midpoint } = useLiveMidpoint(market?.clobTokenIds?.[0] ?? null)
+  const baseOutcomes = market?.outcomes ?? []
+  const outcomes: AuktoraOutcome[] = midpoint !== null && baseOutcomes.length === 2
+    ? [
+        { ...baseOutcomes[0]!, price: midpoint },
+        { ...baseOutcomes[1]!, price: 1 - midpoint },
+      ]
+    : baseOutcomes
   const { teamA, teamB, draw } = resolveOutcomes(outcomes)
 
   const isLive = event.active && !event.closed

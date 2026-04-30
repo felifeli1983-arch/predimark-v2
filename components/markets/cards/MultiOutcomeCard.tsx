@@ -1,12 +1,15 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { AuktoraEvent, AuktoraMarket } from '@/lib/polymarket/mappers'
+import { mapGammaEvent, type AuktoraEvent, type AuktoraMarket } from '@/lib/polymarket/mappers'
+import { fetchEventById } from '@/lib/polymarket/queries'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 import { StarToggle } from '../StarToggle'
 
 const TOP_N = 3
+const REFRESH_INTERVAL_MS = 30_000
 
 interface Props {
   event: AuktoraEvent
@@ -22,8 +25,25 @@ function outcomeLabel(market: AuktoraMarket): string {
   return market.groupItemTitle || market.question
 }
 
-export function MultiOutcomeCard({ event, onBookmark }: Props) {
+export function MultiOutcomeCard({ event: initialEvent, onBookmark }: Props) {
   const router = useRouter()
+  const [event, setEvent] = useState(initialEvent)
+
+  // Polling refresh ogni 30s — multi-outcome ha N tokenIds (uno per
+  // candidato), troppi per WS individuale. Polling fetchEventById(id)
+  // riprende prezzi aggiornati di tutti gli outcomes in 1 request.
+  useEffect(() => {
+    const id = setInterval(async () => {
+      try {
+        const fresh = await fetchEventById(event.id)
+        if (fresh) setEvent(mapGammaEvent(fresh))
+      } catch {
+        /* silenzioso */
+      }
+    }, REFRESH_INTERVAL_MS)
+    return () => clearInterval(id)
+  }, [event.id])
+
   const sorted = [...event.markets].sort((a, b) => b.yesPrice - a.yesPrice)
   const top = sorted.slice(0, TOP_N)
   const remaining = sorted.length - top.length

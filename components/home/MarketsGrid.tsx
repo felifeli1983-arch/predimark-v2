@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
 import type { HeroBadge } from '@/components/home/HeroCard'
@@ -64,6 +64,36 @@ export function MarketsGrid({
   const visibleEvents = sorted.slice(0, visible)
   const hasMore = visible < sorted.length
 
+  // Infinite scroll: IntersectionObserver su un sentinel `<div>` in fondo
+  // alla griglia. Quando entra nel viewport (rootMargin 600px → carica
+  // prima che l'utente arrivi al fondo), aggiunge `pageSize` card alla
+  // visible window. No spazi vuoti, no bottone "Carica altri".
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    if (!hasMore) return
+    const node = sentinelRef.current
+    if (!node) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (entry?.isIntersecting) {
+          setVisible((v) => Math.min(v + pageSize, sorted.length))
+        }
+      },
+      { rootMargin: '600px 0px' }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [hasMore, pageSize, sorted.length])
+
+  // Reset visible window quando cambiano filtri (search/tag/sort) — altrimenti
+  // se l'utente filtrava 100 eventi e poi cambia tag, il sort/filtro nuovo
+  // potrebbe avere meno eventi della finestra corrente → blocca lo scroll.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setVisible(pageSize)
+  }, [q, activeTag, sort, pageSize])
+
   // Pinned visibili solo quando l'utente NON sta filtrando — search/tag
   // attivi nascondono i pinned così le query mostrano risultati onesti.
   const showPinned = !q && activeTag === 'all' && pinnedEvents.length > 0
@@ -102,24 +132,22 @@ export function MarketsGrid({
           </div>
 
           {hasMore && (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 16px 24px' }}>
-              <button
-                type="button"
-                onClick={() => setVisible((v) => v + pageSize)}
+            <>
+              {/* Sentinel: l'IntersectionObserver carica più card quando questo
+                  div entra nel viewport. Loader sotto è puramente cosmetico. */}
+              <div ref={sentinelRef} aria-hidden="true" style={{ height: 1 }} />
+              <div
                 style={{
-                  background: 'var(--color-bg-secondary)',
-                  color: 'var(--color-text-primary)',
-                  border: '1px solid var(--color-border-default)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '8px 18px',
-                  fontSize: 'var(--font-base)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  padding: '12px 16px 24px',
+                  fontSize: 'var(--font-xs)',
+                  color: 'var(--color-text-muted)',
                 }}
               >
-                Carica altri ({sorted.length - visible})
-              </button>
-            </div>
+                Caricamento {sorted.length - visible} mercati…
+              </div>
+            </>
           )}
         </>
       )}

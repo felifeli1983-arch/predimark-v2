@@ -1,12 +1,15 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { AuktoraEvent, AuktoraMarket } from '@/lib/polymarket/mappers'
+import { mapGammaEvent, type AuktoraEvent, type AuktoraMarket } from '@/lib/polymarket/mappers'
+import { fetchEventById } from '@/lib/polymarket/queries'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 import { StarToggle } from '../StarToggle'
 
 const TOP_N = 4
+const REFRESH_INTERVAL_MS = 30_000
 
 interface Props {
   event: AuktoraEvent
@@ -39,8 +42,24 @@ function compareStrikes(a: AuktoraMarket, b: AuktoraMarket): number {
   return sb - sa
 }
 
-export function MultiStrikeCard({ event, onBookmark }: Props) {
+export function MultiStrikeCard({ event: initialEvent, onBookmark }: Props) {
   const router = useRouter()
+  const [event, setEvent] = useState(initialEvent)
+
+  // Polling refresh ogni 30s — multi-strike ha N tokenIds, polling
+  // fetchEventById riprende prezzi aggiornati di tutti gli strikes.
+  useEffect(() => {
+    const id = setInterval(async () => {
+      try {
+        const fresh = await fetchEventById(event.id)
+        if (fresh) setEvent(mapGammaEvent(fresh))
+      } catch {
+        /* silenzioso */
+      }
+    }, REFRESH_INTERVAL_MS)
+    return () => clearInterval(id)
+  }, [event.id])
+
   const sorted = [...event.markets].sort(compareStrikes)
   const top = sorted.slice(0, TOP_N)
   const remaining = sorted.length - top.length

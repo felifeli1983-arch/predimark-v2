@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import type { AuktoraEvent } from '@/lib/polymarket/mappers'
+import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 import { DonutChart } from '../charts/DonutChart'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
@@ -15,8 +16,12 @@ interface BinaryCardProps {
 export function BinaryCard({ event, onBookmark }: BinaryCardProps) {
   const router = useRouter()
   const market = event.markets[0]
-  const yesPrice = market?.yesPrice ?? 0.5
-  const noPrice = market?.noPrice ?? 1 - yesPrice
+  // Live midpoint via WS — quando arriva un trade su Polymarket il
+  // percentuale Yes/No si aggiorna senza refresh. Fallback a yesPrice
+  // statico finché il WS non si è ancora connesso.
+  const { midpoint } = useLiveMidpoint(market?.clobTokenIds?.[0] ?? null)
+  const yesPrice = midpoint ?? market?.yesPrice ?? 0.5
+  const noPrice = 1 - yesPrice
   const yesPct = Math.round(yesPrice * 100)
   const noPct = Math.round(noPrice * 100)
 

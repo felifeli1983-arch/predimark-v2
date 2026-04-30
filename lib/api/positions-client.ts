@@ -44,6 +44,22 @@ export async function fetchOpenPositions(
   return authedGet<PositionsResponse>(token, `/api/v1/users/me/positions?${params}`)
 }
 
+/**
+ * Fetch posizioni RISOLTE (is_open=false). Include sia winning che
+ * losing — il caller filtra per `currentPrice > 0.5` per mostrare solo
+ * quelle redimibili.
+ */
+export async function fetchResolvedPositions(
+  token: string,
+  isDemo: boolean,
+  opts: PositionsListOpts = {}
+): Promise<PositionsResponse> {
+  const params = new URLSearchParams({ is_demo: String(isDemo), only_open: 'false' })
+  if (opts.page) params.set('page', String(opts.page))
+  if (opts.perPage) params.set('per_page', String(opts.perPage))
+  return authedGet<PositionsResponse>(token, `/api/v1/users/me/positions?${params}`)
+}
+
 interface HistoryFilters {
   isDemo: boolean
   type?: 'open' | 'close' | 'resolution'
