@@ -14,8 +14,7 @@ interface Props {
  *
  * Comportamento responsive:
  *  - Mobile + tablet portrait (<1024px): 1 colonna full-width, sidebar
- *    nascosta (le pagine inseriscono moduli mobile inline tipo
- *    MobileSidebarRails)
+ *    nascosta (i mercati prendono tutto lo spazio)
  *  - Desktop (≥1024px): main 1fr + sidebar 320px sticky
  *  - >1440px: contenuto cappato e centrato
  */

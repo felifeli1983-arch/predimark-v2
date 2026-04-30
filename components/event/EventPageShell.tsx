@@ -16,8 +16,6 @@ import { EventTradeBoot } from './EventTradeBoot'
 import { SignalBanner } from './SignalBanner'
 import { PriceHistoryChart } from './PriceHistoryChart'
 import { CryptoRoundNav } from './CryptoRoundNav'
-// OrderBookExpander rimosso: ogni outcome row ha già il proprio orderbook
-// collassabile, l'expander globale era ridondante.
 import { SentimentCard } from './SentimentCard'
 import { RelatedMarkets } from './RelatedMarkets'
 

@@ -83,6 +83,18 @@ export function PositionsList() {
     )
   }
 
+  // Holding Rewards 4% APY (Polymarket "Positions & Tokens" doc):
+  //   "Polymarket pays a 4.00% annualized Holding Reward based on your
+  //    total position value in eligible markets. Your total position
+  //    value is randomly sampled once each hour, and the reward is
+  //    distributed daily."
+  // Daily/weekly reward stimati informativi — Polymarket li paga, noi
+  // li mostriamo solo per UX (utente sa che le posizioni stanno facendo
+  // qualcosa di passivo oltre al PnL).
+  const HOLDING_APY = 0.04
+  const dailyReward = !isDemo ? (meta.totalValue * HOLDING_APY) / 365 : 0
+  const weeklyReward = !isDemo ? (meta.totalValue * HOLDING_APY) / 52 : 0
+
   return (
     <>
       <header
@@ -105,6 +117,13 @@ export function PositionsList() {
           />
           <Stat label="Posizioni aperte" value={String(meta.total)} />
         </div>
+        {!isDemo && meta.totalValue > 0 && (
+          <HoldingRewardsBadge
+            apy={HOLDING_APY}
+            dailyReward={dailyReward}
+            weeklyReward={weeklyReward}
+          />
+        )}
         {!isDemo && <FundActionsRow pusdBalance={meta.totalValue} />}
       </header>
 
@@ -122,6 +141,70 @@ export function PositionsList() {
         onSold={handleSold}
       />
     </>
+  )
+}
+
+/**
+ * Badge informativo Holding Rewards 4% APY — Polymarket paga il reward
+ * direttamente, non gestiamo nulla server-side, mostriamo solo l'expected
+ * earning per UX (così l'utente sa che la posizione frutta passivamente).
+ */
+function HoldingRewardsBadge({
+  apy,
+  dailyReward,
+  weeklyReward,
+}: {
+  apy: number
+  dailyReward: number
+  weeklyReward: number
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '10px 12px',
+        background: 'color-mix(in srgb, var(--color-cta) 8%, transparent)',
+        border: '1px solid color-mix(in srgb, var(--color-cta) 30%, transparent)',
+        borderRadius: 'var(--radius-sm)',
+      }}
+    >
+      <span
+        style={{
+          padding: '2px 8px',
+          borderRadius: 'var(--radius-full)',
+          background: 'var(--color-cta)',
+          color: '#fff',
+          fontSize: 'var(--font-xs)',
+          fontWeight: 700,
+          letterSpacing: '0.04em',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        +{(apy * 100).toFixed(2)}% APY
+      </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 'var(--font-sm)',
+            fontWeight: 600,
+            color: 'var(--color-text-primary)',
+          }}
+        >
+          Holding Rewards Polymarket
+        </div>
+        <div
+          style={{
+            fontSize: 'var(--font-xs)',
+            color: 'var(--color-text-muted)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          ~${dailyReward.toFixed(2)}/giorno · ${weeklyReward.toFixed(2)}/settimana
+        </div>
+      </div>
+    </div>
   )
 }
 

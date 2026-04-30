@@ -20,7 +20,8 @@ import { SidebarNews } from './SidebarNews'
  * BottomNav mobile). La sidebar mostra invece le top 5 posizioni aperte.
  *
  * Visibilità gestita dal PageContainer parent (hidden lg:block).
- * MobileSidebarRails copre il caso mobile + tablet portrait (<1024px).
+ * Su mobile/tablet (<1024px) la sidebar è nascosta — i mercati prendono
+ * tutta la larghezza per non penalizzare lo scroll.
  */
 export function Sidebar() {
   const { authenticated, ready, login } = useAuth()
