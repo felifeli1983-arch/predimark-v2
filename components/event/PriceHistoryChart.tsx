@@ -7,10 +7,13 @@ import { CenteredBox, Container, SectionTitle } from './chart/ChartShell'
 import { HistoryChart } from './HistoryChart'
 import { MultiLineChart, type MultiMarket } from './MultiLineChart'
 import { CryptoCandleChart } from './CryptoCandleChart'
+import { PolymarketEmbed } from './PolymarketEmbed'
 
 interface Props {
   marketId: string
   cardKind?: CardKind
+  /** Slug Polymarket del primo market — usato per l'iframe embed ufficiale. */
+  marketSlug?: string
   /** Simbolo crypto es. 'btcusdt' — estratto da EventPageShell per crypto_up_down */
   cryptoSymbol?: string
   /** Evento attualmente live — usato per h2h_sport (mostra score stub) */
@@ -23,17 +26,21 @@ interface Props {
 }
 
 /**
- * Sprint 3.5.4 / 3.5.5 — Router CardKind-aware per il chart event-page.
+ * Router CardKind-aware per il chart event-page.
  *
- *  - binary | h2h_sport (non-live) → HistoryChart con dual-line YES/NO
- *  - multi_outcome (con multiMarkets) → MultiLineChart (fino a 5 curve)
+ *  - binary | h2h_sport (non-live, con marketSlug) → PolymarketEmbed iframe
+ *    ufficiale (chart identico a polymarket.com — niente da reinventare)
+ *  - multi_outcome (con multiMarkets) → MultiLineChart custom (Polymarket
+ *    embed iframe non supporta multi-event, dobbiamo costruirlo noi)
  *  - multi_strike → HistoryChart single-line YES
- *  - crypto_up_down → LiveSpotView (Chainlink spot price)
- *  - h2h_sport (live) → LiveScoreStub
+ *  - crypto_up_down → LiveSpotView (Chainlink spot price + Binance candles)
+ *  - h2h_sport (live) → LiveScoreStub (sport-data MA6+)
+ *  - fallback senza marketSlug → HistoryChart custom
  */
 export function PriceHistoryChart({
   marketId,
   cardKind = 'binary',
+  marketSlug,
   cryptoSymbol,
   isLive,
   multiMarkets,
@@ -47,6 +54,11 @@ export function PriceHistoryChart({
   if (cardKind === 'multi_outcome' && multiMarkets && multiMarkets.length > 0) {
     return <MultiLineChart markets={multiMarkets} />
   }
+  // Binary o h2h_sport non-live: usa l'embed Polymarket se abbiamo lo slug
+  if ((cardKind === 'binary' || cardKind === 'h2h_sport') && marketSlug) {
+    return <PolymarketEmbed marketSlug={marketSlug} />
+  }
+  // Fallback custom (multi_strike o cardKind senza slug)
   const dualLine = cardKind === 'binary' || cardKind === 'h2h_sport'
   return <HistoryChart marketId={marketId} showBothLines={dualLine} />
 }
