@@ -48,7 +48,8 @@ export function EventCardHeader({
       }}
     >
       {/* Image quadrata 60×60 flush all'angolo top-left.
-          objectFit:contain → l'immagine si vede TUTTA dentro il quadrato. */}
+          objectFit:cover → l'immagine riempie tutto il quadrato (crop
+          al bordo se aspect ratio diverso). */}
       <div
         style={{
           position: 'absolute',
@@ -74,7 +75,7 @@ export function EventCardHeader({
             width={60}
             height={60}
             onError={() => setImgFailed(true)}
-            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
           initial
