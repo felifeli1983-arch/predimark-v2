@@ -2,7 +2,129 @@
 
 > Da MA4 in poi gestito direttamente da VS Code Claude (modalità autonoma totale).
 > Cowork disattivato. Vedi `AGENTS.md` § Modalità operativa per la matrice di autonomia.
-> Ultimo update: 2026-04-29 dopo mezzanotte — **6 sprint chiusi in single session** (MA4.7 → MA7) ~75% MVP
+> Ultimo update: 2026-04-30 — **2 sessioni intense doc-driven Polymarket V2** + UX polish + Vercel infra
+
+---
+
+## Sessione 2026-04-30 — Doc-driven Polymarket V2 fixes + 3-path signup + UX polish
+
+### Direttiva utente
+
+L'utente ha condiviso direttamente i doc Polymarket V2 ufficiali (uno alla volta)
+
+- ha messo la SDK reference completa in `clob-client-v2-main/`. Approccio:
+
+1. Leggi un doc
+2. Confronta con codice
+3. **Implementa o modifica subito** (no "rinviato a sprint dedicato")
+4. Riassumi cambiamenti
+5. Vai al prossimo doc
+
+Esplicito user feedback: "non voglio che resti nulla indietro perché lasci cose
+invariate". Reazione: convertire ogni "rinviato" in implementazione immediata
+quando i doc/SDK forniscono abbastanza.
+
+### Doc-driven sprint chiusi
+
+| #   | Doc input                         | Commit              | Output                                                                                                                                                                                                                                                        |
+| --- | --------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Polymarket 101 (concept overview) | _gap analysis only_ | Domanda design wallet model rimandata all'utente                                                                                                                                                                                                              |
+| 2   | Quickstart V2                     | `a5d768d`           | `signatureType` esplicito (EOA / POLY_PROXY / POLY_GNOSIS_SAFE / POLY_1271), `getMarketDetails(conditionId)` + `getMarketDetailsByToken(tokenId)` per tickSize/negRisk reali (cache 60s), `WalletKind` type, `conditionId` propagato in `TradeDraft`          |
+| 3   | + SDK examples allowances         | `245a343`           | `lib/polymarket/allowances.ts` (read+approve 6 allowance V2 incl. neg-risk), `useOnboardPolymarket` hook (Path A: derive L2 → POST cifrato → approve), `PolymarketOnboardBanner` montato in /me                                                               |
+| 4   | Direttiva utente: 3 path signup   | `9e27003`           | `/signup` riscritta con 3 PathCard (Polymarket / Wallet / Cash), `lib/onboarding/path.ts` storage, banner skip per `cash`                                                                                                                                     |
+| 5   | Errore CI build                   | `18bbf2d`           | `force-dynamic` su layout (auth)/me/admin + creator/apply (Privy hooks ko in SSG con stub envs)                                                                                                                                                               |
+| 6   | Markets & Events doc              | `0d1269e`           | `AuktoraMarket` esteso con `enableOrderBook`, `acceptingOrders`, `questionId`, `orderPriceMinTickSize`, `orderMinSize`. Trade button `disabled` con tooltip per market non tradable. `<SportLimitWarning>` banner per h2h_sport (limit cancellati al kickoff) |
+
+### Cleanup intermedi (sprint 3.5.x — UX event page polish)
+
+- `693ba6f` — fix(ci) lint errors no-explicit-any
+- `7164b2f` — fix(ci-build) PrivyProvider passthrough stub envs + Suspense `/search`
+- `6115bdb` — fix(ci) inject stub Supabase envs nel validate job
+- `b13e743` — fix re-audit B3/P6/price-history schema
+- `a560381` — feat sync-price-history cron + route polymarket-id resolve
+- `7e501a2` — sprint 3.5.3 CardKind-aware chart
+- `44d9999` — sprint 3.5.4 CLOB V2 direct (canonical URL `clob.polymarket.com`)
+- `2c59641` — fix(crypto) LiveSpotView via `useCryptoLivePrice` Chainlink
+- `3ce7883` — sprint 3.5.5 chart multi-line + binary YES/NO dual
+- `9ab10f4` — fix(clob) URL canonical + `{history: [...]}` parsing + orderbook initial REST
+- `03bbb62` — fix chart auto-scale Y axis + filter live events `end_date_min=NOW`
+- `9b02433` — UX rimosso orderbook globale + chart 320px + legenda toggle
+- `6a44885` — UI chart visual polish in stile Polymarket (custom, no iframe branded)
+
+### Capability summary post-sessione
+
+#### Polymarket V2 trading layer
+
+- ✅ ClobClient V2 SDK wired su URL canonical `clob.polymarket.com`
+- ✅ Read endpoints: `getMidpoint`, `getOrderBook`, `getMarket`, `getPricesHistory`,
+  `getLastTradePrice`, `getMarketRecentTrades`, `getMarketDetails`, `getMarketDetailsByToken`
+- ✅ Order signing (build): `buildAndSignOrder`, `buildAndSignSellOrder` con
+  `signatureType` esplicito + `funderAddress` + `builderCode` + tickSize/negRisk reali
+- ✅ Order posting (server): `postSignedOrder` via L2 API creds
+- ✅ Onboarding Path A: `useOnboardPolymarket` derive L2 + save creds cifrate at-rest
+  - approve missing allowances (1-6 firme)
+- ✅ Allowance management: `readAllowances`, `diffAllowances`, `approveMissingAllowances`
+  per V2 standard exchange + neg-risk exchange + neg-risk adapter
+
+#### Signup multi-path
+
+- ✅ 3 card scelta esplicita: Polymarket (verde) / Wallet (blu) / Cash (arancio)
+- ✅ `lib/onboarding/path.ts` localStorage `auktora.onboard-path`
+- ✅ `PolymarketOnboardBanner` skip-render per `cash` users (no pUSD ancora)
+
+#### Event page UX
+
+- ✅ Hero CardKind-aware (HeroDefault/HeroH2H/HeroCrypto)
+- ✅ Chart custom 320px con auto-scale Y, end-of-line labels, X-axis time labels,
+  multi-line legenda toggle (auto-zoom escludendo dominante), real-time WS
+  `price_change` updates, badge LIVE verde
+- ✅ Order book inline per outcome row (collapsible) + initial REST snapshot
+  da `clob.polymarket.com/book?token_id=...` (CORS aperto verificato)
+- ✅ Activity tab CLOB recent-trades polling 30s
+- ✅ Sentiment card (volume 24h, total, liquidity, markets count)
+- ✅ Related markets via Gamma `tag_slug`
+- ✅ Sport limit-cancel warning banner
+- ✅ Market tradability gates: `enableOrderBook + acceptingOrders` disabilita
+  bottoni con tooltip
+
+#### Home filters
+
+- ✅ Default: top 20 featured per volume 24h
+- ✅ Click categoria → `fetchEventsByTag(slug, 100)` dedicato per quella tag
+- ✅ Live tab: `fetchLiveEvents(100)` con `end_date_min=NOW` filter
+
+#### CI/CD
+
+- ✅ Lint hook senza autofix (no più Turbopack cache corruption post-commit)
+- ✅ `force-dynamic` su pagine Privy-auth (signup/me/admin/creator)
+- ⏳ Vercel deploy: utente sta ricreando progetto + env (in corso 2026-04-30)
+
+### Setup richiesto utente (Vercel re-creation)
+
+Env vars **da incollare** (12-13 variabili):
+
+ESSENZIALI (6):
+
+- `NEXT_PUBLIC_PRIVY_APP_ID`, `PRIVY_APP_SECRET`
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- `POLYMARKET_API_ENCRYPTION_KEY`
+
+IMPORTANTI (6-7):
+
+- `NEXT_PUBLIC_APP_URL`
+- `POLYMARKET_CLOB_URL=https://clob.polymarket.com` (URL canonical V2,
+  NON `clob-v2.polymarket.com` che è 301 redirect)
+- `POLYMARKET_GAMMA_BASE_URL`, `POLYMARKET_DATA_URL`, `POLYMARKET_CHAIN_ID=137`
+- `POLYMARKET_BUILDER_CODE`, `NEXT_PUBLIC_POLYMARKET_BUILDER_CODE`
+- `POLYMARKET_BUILDER_API_KEY`, `POLYMARKET_BUILDER_OWNER_ADDRESS`
+- `POLYMARKET_RELAYER_API_KEY`, `POLYMARKET_RELAYER_API_KEY_ADDRESS`
+
+**Contract addresses NON servono** — i 7 vars `POLYMARKET_PUSD_TOKEN`,
+`POLYMARKET_COLLATERAL_*`, `POLYMARKET_EXCHANGE_*`, `POLYMARKET_NEGRISK_*`,
+`POLYMARKET_CONDITIONAL_TOKENS` sono hardcoded in `lib/polymarket/contracts.ts`
+e `lib/polymarket/allowances.ts` (codice non legge mai quelle env).
+
+OPZIONALI: `CRON_SECRET`, `POLYGON_RPC_URL`, `TELEGRAM_*`, `MOONPAY_*`.
 
 ---
 
