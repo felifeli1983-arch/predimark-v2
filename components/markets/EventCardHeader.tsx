@@ -36,24 +36,30 @@ export function EventCardHeader({
     <div
       style={{
         /* Altezza fissa: tutte le card hanno body che parte dalla stessa Y.
-         * 80 = padding 12 top/bottom + slot 56 (titolo 2 righe + gap + tags). */
+         * Image flush top-left (no padding sul lato sx), title+badges
+         * con padding standard sugli altri lati. */
+        position: 'relative',
         height: 80,
         display: 'flex',
         alignItems: 'flex-start',
         gap: '12px',
-        padding: '12px',
+        padding: '12px 12px 12px 52px',
         flexShrink: 0,
         boxSizing: 'border-box',
       }}
     >
-      {/* Avatar/Image */}
+      {/* Image quadrata flush all'angolo top-left della card.
+          objectFit:contain → l'immagine si vede TUTTA dentro il quadrato
+          (no crop). Background tertiary fa da padding visivo se l'image
+          ha aspect ratio diverso da 1:1. */}
       <div
         style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
           width: 40,
           height: 40,
-          borderRadius: '50%',
           overflow: 'hidden',
-          flexShrink: 0,
           background: 'var(--color-bg-tertiary)',
           display: 'flex',
           alignItems: 'center',
@@ -61,6 +67,7 @@ export function EventCardHeader({
           color: 'var(--color-text-secondary)',
           fontWeight: 700,
           fontSize: 'var(--font-lg)',
+          zIndex: 1,
         }}
       >
         {!imgFailed && image ? (
@@ -70,7 +77,7 @@ export function EventCardHeader({
             width={40}
             height={40}
             onError={() => setImgFailed(true)}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
           />
         ) : (
           initial
