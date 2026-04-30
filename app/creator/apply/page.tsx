@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import { ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react'
 
+// Privy hooks → no SSG prerender (durante CI build con stub envs).
+export const dynamic = 'force-dynamic'
+
 interface ApplicationStatus {
   status: 'none' | 'pending' | 'approved' | 'rejected'
   is_verified?: boolean

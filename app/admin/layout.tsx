@@ -7,6 +7,9 @@ import { Loader2 } from 'lucide-react'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { AdminTopBar } from '@/components/admin/AdminTopBar'
 
+// Tutte le admin page richiedono auth + Privy hooks → no SSG prerender.
+export const dynamic = 'force-dynamic'
+
 interface AdminMe {
   role: 'super_admin' | 'admin' | 'moderator' | 'viewer'
   user_id: string

@@ -2,6 +2,9 @@ import type { ReactNode } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { MeSubnav } from '@/components/me/MeSubnav'
 
+// /me/* tutte richiedono autenticazione e Privy hooks → niente prerender SSG.
+export const dynamic = 'force-dynamic'
+
 /**
  * Layout `/me/*` con sub-navigation tab (Watchlist · Positions · History).
  * Server component shell — la subnav e il contenuto delle pagine sono client.
