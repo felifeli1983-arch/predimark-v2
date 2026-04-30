@@ -36,6 +36,13 @@ function sortEvents(events: AuktoraEvent[], sort: SortKey): AuktoraEvent[] {
   return arr
 }
 
+interface EventsApiResponse {
+  items: AuktoraEvent[]
+  meta: { limit: number; offset: number; count: number }
+}
+
+const SERVER_PAGE_SIZE = 100 // eventi per request `/api/v1/events`
+
 export function MarketsGrid({
   initialEvents,
   pinnedEvents = [],
@@ -47,27 +54,79 @@ export function MarketsGrid({
   const sort = (searchParams.get('sort') as SortKey) ?? 'volume24h'
   const q = searchParams.get('q')?.toLowerCase().trim() ?? ''
   const activeTag = searchParams.get('tag') ?? 'all'
+  const category = searchParams.get('category') ?? undefined
   const [visible, setVisible] = useState(pageSize)
+  // Eventi extra fetchati client-side via paginazione `/api/v1/events?offset=`.
+  // initialEvents (SSR) + extraEvents = pool totale. Doc Polymarket
+  // "Fetching Markets" raccomanda offset+limit per >200 events.
+  const [extraEvents, setExtraEvents] = useState<AuktoraEvent[]>([])
+  const [serverHasMore, setServerHasMore] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+
+  // Reset extra cache quando l'utente cambia categoria — nuovo set di
+  // events server-side, partiamo da zero.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setExtraEvents([])
+    setServerHasMore(true)
+    setLoadingMore(false)
+  }, [category])
+
+  const allEvents = useMemo(
+    () => [...initialEvents, ...extraEvents],
+    [initialEvents, extraEvents]
+  )
 
   const filtered = useMemo(() => {
-    if (!q && activeTag === 'all') return initialEvents
+    if (!q && activeTag === 'all') return allEvents
     const tagLower = activeTag.toLowerCase()
-    return initialEvents.filter((ev) => {
+    return allEvents.filter((ev) => {
       const matchQ = !q || ev.title.toLowerCase().includes(q)
       const matchTag =
         activeTag === 'all' || ev.tags.some((t) => t.toLowerCase().includes(tagLower))
       return matchQ && matchTag
     })
-  }, [initialEvents, q, activeTag])
+  }, [allEvents, q, activeTag])
 
   const sorted = useMemo(() => sortEvents(filtered, sort), [filtered, sort])
   const visibleEvents = sorted.slice(0, visible)
-  const hasMore = visible < sorted.length
+  const hasMoreLocal = visible < sorted.length
+  const hasMore = hasMoreLocal || serverHasMore
 
-  // Infinite scroll: IntersectionObserver su un sentinel `<div>` in fondo
-  // alla griglia. Quando entra nel viewport (rootMargin 600px → carica
-  // prima che l'utente arrivi al fondo), aggiunge `pageSize` card alla
-  // visible window. No spazi vuoti, no bottone "Carica altri".
+  // Fetch della prossima pagina server-side via /api/v1/events?offset=N.
+  // Triggerato quando `visible` raggiunge la fine del pool locale e
+  // serverHasMore è ancora true.
+  async function fetchNextServerPage() {
+    if (loadingMore || !serverHasMore) return
+    setLoadingMore(true)
+    try {
+      const params = new URLSearchParams({
+        limit: String(SERVER_PAGE_SIZE),
+        offset: String(allEvents.length),
+      })
+      if (category) params.set('category', category)
+      const res = await fetch(`/api/v1/events?${params.toString()}`)
+      if (!res.ok) {
+        setServerHasMore(false)
+        return
+      }
+      const data = (await res.json()) as EventsApiResponse
+      if (data.items.length === 0) {
+        setServerHasMore(false)
+      } else {
+        setExtraEvents((prev) => [...prev, ...data.items])
+      }
+    } catch {
+      setServerHasMore(false)
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  // Infinite scroll: IntersectionObserver su sentinel <div> a bottom.
+  // Quando visibile, prima estende `visible` window locale; quando il
+  // pool locale è esaurito, fetcha next server page (oltre i 200
+  // iniziali). No spazi vuoti, no bottone "Carica altri".
   const sentinelRef = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
     if (!hasMore) return
@@ -76,19 +135,22 @@ export function MarketsGrid({
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0]
-        if (entry?.isIntersecting) {
+        if (!entry?.isIntersecting) return
+        if (hasMoreLocal) {
           setVisible((v) => Math.min(v + pageSize, sorted.length))
+        } else if (serverHasMore && !loadingMore) {
+          void fetchNextServerPage()
         }
       },
       { rootMargin: '600px 0px' }
     )
     observer.observe(node)
     return () => observer.disconnect()
-  }, [hasMore, pageSize, sorted.length])
+    // fetchNextServerPage è stable wrt deps usate dentro
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMore, hasMoreLocal, pageSize, sorted.length, serverHasMore, loadingMore])
 
-  // Reset visible window quando cambiano filtri (search/tag/sort) — altrimenti
-  // se l'utente filtrava 100 eventi e poi cambia tag, il sort/filtro nuovo
-  // potrebbe avere meno eventi della finestra corrente → blocca lo scroll.
+  // Reset visible window quando cambiano filtri.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(pageSize)
@@ -145,7 +207,11 @@ export function MarketsGrid({
                   color: 'var(--color-text-muted)',
                 }}
               >
-                Caricamento {sorted.length - visible} mercati…
+                {loadingMore
+                  ? 'Caricamento altri mercati dal server…'
+                  : hasMoreLocal
+                    ? `Caricamento ${sorted.length - visible} mercati…`
+                    : 'Cerca altri mercati…'}
               </div>
             </>
           )}

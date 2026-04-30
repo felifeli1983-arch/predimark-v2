@@ -22,12 +22,15 @@ export async function fetchEventById(id: string): Promise<GammaEvent | null> {
 /**
  * Top eventi attivi ordinati per volume 24h. Storicamente filtrava
  * `featured=true` ma quel flag viene curato a mano da Polymarket e
- * include solo ~20 eventi mentre Gamma ne serve 500+ attivi. L'utente
- * vede 23 card totali (20 featured + 3 hero) → "elimina il blocco":
- * via il filtro featured, default limit alzato a 200 (con cap 500
- * server-side di Gamma).
+ * include solo ~20 eventi mentre Gamma ne serve 500+ attivi.
+ *
+ * Doc "Fetching Markets" Polymarket: usare `offset` per pagination
+ * server-side oltre il limit. Default offset=0 mantiene compat.
  */
-export async function fetchFeaturedEvents(limit: number = 200): Promise<GammaEvent[]> {
+export async function fetchFeaturedEvents(
+  limit: number = 200,
+  offset: number = 0
+): Promise<GammaEvent[]> {
   return gammaGet<GammaEvent[]>(
     '/events',
     {
@@ -36,6 +39,7 @@ export async function fetchFeaturedEvents(limit: number = 200): Promise<GammaEve
       order: 'volume24hr',
       ascending: false,
       limit,
+      offset,
     },
     { revalidate: 30 }
   )
@@ -43,14 +47,16 @@ export async function fetchFeaturedEvents(limit: number = 200): Promise<GammaEve
 
 /**
  * Fetch eventi attivi di una specifica categoria (tag slug).
- * Usato dai filtri Crypto/Sport/Politics ecc — vanno dritti su Gamma con
- * `tag_slug=...` invece di filtrare client-side i 20 eventi della home.
+ * Doc Polymarket consiglia `tag_id` numerico ma `tag_slug` stringa
+ * funziona ed è più human-readable per le nostre rotte `/?category=politics`.
  *
- * Ritorna fino a `limit` eventi attivi (default 100), ordinati per volume 24h.
+ * Ritorna fino a `limit` eventi attivi, ordinati per volume 24h.
+ * Supporta `offset` per pagination server-side.
  */
 export async function fetchEventsByTag(
   tagSlug: string,
-  limit: number = 100
+  limit: number = 100,
+  offset: number = 0
 ): Promise<GammaEvent[]> {
   return gammaGet<GammaEvent[]>(
     '/events',
@@ -61,6 +67,7 @@ export async function fetchEventsByTag(
       order: 'volume24hr',
       ascending: false,
       limit,
+      offset,
     },
     { revalidate: 30 }
   )
