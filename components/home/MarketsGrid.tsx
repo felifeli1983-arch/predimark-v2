@@ -41,7 +41,9 @@ interface EventsApiResponse {
   meta: { limit: number; offset: number; count: number }
 }
 
-const SERVER_PAGE_SIZE = 100 // eventi per request `/api/v1/events`
+// 80 mantiene il payload Gamma sotto i 2MB del Next.js data cache anche
+// dopo la projection (vedi lib/polymarket/queries.ts:projectListEvents).
+const SERVER_PAGE_SIZE = 80
 
 export function MarketsGrid({
   initialEvents,
@@ -72,10 +74,7 @@ export function MarketsGrid({
     setLoadingMore(false)
   }, [category])
 
-  const allEvents = useMemo(
-    () => [...initialEvents, ...extraEvents],
-    [initialEvents, extraEvents]
-  )
+  const allEvents = useMemo(() => [...initialEvents, ...extraEvents], [initialEvents, extraEvents])
 
   const filtered = useMemo(() => {
     if (!q && activeTag === 'all') return allEvents

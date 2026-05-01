@@ -1,7 +1,86 @@
+import { unstable_cache } from 'next/cache'
 import { gammaGet } from './client'
 import type { GammaEvent, GammaEventsParams, GammaMarket } from './types'
 
 type ParamRecord = Record<string, string | number | boolean | undefined>
+
+const LIST_EVENT_FIELDS = new Set<keyof GammaEvent>([
+  'id',
+  'title',
+  'slug',
+  'image',
+  'icon',
+  'startDate',
+  'endDate',
+  'active',
+  'closed',
+  'volume24hr',
+  'volume',
+  'liquidity',
+  'commentCount',
+  'tags',
+  'markets',
+  'series',
+])
+
+const LIST_MARKET_FIELDS = new Set<keyof GammaMarket>([
+  'id',
+  'conditionId',
+  'questionID',
+  'question',
+  'slug',
+  'outcomes',
+  'outcomePrices',
+  'volume',
+  'liquidity',
+  'startDate',
+  'endDate',
+  'active',
+  'closed',
+  'clobTokenIds',
+  'enableOrderBook',
+  'acceptingOrders',
+  'orderPriceMinTickSize',
+  'orderMinSize',
+  'groupItemTitle',
+  'resolutionSource',
+])
+
+/**
+ * Proietta solo i campi che il mapper consuma — il payload Gamma raw è ~90KB
+ * per evento (markets[].description duplicate, eventMetadata, clobRewards,
+ * uma* fields). Senza questa proiezione anche 20 eventi superano il limit
+ * 2MB di Next.js data cache, costringendo refetch ad ogni request.
+ *
+ * USA SOLO per liste — fetchEventBySlug/fetchEventById tornano payload pieno
+ * perché la pagina evento mostra description + market metadata complete.
+ */
+function projectListEvents(events: GammaEvent[]): GammaEvent[] {
+  return events.map((ev) => {
+    const evRec = ev as unknown as Record<string, unknown>
+    const out: Record<string, unknown> = {}
+    for (const k of Object.keys(evRec)) {
+      if (LIST_EVENT_FIELDS.has(k as keyof GammaEvent)) out[k] = evRec[k]
+    }
+    if (Array.isArray(ev.markets)) {
+      out.markets = ev.markets.map((m) => {
+        const mRec = m as unknown as Record<string, unknown>
+        const mOut: Record<string, unknown> = {}
+        for (const k of Object.keys(mRec)) {
+          if (LIST_MARKET_FIELDS.has(k as keyof GammaMarket)) mOut[k] = mRec[k]
+        }
+        return mOut as unknown as GammaMarket
+      })
+    }
+    if (Array.isArray(ev.tags)) {
+      out.tags = ev.tags.map((t) => ({ id: '', label: '', slug: t.slug }))
+    }
+    if (Array.isArray(ev.series)) {
+      out.series = ev.series.map((s) => ({ id: '', slug: s.slug, label: '', image: '' }))
+    }
+    return out as unknown as GammaEvent
+  })
+}
 
 export async function fetchEvents(params?: GammaEventsParams): Promise<GammaEvent[]> {
   return gammaGet<GammaEvent[]>('/events', params ? ({ ...params } as ParamRecord) : undefined, {
@@ -27,23 +106,30 @@ export async function fetchEventById(id: string): Promise<GammaEvent | null> {
  * Doc "Fetching Markets" Polymarket: usare `offset` per pagination
  * server-side oltre il limit. Default offset=0 mantiene compat.
  */
-export async function fetchFeaturedEvents(
-  limit: number = 200,
-  offset: number = 0
-): Promise<GammaEvent[]> {
-  return gammaGet<GammaEvent[]>(
-    '/events',
-    {
-      active: true,
-      closed: false,
-      order: 'volume24hr',
-      ascending: false,
-      limit,
-      offset,
-    },
-    { revalidate: 30 }
-  )
-}
+/**
+ * Featured events: la projection riduce ~10MB upstream → ~1.7MB cache-able.
+ * Usiamo unstable_cache (in-memory + revalidate) invece del fetch cache di
+ * Next perché il payload raw upstream supera il limit 2MB.
+ */
+export const fetchFeaturedEvents = unstable_cache(
+  async (limit: number = 80, offset: number = 0): Promise<GammaEvent[]> => {
+    const events = await gammaGet<GammaEvent[]>(
+      '/events',
+      {
+        active: true,
+        closed: false,
+        order: 'volume24hr',
+        ascending: false,
+        limit,
+        offset,
+      },
+      { noCache: true }
+    )
+    return projectListEvents(events)
+  },
+  ['gamma-featured-events'],
+  { revalidate: 30 }
+)
 
 /**
  * Fetch eventi attivi di una specifica categoria (tag slug).
@@ -72,30 +158,46 @@ export interface EventsByTagOpts {
   excludeTag?: string
 }
 
+const fetchEventsByTagInner = unstable_cache(
+  async (
+    tagSlug: string,
+    limit: number,
+    offset: number,
+    relatedTags: boolean,
+    excludeTag: string | undefined
+  ): Promise<GammaEvent[]> => {
+    const params: ParamRecord = {
+      tag_slug: tagSlug,
+      active: true,
+      closed: false,
+      order: 'volume24hr',
+      ascending: false,
+      limit,
+      offset,
+    }
+    if (relatedTags) params.related_tags = true
+    if (excludeTag) params.exclude_tag_id = excludeTag
+    const events = await gammaGet<GammaEvent[]>('/events', params, { noCache: true })
+    return projectListEvents(events)
+  },
+  ['gamma-events-by-tag'],
+  { revalidate: 30 }
+)
+
 export async function fetchEventsByTag(
   tagSlug: string,
   limitOrOpts: number | EventsByTagOpts = 100,
   offsetArg: number = 0
 ): Promise<GammaEvent[]> {
-  // Backward compat: chiamata con (tagSlug, limit, offset) numerica
-  // come prima OR con (tagSlug, opts) per il pattern nuovo con
-  // relatedTags/excludeTag.
   const opts: EventsByTagOpts =
-    typeof limitOrOpts === 'number'
-      ? { limit: limitOrOpts, offset: offsetArg }
-      : limitOrOpts
-  const params: ParamRecord = {
-    tag_slug: tagSlug,
-    active: true,
-    closed: false,
-    order: 'volume24hr',
-    ascending: false,
-    limit: opts.limit ?? 100,
-    offset: opts.offset ?? 0,
-  }
-  if (opts.relatedTags) params.related_tags = true
-  if (opts.excludeTag) params.exclude_tag_id = opts.excludeTag
-  return gammaGet<GammaEvent[]>('/events', params, { revalidate: 30 })
+    typeof limitOrOpts === 'number' ? { limit: limitOrOpts, offset: offsetArg } : limitOrOpts
+  return fetchEventsByTagInner(
+    tagSlug,
+    opts.limit ?? 100,
+    opts.offset ?? 0,
+    opts.relatedTags ?? false,
+    opts.excludeTag
+  )
 }
 
 /**
@@ -107,29 +209,39 @@ export async function fetchEventsByTag(
  * lascia con `active=true` ma scaduti settimane fa. Senza questo, la home
  * Live si riempiva di crypto round del 2025 che non sono live.
  */
-export async function fetchLiveEvents(limit: number = 100): Promise<GammaEvent[]> {
-  const nowIso = new Date().toISOString()
-  return gammaGet<GammaEvent[]>(
-    '/events',
-    {
-      active: true,
-      closed: false,
-      end_date_min: nowIso,
-      order: 'endDate',
-      ascending: true,
-      limit,
-    },
-    { revalidate: 15 }
-  )
-}
+export const fetchLiveEvents = unstable_cache(
+  async (limit: number = 80): Promise<GammaEvent[]> => {
+    const nowIso = new Date().toISOString()
+    const events = await gammaGet<GammaEvent[]>(
+      '/events',
+      {
+        active: true,
+        closed: false,
+        end_date_min: nowIso,
+        order: 'endDate',
+        ascending: true,
+        limit,
+      },
+      { noCache: true }
+    )
+    return projectListEvents(events)
+  },
+  ['gamma-live-events'],
+  { revalidate: 15 }
+)
 
-export async function searchEvents(query: string, limit: number = 20): Promise<GammaEvent[]> {
-  return gammaGet<GammaEvent[]>(
-    '/events',
-    { search: query, active: true, limit },
-    { revalidate: 15 }
-  )
-}
+export const searchEvents = unstable_cache(
+  async (query: string, limit: number = 20): Promise<GammaEvent[]> => {
+    const events = await gammaGet<GammaEvent[]>(
+      '/events',
+      { search: query, active: true, limit },
+      { noCache: true }
+    )
+    return projectListEvents(events)
+  },
+  ['gamma-search-events'],
+  { revalidate: 15 }
+)
 
 export type HeroPickKind = 'new' | 'live' | 'upcoming'
 
@@ -233,9 +345,7 @@ export async function fetchHeroEvents(): Promise<HeroPick[]> {
  * `cache: 'no-store'` perché chiamata client-side ad ogni 5s tick — non
  * vogliamo browser cache che ci ridia il round appena scaduto.
  */
-export async function fetchNextRoundInSeries(
-  seriesSlug: string
-): Promise<GammaEvent | null> {
+export async function fetchNextRoundInSeries(seriesSlug: string): Promise<GammaEvent | null> {
   const nowIso = new Date().toISOString()
   const url = new URL('/events', 'https://gamma-api.polymarket.com')
   url.searchParams.set('series_slug', seriesSlug)
@@ -425,14 +535,7 @@ export interface GammaTeam {
 }
 
 /** Lista team per una specifica lega (es. NFL, NBA, Premier League). */
-export async function fetchTeams(
-  league: string,
-  limit: number = 100
-): Promise<GammaTeam[]> {
-  const data = await gammaGet<GammaTeam[]>(
-    '/teams',
-    { league, limit },
-    { revalidate: 3600 }
-  )
+export async function fetchTeams(league: string, limit: number = 100): Promise<GammaTeam[]> {
+  const data = await gammaGet<GammaTeam[]>('/teams', { league, limit }, { revalidate: 3600 })
   return Array.isArray(data) ? data : []
 }

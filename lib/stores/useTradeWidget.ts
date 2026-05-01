@@ -34,6 +34,18 @@ export interface TradeDraft {
 
 export type TradeMode = 'market' | 'limit'
 
+/**
+ * Preset scadenza GTD (Doc 4 wireframe page-2):
+ *  - 'gtc'  → Good-Till-Cancelled (no expiration)
+ *  - '5m'   → 5 minuti (crypto round 5m)
+ *  - '1h'   → 1 ora (crypto round 15m / breve)
+ *  - '12h'  → 12 ore
+ *  - '24h'  → 24 ore
+ *  - 'eod'  → Fine giornata (mezzanotte UTC oggi)
+ *  - 'custom' → date picker (placeholder, non implementato)
+ */
+export type LimitExpirationPreset = 'gtc' | '5m' | '1h' | '12h' | '24h' | 'eod' | 'custom'
+
 interface TradeWidgetState {
   draft: TradeDraft | null
   mode: TradeMode
@@ -41,6 +53,8 @@ interface TradeWidgetState {
   /** Limite — placeholder MA4.4, UI presente */
   limitPriceCents: number
   limitShares: number
+  /** Preset scadenza GTD selezionato. Default 'gtc' (no expire). */
+  limitExpiration: LimitExpirationPreset
   /** Mobile bottom sheet visibility */
   isOpen: boolean
 }
@@ -52,6 +66,7 @@ interface TradeWidgetActions {
   incrementAmount: (delta: number) => void
   setLimitPrice: (cents: number) => void
   setLimitShares: (shares: number) => void
+  setLimitExpiration: (preset: LimitExpirationPreset) => void
   open: () => void
   close: () => void
   clear: () => void
@@ -74,6 +89,7 @@ const INITIAL_STATE: TradeWidgetState = {
   amountUsdc: DEFAULT_AMOUNT,
   limitPriceCents: 50,
   limitShares: 0,
+  limitExpiration: 'gtc',
   isOpen: false,
 }
 
@@ -102,6 +118,8 @@ export const useTradeWidget = create<TradeWidgetStore>()((set) => ({
   },
 
   setLimitShares: (shares) => set({ limitShares: Math.max(0, Math.round(shares)) }),
+
+  setLimitExpiration: (preset) => set({ limitExpiration: preset }),
 
   open: () => set({ isOpen: true }),
   close: () => set({ isOpen: false }),

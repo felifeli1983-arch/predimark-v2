@@ -34,21 +34,20 @@ const HERO_BADGES: Record<HeroPickKind, HeroBadge> = {
 }
 
 async function fetchEventsForCategory(category: string | undefined) {
+  // SSR pull cap a 80 — sopra i 2MB il Next.js data cache rigetta il payload
+  // ("items over 2MB can not be cached"). Con projection 80 eventi pesano
+  // ~1.7MB, restano cache-able. MarketsGrid pagina via /api/v1/events per
+  // gli eventi successivi (infinite scroll).
   if (!category || category === 'all' || category === 'for-you') {
-    // Default: top 200 per volume 24h (no featured filter — c'erano
-    // solo 21 featured su 500+ attivi, l'utente vedeva 23 card totali).
-    return fetchFeaturedEvents(200)
+    return fetchFeaturedEvents(80)
   }
   if (category === 'live') {
-    // LIVE: 200 attivi end_date_min=NOW, ordinati per scadenza più imminente.
-    return fetchLiveEvents(200)
+    return fetchLiveEvents(80)
   }
   if (NON_TAG_SLUGS.has(category)) {
-    // mentions/creators → MA5+ feature, per ora mostra top attivi.
-    return fetchFeaturedEvents(200)
+    return fetchFeaturedEvents(80)
   }
-  // Categoria reale → fetch dedicato per quel tag (fino a 200 eventi).
-  return fetchEventsByTag(category, 200)
+  return fetchEventsByTag(category, 80)
 }
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<SearchParams> }) {

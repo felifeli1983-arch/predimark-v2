@@ -28,7 +28,7 @@ function buildUrl(path: string, params?: Record<string, ParamValue>): string {
 export async function gammaGet<T>(
   path: string,
   params?: Record<string, ParamValue>,
-  options?: { revalidate?: number }
+  options?: { revalidate?: number; noCache?: boolean }
 ): Promise<T> {
   const url = buildUrl(path, params)
   const revalidate = options?.revalidate ?? 30
@@ -40,9 +40,13 @@ export async function gammaGet<T>(
     const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS)
 
     try {
+      // Endpoint /events ritorna >2MB su limit≥20 — il Next.js fetch
+      // cache rifiuta items >2MB con un warning rumoroso e refetcha
+      // ogni request. Per i list calls bypassiamo il fetch cache e
+      // cachiamo a valle col projection (vedi queries.ts:projectListEvents).
       const res = await fetch(url, {
         signal: controller.signal,
-        next: { revalidate },
+        ...(options?.noCache ? { cache: 'no-store' as const } : { next: { revalidate } }),
       })
       clearTimeout(timeoutId)
 
