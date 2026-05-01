@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, Gift, Sun, Moon, Wallet, TrendingUp, Star } from 'lucide-react'
+import { Gift, Sun, Moon, Wallet, TrendingUp, Star } from 'lucide-react'
 import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
 import { useFundWallet, useWallets, getEmbeddedConnectedWallet } from '@privy-io/react-auth'
@@ -11,6 +11,7 @@ import { useBalance } from '@/lib/stores/useBalance'
 import { useRedeemPromptStore } from '@/lib/stores/useRedeemPrompt'
 import { ProfileDropdown } from './ProfileDropdown'
 import { RealDemoToggle } from './RealDemoToggle'
+import { NotificationBell } from './NotificationBell'
 
 interface Props {
   ready: boolean
@@ -244,12 +245,7 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
         </Link>
       )}
 
-      <button
-        aria-label="Notifiche"
-        style={{ ...iconBtnStyle, display: 'flex', position: 'relative' }}
-      >
-        <Bell size={15} />
-      </button>
+      <NotificationBell iconBtnStyle={iconBtnStyle} />
 
       {authenticated && <RealDemoToggle isDemo={isDemo} onToggle={toggleDemo} />}
 

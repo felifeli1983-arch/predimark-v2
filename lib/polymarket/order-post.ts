@@ -298,6 +298,106 @@ export async function areOrdersScoring(
   return (res as Record<string, boolean>) ?? {}
 }
 
+export interface PolymarketNotification {
+  id: number
+  type: number
+  /** 1=cancellation, 2=fill, 4=market_resolved (Doc L2 Methods → Notifications). */
+  typeLabel: 'cancellation' | 'fill' | 'market_resolved' | 'unknown'
+  payload: unknown
+  timestamp: number | null
+  owner: string
+}
+
+const NOTIF_TYPE_MAP: Record<number, PolymarketNotification['typeLabel']> = {
+  1: 'cancellation',
+  2: 'fill',
+  4: 'market_resolved',
+}
+
+/**
+ * Notifiche eventi Polymarket per l'utente (ordine cancellato/filled,
+ * market resolved). Doc L2 Methods → getNotifications. Auto-purge dopo
+ * 48h server-side, quindi vanno fetchate periodicamente.
+ *
+ * Usate dal NotificationBell in header per badge count + dropdown lista.
+ */
+export async function getPolymarketNotifications(
+  creds: ApiKeyCreds
+): Promise<PolymarketNotification[]> {
+  try {
+    const res = (await authClient(creds).getNotifications()) as Array<{
+      id?: number
+      type?: number
+      payload?: unknown
+      timestamp?: number
+      owner?: string
+    }>
+    return (res ?? []).map((n) => ({
+      id: Number(n.id ?? 0),
+      type: Number(n.type ?? 0),
+      typeLabel: NOTIF_TYPE_MAP[Number(n.type ?? 0)] ?? 'unknown',
+      payload: n.payload ?? null,
+      timestamp: n.timestamp ?? null,
+      owner: String(n.owner ?? ''),
+    }))
+  } catch {
+    return []
+  }
+}
+
+/** Marca notifiche come read/dismissed (Doc L2 Methods → dropNotifications). */
+export async function dropPolymarketNotifications(
+  creds: ApiKeyCreds,
+  ids: string[]
+): Promise<void> {
+  if (ids.length === 0) return
+  await authClient(creds).dropNotifications({ ids })
+}
+
+export interface BalanceAllowance {
+  /** Saldo in human units (USDC = 1.5 per $1.50, conditional shares = float). */
+  balance: number
+  /** Allowance contratto CTFExchange — se < balance, il trade viene rifiutato. */
+  allowance: number
+  /** True se balance ≥ allowance ≥ 0 e nessuno è null. */
+  ready: boolean
+}
+
+/**
+ * Balance + allowance per COLLATERAL (USDC) o CONDITIONAL (token shares).
+ * Doc L2 Methods → getBalanceAllowance. Critical per pre-trade UI:
+ * mostra "Disponibile: $X" e warns se allowance < balance (richiede
+ * approve on-chain prima di poter tradare).
+ *
+ * Se assetType=CONDITIONAL, tokenId è REQUIRED.
+ */
+export async function getBalanceAllowance(
+  creds: ApiKeyCreds,
+  assetType: 'COLLATERAL' | 'CONDITIONAL',
+  tokenId?: string
+): Promise<BalanceAllowance | null> {
+  try {
+    // Cast as unknown — il SDK richiede AssetType enum + token_id condizionale,
+    // ma noi normalizziamo col nostro union literal che equivale.
+    const res = (await authClient(creds).getBalanceAllowance({
+      asset_type: assetType,
+      ...(tokenId && { token_id: tokenId }),
+    } as unknown as Parameters<ClobClient['getBalanceAllowance']>[0])) as {
+      balance?: string | number
+      allowance?: string | number
+    }
+    const balance = Number(res?.balance ?? 0)
+    const allowance = Number(res?.allowance ?? 0)
+    return {
+      balance,
+      allowance,
+      ready: Number.isFinite(balance) && Number.isFinite(allowance) && allowance >= balance,
+    }
+  } catch {
+    return null
+  }
+}
+
 /**
  * Status snapshot di un singolo ordine (per polling live → matched/
  * cancelled/expired). Returns null se non trovato.
