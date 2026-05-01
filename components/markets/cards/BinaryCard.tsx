@@ -7,6 +7,7 @@ import { DonutChart } from '../charts/DonutChart'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 import { StarToggle } from '../StarToggle'
+import { BetSlipAddButton } from '../BetSlipAddButton'
 
 interface BinaryCardProps {
   event: AuktoraEvent
@@ -70,43 +71,67 @@ export function BinaryCard({ event, onBookmark }: BinaryCardProps) {
       >
         <DonutChart probability={yesPrice} size={70} />
 
-        <div className="flex w-full" style={{ gap: 8 }}>
-          <button
-            type="button"
-            className="btn-trade btn-trade-yes"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              navigateToEvent('yes')
-            }}
-            style={{
-              flex: 1,
-              padding: '8px 12px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: 'var(--font-base)',
-              fontWeight: 600,
-            }}
-          >
-            Yes {yesPct}%
-          </button>
-          <button
-            type="button"
-            className="btn-trade btn-trade-no"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              navigateToEvent('no')
-            }}
-            style={{
-              flex: 1,
-              padding: '8px 12px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: 'var(--font-base)',
-              fontWeight: 600,
-            }}
-          >
-            No {noPct}%
-          </button>
+        <div className="flex w-full" style={{ gap: 6 }}>
+          <div style={{ flex: 1, display: 'flex', gap: 4, alignItems: 'center' }}>
+            <button
+              type="button"
+              className="btn-trade btn-trade-yes"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                navigateToEvent('yes')
+              }}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-base)',
+                fontWeight: 600,
+              }}
+            >
+              Yes {yesPct}%
+            </button>
+            {market && (
+              <BetSlipAddButton
+                event={event}
+                market={market}
+                side="yes"
+                outcomeLabel={`Yes · ${event.title}`}
+                pricePerShare={yesPrice}
+                tokenId={market.clobTokenIds?.[0] ?? ''}
+              />
+            )}
+          </div>
+          <div style={{ flex: 1, display: 'flex', gap: 4, alignItems: 'center' }}>
+            <button
+              type="button"
+              className="btn-trade btn-trade-no"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                navigateToEvent('no')
+              }}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-base)',
+                fontWeight: 600,
+              }}
+            >
+              No {noPct}%
+            </button>
+            {market && (
+              <BetSlipAddButton
+                event={event}
+                market={market}
+                side="no"
+                outcomeLabel={`No · ${event.title}`}
+                pricePerShare={noPrice}
+                tokenId={market.clobTokenIds?.[1] ?? ''}
+              />
+            )}
+          </div>
         </div>
       </div>
 

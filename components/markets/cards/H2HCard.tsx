@@ -6,6 +6,7 @@ import { useLiveMidpoint } from '@/lib/ws/hooks/useLiveMidpoint'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 import { StarToggle } from '../StarToggle'
+import { BetSlipAddButton } from '../BetSlipAddButton'
 
 interface Props {
   event: AuktoraEvent
@@ -54,12 +55,13 @@ export function H2HCard({ event, onBookmark }: Props) {
   // semplificazione (non perfetta), ma meglio di prob statiche.
   const { midpoint } = useLiveMidpoint(market?.clobTokenIds?.[0] ?? null)
   const baseOutcomes = market?.outcomes ?? []
-  const outcomes: AuktoraOutcome[] = midpoint !== null && baseOutcomes.length === 2
-    ? [
-        { ...baseOutcomes[0]!, price: midpoint },
-        { ...baseOutcomes[1]!, price: 1 - midpoint },
-      ]
-    : baseOutcomes
+  const outcomes: AuktoraOutcome[] =
+    midpoint !== null && baseOutcomes.length === 2
+      ? [
+          { ...baseOutcomes[0]!, price: midpoint },
+          { ...baseOutcomes[1]!, price: 1 - midpoint },
+        ]
+      : baseOutcomes
   const { teamA, teamB, draw } = resolveOutcomes(outcomes)
 
   const isLive = event.active && !event.closed
@@ -116,19 +118,51 @@ export function H2HCard({ event, onBookmark }: Props) {
           <TeamLabel outcome={teamB} align="right" />
         </div>
 
-        {/* Riga bottoni */}
+        {/* Riga bottoni — ognuno con "+" Bet Slip accanto */}
         <div style={{ display: 'flex', gap: 6 }}>
-          <TeamButton
-            outcome={teamA}
-            onClick={teamA ? () => navigateToEvent(teamA.name) : undefined}
-          />
-          {draw && (
-            <TeamButton outcome={draw} variant="muted" onClick={() => navigateToEvent(draw.name)} />
+          {teamA && market && (
+            <div style={{ flex: 1, display: 'flex', gap: 4, alignItems: 'center' }}>
+              <TeamButton outcome={teamA} onClick={() => navigateToEvent(teamA.name)} />
+              <BetSlipAddButton
+                event={event}
+                market={market}
+                side={teamA.name}
+                outcomeLabel={teamA.name}
+                pricePerShare={teamA.price}
+                tokenId={market.clobTokenIds?.[0] ?? ''}
+              />
+            </div>
           )}
-          <TeamButton
-            outcome={teamB}
-            onClick={teamB ? () => navigateToEvent(teamB.name) : undefined}
-          />
+          {draw && market && (
+            <div style={{ flex: 1, display: 'flex', gap: 4, alignItems: 'center' }}>
+              <TeamButton
+                outcome={draw}
+                variant="muted"
+                onClick={() => navigateToEvent(draw.name)}
+              />
+              <BetSlipAddButton
+                event={event}
+                market={market}
+                side={draw.name}
+                outcomeLabel={draw.name}
+                pricePerShare={draw.price}
+                tokenId={market.clobTokenIds?.[0] ?? ''}
+              />
+            </div>
+          )}
+          {teamB && market && (
+            <div style={{ flex: 1, display: 'flex', gap: 4, alignItems: 'center' }}>
+              <TeamButton outcome={teamB} onClick={() => navigateToEvent(teamB.name)} />
+              <BetSlipAddButton
+                event={event}
+                market={market}
+                side={teamB.name}
+                outcomeLabel={teamB.name}
+                pricePerShare={teamB.price}
+                tokenId={market.clobTokenIds?.[1] ?? ''}
+              />
+            </div>
+          )}
         </div>
       </div>
 

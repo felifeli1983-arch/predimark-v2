@@ -7,6 +7,7 @@ import { useBatchPrices } from '@/lib/ws/hooks/useBatchPrices'
 import { EventCardHeader } from '../EventCardHeader'
 import { EventCardFooter } from '../EventCardFooter'
 import { StarToggle } from '../StarToggle'
+import { BetSlipAddButton } from '../BetSlipAddButton'
 
 const TOP_N = 3
 const REFRESH_INTERVAL_MS = 15_000
@@ -153,9 +154,27 @@ function OutcomeRow({ market, event, onYesClick, onNoClick }: RowProps) {
       >
         {pct}%
       </span>
-      <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+      <div style={{ display: 'flex', gap: 4, flexShrink: 0, alignItems: 'center' }}>
         <MiniBtn label="Sì" variant="yes" onClick={onYesClick} />
+        <BetSlipAddButton
+          event={event}
+          market={market}
+          side="yes"
+          outcomeLabel={`Sì · ${label}`}
+          pricePerShare={market.yesPrice}
+          tokenId={market.clobTokenIds?.[0] ?? ''}
+          size={11}
+        />
         <MiniBtn label="No" variant="no" onClick={onNoClick} />
+        <BetSlipAddButton
+          event={event}
+          market={market}
+          side="no"
+          outcomeLabel={`No · ${label}`}
+          pricePerShare={market.noPrice}
+          tokenId={market.clobTokenIds?.[1] ?? ''}
+          size={11}
+        />
       </div>
     </div>
   )

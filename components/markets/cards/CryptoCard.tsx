@@ -13,6 +13,7 @@ import { fetchReferencePrice } from '@/lib/crypto/reference-price'
 import { DonutChart } from '../charts/DonutChart'
 import { EventCardHeader } from '../EventCardHeader'
 import { StarToggle } from '../StarToggle'
+import { BetSlipAddButton } from '../BetSlipAddButton'
 
 interface Props {
   event: AuktoraEvent
@@ -283,63 +284,82 @@ export function CryptoCard({ event: initialEvent, onBookmark }: Props) {
               </span>
             )}
           </div>
-          <DonutChart
-            probability={upProb}
-            size={64}
-            strokeWidth={7}
-            labels={['Up', 'Down']}
-          />
+          <DonutChart probability={upProb} size={64} strokeWidth={7} labels={['Up', 'Down']} />
         </div>
 
-        {/* Up/Down buttons */}
+        {/* Up/Down buttons + Bet Slip "+" */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', gap: 6 }}>
-            <button
-              type="button"
-              className="btn-trade btn-trade-up"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                navigateToEvent('up')
-              }}
-              style={{
-                flex: 1,
-                padding: '8px 4px',
-                borderRadius: 'var(--radius-md)',
-                fontSize: 'var(--font-base)',
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-                cursor: 'pointer',
-              }}
-            >
-              <TrendingUp size={13} /> Up {upPct}%
-            </button>
-            <button
-              type="button"
-              className="btn-trade btn-trade-down"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                navigateToEvent('down')
-              }}
-              style={{
-                flex: 1,
-                padding: '8px 4px',
-                borderRadius: 'var(--radius-md)',
-                fontSize: 'var(--font-base)',
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-                cursor: 'pointer',
-              }}
-            >
-              <TrendingDown size={13} /> Down {downPct}%
-            </button>
+            <div style={{ flex: 1, display: 'flex', gap: 4, alignItems: 'center' }}>
+              <button
+                type="button"
+                className="btn-trade btn-trade-up"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  navigateToEvent('up')
+                }}
+                style={{
+                  flex: 1,
+                  padding: '8px 4px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--font-base)',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 4,
+                  cursor: 'pointer',
+                }}
+              >
+                <TrendingUp size={13} /> Up {upPct}%
+              </button>
+              {market && (
+                <BetSlipAddButton
+                  event={event}
+                  market={market}
+                  side="up"
+                  outcomeLabel={`Up · ${event.title}`}
+                  pricePerShare={upProb}
+                  tokenId={market.clobTokenIds?.[0] ?? ''}
+                />
+              )}
+            </div>
+            <div style={{ flex: 1, display: 'flex', gap: 4, alignItems: 'center' }}>
+              <button
+                type="button"
+                className="btn-trade btn-trade-down"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  navigateToEvent('down')
+                }}
+                style={{
+                  flex: 1,
+                  padding: '8px 4px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--font-base)',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 4,
+                  cursor: 'pointer',
+                }}
+              >
+                <TrendingDown size={13} /> Down {downPct}%
+              </button>
+              {market && (
+                <BetSlipAddButton
+                  event={event}
+                  market={market}
+                  side="down"
+                  outcomeLabel={`Down · ${event.title}`}
+                  pricePerShare={downProb}
+                  tokenId={market.clobTokenIds?.[1] ?? ''}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
