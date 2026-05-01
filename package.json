@@ -17,6 +17,7 @@
     "test:coverage": "vitest run --coverage",
     "validate": "npm run typecheck && npm run lint && npm run test",
     "types:gen": "supabase gen types typescript --project-id hhuwxcijarcyivwzpqfp --schema public > lib/supabase/database.types.ts",
+    "derive:builder-creds": "tsx scripts/derive-builder-creds.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -50,6 +51,7 @@
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.1.5"
   },
