@@ -1,11 +1,11 @@
 /**
  * Builder analytics — trades attribuiti al nostro builder code Auktora.
  *
- * Doc Polymarket "Trading CLOB Overview": Builder Methods → "Track orders
- * and trades attributed to your builder code".
+ * Doc Polymarket "Builder Methods": Track orders and trades attributed
+ * to your builder code via getBuilderTrades(BuilderTradesPaginatedResponse).
  *
- * SDK method: `getBuilderTrades({ builder_code, limit, before, after,
- * market?, asset_id? })` ritorna paginato + cumulative stats lato caller.
+ * SDK method: `getBuilderTrades({ builder_code, market?, asset_id?,
+ * before?, after? })` ritorna paginato cursor-based con next_cursor.
  *
  * Auth: richiede L2 creds del wallet che owns il builder code (server-side,
  * env vars POLYMARKET_BUILDER_API_KEY/SECRET/PASSPHRASE). MAI esporre
@@ -17,6 +17,10 @@ import { CLOB_URL, BUILDER_CODE } from './clob'
 
 export interface BuilderTradeRow {
   id: string
+  /** Type of the trade (Doc Builder Methods → BuilderTrade.tradeType). */
+  tradeType: string
+  /** Hash of the taker order (Doc → takerOrderHash). */
+  takerOrderHash: string
   market: string
   assetId: string
   side: 'BUY' | 'SELL'
@@ -36,13 +40,29 @@ export interface BuilderTradeRow {
   feeUsdc: number
   transactionHash: string
   matchTime: string
+  /** Bucket index per trade reconciliation (split tx). */
+  bucketIndex: number
   /**
    * Builder code attribution (bytes32) — Doc Order Attribution.
    * Sanity check: deve coincidere con BUILDER_CODE configurato.
-   * Se differisce, il trade è stato attribuito a un'altra app (mai
-   * dovrebbe succedere visto che filtriamo per builder_code in fetch).
    */
   builder: string
+  /** Error message se trade ha encountered issue, altrimenti null. */
+  errMsg: string | null
+  /** Timestamp creation record (può essere null). */
+  createdAt: string | null
+  /** Timestamp ultimo update record (può essere null). */
+  updatedAt: string | null
+}
+
+export interface BuilderTradesPaginatedResponse {
+  trades: BuilderTradeRow[]
+  /** Cursor opaco per la prossima pagina, vuoto se ultima. */
+  nextCursor: string
+  /** Massimo trade per pagina (server-side limit). */
+  limit: number
+  /** Trade count in QUESTA pagina (non total). */
+  count: number
 }
 
 export interface BuilderStats {
@@ -75,19 +95,54 @@ function builderClient(creds: ApiKeyCreds): ClobClient {
   })
 }
 
+function mapTradeRow(r: Record<string, unknown>): BuilderTradeRow {
+  return {
+    id: String(r.id ?? ''),
+    tradeType: String(r.tradeType ?? ''),
+    takerOrderHash: String(r.takerOrderHash ?? ''),
+    market: String(r.market ?? ''),
+    assetId: String(r.assetId ?? ''),
+    side: r.side === 'SELL' ? 'SELL' : 'BUY',
+    outcome: String(r.outcome ?? ''),
+    outcomeIndex: Number(r.outcomeIndex ?? 0),
+    size: Number(r.size ?? 0),
+    sizeUsdc: Number(r.sizeUsdc ?? 0),
+    price: Number(r.price ?? 0),
+    owner: String(r.owner ?? ''),
+    maker: String(r.maker ?? ''),
+    status: String(r.status ?? ''),
+    fee: Number(r.fee ?? 0),
+    feeUsdc: Number(r.feeUsdc ?? 0),
+    transactionHash: String(r.transactionHash ?? ''),
+    matchTime: String(r.matchTime ?? ''),
+    bucketIndex: Number(r.bucketIndex ?? 0),
+    builder: String(r.builder ?? ''),
+    errMsg: typeof r.err_msg === 'string' ? r.err_msg : null,
+    createdAt: typeof r.createdAt === 'string' ? r.createdAt : null,
+    updatedAt: typeof r.updatedAt === 'string' ? r.updatedAt : null,
+  }
+}
+
 /**
- * Fetch trades attribuiti al nostro builder code.
+ * Fetch trades attribuiti al nostro builder code, paginato cursor-based.
+ *
+ * Doc Builder Methods → BuilderTradesPaginatedResponse:
+ *  - trades: array (questa pagina)
+ *  - next_cursor: passa al prossimo before/after per page following
+ *  - limit: pageSize server-side
+ *  - count: trade in QUESTA pagina (non grand total)
+ *
  * Filtri opzionali per market/asset (focus su singolo evento).
  *
  * Ritorna `null` se le builder creds non sono configurate (env mancanti).
  */
 export async function getBuilderTrades(params: {
-  limit?: number
   market?: string
   assetId?: string
+  /** Cursor per paginazione: passa il `nextCursor` della risposta precedente. */
   before?: string
   after?: string
-}): Promise<BuilderTradeRow[] | null> {
+}): Promise<BuilderTradesPaginatedResponse | null> {
   if (!BUILDER_CODE) return null
   const creds = builderCreds()
   if (!creds) return null
@@ -103,27 +158,17 @@ export async function getBuilderTrades(params: {
   try {
     const res = (await builderClient(creds).getBuilderTrades(sdkParams)) as unknown as {
       trades?: Array<Record<string, unknown>>
+      next_cursor?: string
+      limit?: number
+      count?: number
     }
     const rows = res?.trades ?? []
-    return rows.map((r) => ({
-      id: String(r.id ?? ''),
-      market: String(r.market ?? ''),
-      assetId: String(r.assetId ?? ''),
-      side: r.side === 'SELL' ? 'SELL' : 'BUY',
-      outcome: String(r.outcome ?? ''),
-      outcomeIndex: Number(r.outcomeIndex ?? 0),
-      size: Number(r.size ?? 0),
-      sizeUsdc: Number(r.sizeUsdc ?? 0),
-      price: Number(r.price ?? 0),
-      owner: String(r.owner ?? ''),
-      maker: String(r.maker ?? ''),
-      status: String(r.status ?? ''),
-      fee: Number(r.fee ?? 0),
-      feeUsdc: Number(r.feeUsdc ?? 0),
-      transactionHash: String(r.transactionHash ?? ''),
-      matchTime: String(r.matchTime ?? ''),
-      builder: String(r.builder ?? ''),
-    }))
+    return {
+      trades: rows.map(mapTradeRow),
+      nextCursor: res.next_cursor ?? '',
+      limit: Number(res.limit ?? rows.length),
+      count: Number(res.count ?? rows.length),
+    }
   } catch (err) {
     console.error('[builder.getBuilderTrades]', err)
     return null
@@ -133,6 +178,9 @@ export async function getBuilderTrades(params: {
 /**
  * Aggregate stats su un set di trades — calcolato client-side perché
  * Polymarket SDK non espone stats endpoint dedicato.
+ *
+ * Per stats globali (across pages), il caller accumula man mano che
+ * pagina via cursor: pass tutti i trades unione delle pagine.
  */
 export function aggregateBuilderStats(trades: BuilderTradeRow[]): BuilderStats {
   const traders = new Set<string>()
