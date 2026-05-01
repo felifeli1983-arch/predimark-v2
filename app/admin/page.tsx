@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { Users, TrendingUp, DollarSign, AlertCircle, Loader2 } from 'lucide-react'
+import { ClobHealthBadge } from '@/components/admin/ClobHealthBadge'
 
 interface KPIs {
   dau: number
@@ -45,17 +46,27 @@ export default function AdminDashboardPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <header>
-        <h1 style={{ margin: 0, fontSize: 'var(--font-2xl)', fontWeight: 700 }}>Dashboard</h1>
-        <p
-          style={{
-            margin: '6px 0 0',
-            fontSize: 'var(--font-sm)',
-            color: 'var(--color-text-muted)',
-          }}
-        >
-          Overview KPI e attività recente.
-        </p>
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 12,
+        }}
+      >
+        <div>
+          <h1 style={{ margin: 0, fontSize: 'var(--font-2xl)', fontWeight: 700 }}>Dashboard</h1>
+          <p
+            style={{
+              margin: '6px 0 0',
+              fontSize: 'var(--font-sm)',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            Overview KPI e attività recente.
+          </p>
+        </div>
+        <ClobHealthBadge />
       </header>
 
       {error ? (

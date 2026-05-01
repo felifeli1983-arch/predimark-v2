@@ -273,3 +273,176 @@ export async function calculateMarketImpact(
     return null
   }
 }
+
+/**
+ * Health check del CLOB Polymarket (Doc Public Methods → getOk).
+ * Ritorna true se il servizio risponde, false su qualsiasi errore o
+ * timeout. Usato in /api/v1/polymarket/health per esporre lo stato
+ * upstream nella admin dashboard / monitoring.
+ */
+export async function getClobOk(): Promise<boolean> {
+  try {
+    await createReadOnlyClient().getOk()
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Server time CLOB (Unix seconds). Doc Public Methods → getServerTime.
+ * Utile per:
+ *  - Clock skew check tra client/server (warn se diff >30s)
+ *  - GTD expiration sync (l'expiration deve essere relative al server,
+ *    non al client clock che può essere off)
+ */
+export async function getServerTime(): Promise<number | null> {
+  try {
+    const t = (await createReadOnlyClient().getServerTime()) as number | string
+    const n = Number(t)
+    return Number.isFinite(n) ? n : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Tutti i CLOB-level params per un market in una sola call (Doc Public
+ * Methods → getClobMarketInfo). Più efficient di getMarketDetailsByToken
+ * (1 call vs 2: getTickSize + getNegRisk).
+ *
+ * Risposta abbreviata: t=tokens, mts=tickSize, mos=minOrderSize,
+ * mbf/tbf=base fees, fd=fee curve, rfqe=RFQ enabled, gst=game start.
+ */
+export interface ClobMarketInfo {
+  tokens: Array<{ tokenId: string; outcome: string }>
+  minOrderSize: number
+  tickSize: string
+  makerBaseFeeBps: number
+  takerBaseFeeBps: number
+  rfqEnabled: boolean
+  gameStartTime: string | null
+}
+
+export async function getClobMarketInfo(conditionId: string): Promise<ClobMarketInfo | null> {
+  try {
+    const raw = (await createReadOnlyClient().getClobMarketInfo(conditionId)) as {
+      t?: Array<{ t?: string; o?: string }>
+      mos?: number
+      mts?: number | string
+      mbf?: number
+      tbf?: number
+      rfqe?: boolean
+      gst?: string | null
+    } | null
+    if (!raw) return null
+    return {
+      tokens: (raw.t ?? []).map((tk) => ({
+        tokenId: String(tk.t ?? ''),
+        outcome: String(tk.o ?? ''),
+      })),
+      minOrderSize: Number(raw.mos ?? 1),
+      tickSize: String(raw.mts ?? '0.01'),
+      makerBaseFeeBps: Number(raw.mbf ?? 0),
+      takerBaseFeeBps: Number(raw.tbf ?? 0),
+      rfqEnabled: Boolean(raw.rfqe ?? false),
+      gameStartTime: raw.gst ?? null,
+    }
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Fee rate in basis points per un tokenID (Doc Public Methods).
+ * Usato dalla preview UI per mostrare "Fee 0.4%" prima del submit.
+ */
+export async function getFeeRateBps(tokenId: string): Promise<number | null> {
+  try {
+    const bps = await createReadOnlyClient().getFeeRateBps(tokenId)
+    return Number.isFinite(Number(bps)) ? Number(bps) : null
+  } catch {
+    return null
+  }
+}
+
+/** Fee curve exponent per un tokenID (Doc Public Methods). */
+export async function getFeeExponent(tokenId: string): Promise<number | null> {
+  try {
+    const exp = await createReadOnlyClient().getFeeExponent(tokenId)
+    return Number.isFinite(Number(exp)) ? Number(exp) : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Midpoints batch per N token IDs (Doc Public Methods → getMidpoints).
+ * 1 call invece di N. Usato da MultiStrikeCard / multi-line chart.
+ */
+export async function getMidpointsBatch(tokenIds: string[]): Promise<Record<string, number>> {
+  if (tokenIds.length === 0) return {}
+  try {
+    const params = tokenIds.map((token_id) => ({ token_id, side: Side.BUY }))
+    const res = (await createReadOnlyClient().getMidpoints(params)) as Record<string, string>
+    const out: Record<string, number> = {}
+    for (const [tokenId, value] of Object.entries(res ?? {})) {
+      const n = Number(value)
+      if (Number.isFinite(n)) out[tokenId] = n
+    }
+    return out
+  } catch {
+    return {}
+  }
+}
+
+/**
+ * OrderBooks batch per N token IDs (Doc Public Methods → getOrderBooks).
+ * Per dashboard di market making — 1 call vs N.
+ */
+export async function getOrderBooksBatch(
+  tokenIds: string[]
+): Promise<Record<string, OrderBookSummary>> {
+  if (tokenIds.length === 0) return {}
+  try {
+    const params = tokenIds.map((token_id) => ({ token_id, side: Side.BUY }))
+    const res = (await createReadOnlyClient().getOrderBooks(params)) as OrderBookSummary[]
+    const out: Record<string, OrderBookSummary> = {}
+    for (const book of res ?? []) {
+      if (book?.asset_id) out[book.asset_id] = book
+    }
+    return out
+  } catch {
+    return {}
+  }
+}
+
+/**
+ * Last trade prices batch (Doc Public Methods → getLastTradesPrices).
+ * Usato da home grid per mostrare "ultimo prezzo trade" come fallback
+ * quando midpoint non è disponibile (es. spread ampio).
+ */
+export async function getLastTradesPricesBatch(
+  tokenIds: string[]
+): Promise<Record<string, { price: number; side: 'BUY' | 'SELL' }>> {
+  if (tokenIds.length === 0) return {}
+  try {
+    const params = tokenIds.map((token_id) => ({ token_id, side: Side.BUY }))
+    const res = (await createReadOnlyClient().getLastTradesPrices(params)) as Array<{
+      token_id?: string
+      price?: string | number
+      side?: string
+    }>
+    const out: Record<string, { price: number; side: 'BUY' | 'SELL' }> = {}
+    for (const row of res ?? []) {
+      const tokenId = String(row.token_id ?? '')
+      const price = Number(row.price ?? 0)
+      if (tokenId && Number.isFinite(price)) {
+        out[tokenId] = { price, side: row.side === 'SELL' ? 'SELL' : 'BUY' }
+      }
+    }
+    return out
+  } catch {
+    return {}
+  }
+}

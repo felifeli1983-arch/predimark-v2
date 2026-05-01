@@ -1,5 +1,12 @@
 import { NextResponse } from 'next/server'
-import { CLOB_URL, CLOB_CHAIN, BUILDER_CODE, getMidpoint } from '@/lib/polymarket/clob'
+import {
+  CLOB_URL,
+  CLOB_CHAIN,
+  BUILDER_CODE,
+  getMidpoint,
+  getClobOk,
+  getServerTime,
+} from '@/lib/polymarket/clob'
 
 /**
  * GET /api/v1/polymarket/health
@@ -23,18 +30,34 @@ export async function GET(request: Request): Promise<NextResponse> {
     builderCodeConfigured: Boolean(BUILDER_CODE),
   }
 
+  // Doc Public Methods → getOk + getServerTime: probe upstream CLOB.
+  // Clock skew check: warn se server time differisce dal nostro >30s
+  // (potrebbe causare GTD expiration off-by-X).
+  const [clobOk, serverTime] = await Promise.all([getClobOk(), getServerTime()])
+  const localTime = Math.floor(Date.now() / 1000)
+  const clockSkewSec = serverTime !== null ? Math.abs(serverTime - localTime) : null
+
+  const upstream = {
+    clobOk,
+    serverTime,
+    localTime,
+    clockSkewSec,
+    clockSkewWarn: clockSkewSec !== null && clockSkewSec > 30,
+  }
+
   if (!tokenId) {
-    return NextResponse.json({ ok: true, config })
+    return NextResponse.json({ ok: clobOk, config, upstream })
   }
 
   try {
     const mid = await getMidpoint(tokenId)
-    return NextResponse.json({ ok: true, config, midpoint: mid, tokenId })
+    return NextResponse.json({ ok: clobOk, config, upstream, midpoint: mid, tokenId })
   } catch (err) {
     return NextResponse.json(
       {
         ok: false,
         config,
+        upstream,
         error: err instanceof Error ? err.message : 'Errore sconosciuto',
       },
       { status: 502 }
