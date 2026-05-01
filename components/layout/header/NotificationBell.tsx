@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Bell, CheckCircle2, XCircle, Award, X } from 'lucide-react'
 import { usePrivy } from '@privy-io/react-auth'
+import { useUserChannel } from '@/lib/hooks/useUserChannel'
 
 interface PolymarketNotification {
   id: number
@@ -12,13 +13,22 @@ interface PolymarketNotification {
   timestamp: number | null
 }
 
-const POLL_MS = 60_000
+/** Safety net polling fallback se WS si disconnette per >5min. */
+const FALLBACK_POLL_MS = 5 * 60 * 1000
 
 /**
  * Notifiche eventi Polymarket — Doc L2 Methods → getNotifications.
- * Polling 60s mentre l'utente è auth + dropdown lista al click sul bell.
  *
- * Tipi notifica (Doc):
+ * REAL-TIME PUSH via WS User Channel (Doc WebSocket User Channel).
+ * Quando arriva un evento ORDER (cancellation/match) o TRADE
+ * (matched/confirmed), trigger un refetch della lista notifiche dal
+ * server (che resta source of truth, perché getNotifications include
+ * anche market_resolved che il WS user channel non emette).
+ *
+ * Polling fallback ogni 5min come safety net (WS disconnessa, network
+ * issue, ecc).
+ *
+ * Tipi notifica (Doc L2):
  *  - 1 cancellation: ordine cancellato (es. expired GTD)
  *  - 2 fill: ordine matchato (parziale o totale)
  *  - 4 market_resolved: market chiuso → posizione redeem-able
@@ -29,34 +39,38 @@ export function NotificationBell({ iconBtnStyle }: { iconBtnStyle: React.CSSProp
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
+  const load = useCallback(async () => {
+    try {
+      const token = await getAccessToken()
+      if (!token) return
+      const res = await fetch('/api/v1/users/me/polymarket/notifications', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) return
+      const body = (await res.json()) as { items?: PolymarketNotification[] }
+      setItems(body.items ?? [])
+    } catch {
+      /* silent */
+    }
+  }, [getAccessToken])
+
   useEffect(() => {
     if (!authenticated) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setItems([])
       return
     }
-    let cancelled = false
-    async function load() {
-      try {
-        const token = await getAccessToken()
-        if (!token) return
-        const res = await fetch('/api/v1/users/me/polymarket/notifications', {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (!res.ok) return
-        const body = (await res.json()) as { items?: PolymarketNotification[] }
-        if (!cancelled) setItems(body.items ?? [])
-      } catch {
-        /* silent */
-      }
-    }
     void load()
-    const id = setInterval(load, POLL_MS)
-    return () => {
-      cancelled = true
-      clearInterval(id)
+    const id = setInterval(load, FALLBACK_POLL_MS)
+    return () => clearInterval(id)
+  }, [authenticated, load])
+
+  // Push real-time: ogni order/trade event → refetch (server è source of truth)
+  useUserChannel((event) => {
+    if (event.event_type === 'order' || event.event_type === 'trade') {
+      void load()
     }
-  }, [authenticated, getAccessToken])
+  })
 
   // Chiudi dropdown su click outside
   useEffect(() => {

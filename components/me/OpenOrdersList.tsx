@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { ListOrdered, Loader2, Trash2, X, Sparkles } from 'lucide-react'
 
@@ -12,6 +12,7 @@ import {
   type OpenOrderRow,
 } from '@/lib/api/orders-client'
 import { useHeartbeat } from '@/lib/hooks/useHeartbeat'
+import { useUserChannel } from '@/lib/hooks/useUserChannel'
 
 /**
  * Lista ordini live (resting on book) con bottone Cancel per riga.
@@ -19,9 +20,10 @@ import { useHeartbeat } from '@/lib/hooks/useHeartbeat'
  * o cancel; GTD scadono auto. Cancel idempotente (ordine già matched
  * → 409 gracefully).
  *
- * Polling 30s per catturare status changes (live → matched/cancelled).
+ * REAL-TIME PUSH via WS User Channel (Doc WebSocket User Channel) +
+ * fallback polling 5min come safety net se WS si disconnette.
  */
-const POLL_INTERVAL_MS = 30_000
+const FALLBACK_POLL_MS = 5 * 60 * 1000
 
 export function OpenOrdersList() {
   const { ready, authenticated, getAccessToken, login } = usePrivy()
@@ -37,45 +39,45 @@ export function OpenOrdersList() {
   // di inattività (Doc Orders Overview).
   useHeartbeat(authenticated && items.length > 0)
 
+  const load = useCallback(async () => {
+    try {
+      const token = await getAccessToken()
+      if (!token) return
+      const data = await fetchOpenOrders(token)
+      setItems(data.items)
+      setReservedSize(data.meta.reservedSize)
+      setError(null)
+      const ids = data.items.map((o) => o.id)
+      if (ids.length > 0) {
+        const map = await fetchOrderScoring(token, ids)
+        setScoring(map)
+      } else {
+        setScoring({})
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Errore')
+    } finally {
+      setLoading(false)
+    }
+  }, [getAccessToken])
+
   useEffect(() => {
     if (!ready || !authenticated) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false)
       return
     }
-    let cancelled = false
-    async function load() {
-      try {
-        const token = await getAccessToken()
-        if (!token) return
-        const data = await fetchOpenOrders(token)
-        if (cancelled) return
-        setItems(data.items)
-        setReservedSize(data.meta.reservedSize)
-        setError(null)
-        // Maker rebate eligibility — solo per ordini live attualmente
-        // resting (Doc Cancel Order → Order Scoring). Best-effort: il
-        // fetch fallisce silenzioso, no badge mostrato.
-        const ids = data.items.map((o) => o.id)
-        if (ids.length > 0) {
-          const map = await fetchOrderScoring(token, ids)
-          if (!cancelled) setScoring(map)
-        } else {
-          setScoring({})
-        }
-      } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Errore')
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
     void load()
-    const id = setInterval(load, POLL_INTERVAL_MS)
-    return () => {
-      cancelled = true
-      clearInterval(id)
+    const id = setInterval(load, FALLBACK_POLL_MS)
+    return () => clearInterval(id)
+  }, [ready, authenticated, load])
+
+  // Push real-time: ogni order/trade event refetch list (server è source of truth)
+  useUserChannel((event) => {
+    if (event.event_type === 'order' || event.event_type === 'trade') {
+      void load()
     }
-  }, [ready, authenticated, getAccessToken])
+  })
 
   async function handleCancel(orderId: string) {
     if (cancellingId) return
