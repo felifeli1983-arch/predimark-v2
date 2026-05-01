@@ -18,6 +18,7 @@ import { PriceHistoryChart } from './PriceHistoryChart'
 import { CryptoRoundNav } from './CryptoRoundNav'
 import { SentimentCard } from './SentimentCard'
 import { RelatedMarkets } from './RelatedMarkets'
+import { CancelMarketOrdersButton } from './CancelMarketOrdersButton'
 
 interface Props {
   event: AuktoraEvent
@@ -155,6 +156,9 @@ export function EventPageShell({ event }: Props) {
             <CryptoRoundNav seriesSlug={event.seriesSlug} currentSlug={event.slug} />
           )}
           <EventProbabilities event={event} onTrade={openTradeWidget} />
+          <CancelMarketOrdersButton
+            conditionIds={event.markets.map((m) => m.conditionId).filter(Boolean)}
+          />
           <EventRules
             description={event.description}
             resolutionSource={event.markets[0]?.resolutionSource}
