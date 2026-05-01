@@ -36,6 +36,13 @@ export interface BuilderTradeRow {
   feeUsdc: number
   transactionHash: string
   matchTime: string
+  /**
+   * Builder code attribution (bytes32) — Doc Order Attribution.
+   * Sanity check: deve coincidere con BUILDER_CODE configurato.
+   * Se differisce, il trade è stato attribuito a un'altra app (mai
+   * dovrebbe succedere visto che filtriamo per builder_code in fetch).
+   */
+  builder: string
 }
 
 export interface BuilderStats {
@@ -115,6 +122,7 @@ export async function getBuilderTrades(params: {
       feeUsdc: Number(r.feeUsdc ?? 0),
       transactionHash: String(r.transactionHash ?? ''),
       matchTime: String(r.matchTime ?? ''),
+      builder: String(r.builder ?? ''),
     }))
   } catch (err) {
     console.error('[builder.getBuilderTrades]', err)
