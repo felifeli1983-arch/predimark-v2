@@ -3,8 +3,10 @@ import {
   Chain,
   Side,
   SignatureTypeV2,
+  OrderType,
   type SignedOrder,
   type UserOrderV2,
+  type UserMarketOrderV2,
   type CreateOrderOptions,
   type TickSize,
 } from '@polymarket/clob-client-v2'
@@ -89,6 +91,35 @@ export interface BuildSellOrderInput {
   negRisk?: boolean
 }
 
+export interface BuildMarketOrderInput {
+  signer: WalletClient
+  funderAddress: string
+  tokenId: string
+  conditionId?: string | null
+  /**
+   * BUY: USDC amount da spendere (es. $5).
+   * SELL: numero di shares da vendere.
+   */
+  amount: number
+  side: 'BUY' | 'SELL'
+  /**
+   * Prezzo limite opzionale — se omesso il SDK usa il market price.
+   * Per Auktora passiamo sempre il prezzo snapshot al click così
+   * proteggiamo dall'imprevisto slippage di prezzo tra widget e submit.
+   */
+  price?: number
+  /**
+   * FOK (default) = fill all or kill — istantaneo, no resto on book.
+   * FAK = fill what's available, cancel resto. Doc Order Lifecycle.
+   */
+  orderType?: OrderType.FOK | OrderType.FAK
+  walletKind?: WalletKind
+  tickSize?: TickSize
+  negRisk?: boolean
+  /** USDC balance dell'utente — se ≥ amount+fees, no slippage extra. */
+  userUsdcBalance?: number
+}
+
 /**
  * Build + sign un BUY order V2.
  * - Se tickSize/negRisk non sono passati, vengono fetchati da getMarket(conditionId)
@@ -127,6 +158,49 @@ export async function buildAndSignOrder(input: BuildOrderInput): Promise<SignedO
   })
 
   return await client.createOrder(userOrder, options)
+}
+
+/**
+ * Build + sign un MARKET order V2 (instant fill — Doc L1 Methods →
+ * createMarketOrder).
+ *
+ * Differenza vs buildAndSignOrder (limit):
+ *  - Usa `amount` ($ per BUY, shares per SELL) invece di size+price
+ *  - SDK calcola size = amount/price con slippage protection automatica
+ *  - orderType FOK (default) o FAK — non fa rest on book
+ *
+ * Per BUY $5 di YES @ 27¢: amount=5, side=BUY, price=0.27 → SDK firma
+ * un order che riempe ~18.5 shares al meglio possibile, FOK kill se non
+ * matchabile interamente al prezzo dato.
+ */
+export async function buildAndSignMarketOrder(input: BuildMarketOrderInput): Promise<SignedOrder> {
+  const resolved = await resolveTickAndRisk(input)
+  if (!Number.isFinite(input.amount) || input.amount <= 0) {
+    throw new Error('amount non valido')
+  }
+
+  const userMarketOrder: UserMarketOrderV2 = {
+    tokenID: input.tokenId,
+    amount: input.amount,
+    side: input.side === 'SELL' ? Side.SELL : Side.BUY,
+    builderCode: BUILDER_CODE,
+    ...(input.price !== undefined && { price: input.price }),
+    ...(input.orderType !== undefined && { orderType: input.orderType }),
+    ...(input.userUsdcBalance !== undefined && { userUSDCBalance: input.userUsdcBalance }),
+  }
+
+  const options: CreateOrderOptions = { tickSize: resolved.tickSize, negRisk: resolved.negRisk }
+
+  const client = new ClobClient({
+    host: CLOB_URL,
+    chain: Chain.POLYGON,
+    signer: input.signer,
+    funderAddress: input.funderAddress,
+    signatureType: toSigType(input.walletKind ?? 'eoa'),
+    throwOnError: true,
+  })
+
+  return await client.createMarketOrder(userMarketOrder, options)
 }
 
 /**

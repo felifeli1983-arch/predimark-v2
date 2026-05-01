@@ -10,7 +10,7 @@ import type { TradeSubmitResponse } from '@/app/api/v1/trades/submit/route'
 import { useTradeWidget } from '@/lib/stores/useTradeWidget'
 import { balanceActions } from '@/lib/stores/useBalance'
 import { useThemeStore } from '@/lib/stores/themeStore'
-import { buildAndSignOrder } from '@/lib/polymarket/order-create'
+import { buildAndSignOrder, buildAndSignMarketOrder } from '@/lib/polymarket/order-create'
 
 export type TradeSubmitStatus = 'idle' | 'submitting' | 'signing' | 'success' | 'error'
 
@@ -37,6 +37,7 @@ export function useTradeSubmit(): UseTradeSubmitResult {
   const isDemo = useThemeStore((s) => s.isDemo)
   const draft = useTradeWidget((s) => s.draft)
   const amountUsdc = useTradeWidget((s) => s.amountUsdc)
+  const mode = useTradeWidget((s) => s.mode)
   const closeWidget = useTradeWidget((s) => s.close)
 
   const [status, setStatus] = useState<TradeSubmitStatus>('idle')
@@ -101,17 +102,29 @@ export function useTradeSubmit(): UseTradeSubmitResult {
           chain: polygon,
           transport: custom(provider),
         })
-        const signedOrder = await buildAndSignOrder({
-          signer: walletClient,
-          funderAddress: embedded.address,
-          tokenId: draft.tokenId,
-          conditionId: draft.conditionId,
-          side: draft.side,
-          pricePerShare: draft.pricePerShare,
-          amountUsdc,
-          // walletKind default 'eoa' — Privy embedded wallet è EOA. Path A
-          // (Polymarket import) imposterà 'poly_proxy' quando wired.
-        })
+        // Market mode (default) usa createMarketOrder del SDK V2 — Doc
+        // L1 Methods. Slippage protection automatica + FOK semantics.
+        // Limit mode usa createOrder con price+size esatti (GTC/GTD).
+        const signedOrder =
+          mode === 'market'
+            ? await buildAndSignMarketOrder({
+                signer: walletClient,
+                funderAddress: embedded.address,
+                tokenId: draft.tokenId,
+                conditionId: draft.conditionId,
+                side: 'BUY',
+                amount: amountUsdc,
+                price: draft.pricePerShare,
+              })
+            : await buildAndSignOrder({
+                signer: walletClient,
+                funderAddress: embedded.address,
+                tokenId: draft.tokenId,
+                conditionId: draft.conditionId,
+                side: draft.side,
+                pricePerShare: draft.pricePerShare,
+                amountUsdc,
+              })
         payload = {
           ...basePayload,
           tokenId: draft.tokenId,
@@ -139,7 +152,7 @@ export function useTradeSubmit(): UseTradeSubmitResult {
       setStatus('error')
       return null
     }
-  }, [authenticated, draft, amountUsdc, isDemo, wallets, getAccessToken, closeWidget])
+  }, [authenticated, draft, amountUsdc, mode, isDemo, wallets, getAccessToken, closeWidget])
 
   const reset = useCallback(() => {
     setStatus('idle')
