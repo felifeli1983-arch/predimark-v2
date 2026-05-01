@@ -254,6 +254,7 @@ function StrikeListView({ event, onTrade }: ViewProps) {
           <OutcomeRowFull
             key={m.id}
             market={m}
+            event={event}
             highlighted={i === currentIdx}
             onTrade={(side) => onTrade(m.id, side)}
           />
@@ -282,6 +283,7 @@ function OutcomeListView({ event, onTrade }: ViewProps) {
           <OutcomeRowFull
             key={m.id}
             market={m}
+            event={event}
             label={m.groupItemTitle || m.question}
             onTrade={(side) => onTrade(m.id, side)}
           />

@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import type { AuktoraMarket } from '@/lib/polymarket/mappers'
+import type { AuktoraEvent, AuktoraMarket } from '@/lib/polymarket/mappers'
 import { subscribeToTickInvalidation } from '@/lib/ws/global-effects'
 import { OrderBookPanel } from './OrderBookPanel'
+import { BetSlipAddButton } from '@/components/markets/BetSlipAddButton'
 
 interface Props {
   market: AuktoraMarket
+  /** Event parent — usato per BetSlipAddButton context. */
+  event: AuktoraEvent
   /** Override per multi-strike: true mostra "Currently" badge */
   highlighted?: boolean
   /** Label custom (es. groupItemTitle pulito); fallback a market.question */
@@ -15,7 +18,7 @@ interface Props {
   onTrade: (side: 'yes' | 'no') => void
 }
 
-export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
+export function OutcomeRowFull({ market, event, highlighted, label, onTrade }: Props) {
   const [expanded, setExpanded] = useState(false)
 
   // WS tick_size_change listener — invalida la cache _detailsCache di
@@ -121,8 +124,11 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
           {pct}%
         </span>
 
-        {/* Col 3 desktop / row 2 spans full mobile: buttons Sì/No */}
-        <div className="outcome-row__btns" style={{ display: 'flex', gap: 8, justifySelf: 'end' }}>
+        {/* Col 3 desktop / row 2 spans full mobile: buttons Sì/No + Bet Slip "+" */}
+        <div
+          className="outcome-row__btns"
+          style={{ display: 'flex', gap: 8, justifySelf: 'end', alignItems: 'center' }}
+        >
           <SideBtn
             label={`Sì ${yesCents}¢`}
             variant="yes"
@@ -133,6 +139,14 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
               onTrade('yes')
             }}
           />
+          <BetSlipAddButton
+            event={event}
+            market={market}
+            side="yes"
+            outcomeLabel={`Sì · ${displayLabel}`}
+            pricePerShare={market.yesPrice}
+            tokenId={market.clobTokenIds?.[0] ?? ''}
+          />
           <SideBtn
             label={`No ${noCents}¢`}
             variant="no"
@@ -142,6 +156,14 @@ export function OutcomeRowFull({ market, highlighted, label, onTrade }: Props) {
               e.stopPropagation()
               onTrade('no')
             }}
+          />
+          <BetSlipAddButton
+            event={event}
+            market={market}
+            side="no"
+            outcomeLabel={`No · ${displayLabel}`}
+            pricePerShare={market.noPrice}
+            tokenId={market.clobTokenIds?.[1] ?? ''}
           />
         </div>
 

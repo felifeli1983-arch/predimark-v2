@@ -12,6 +12,7 @@ import { OnboardingModal } from '@/components/onboarding/OnboardingModal'
 import { WatchlistHydrator } from '@/components/WatchlistHydrator'
 import { BalanceHydrator } from '@/components/BalanceHydrator'
 import { RedeemAutoPrompt } from '@/components/me/RedeemAutoPrompt'
+import { BetSlipDrawer } from '@/components/trade/BetSlipDrawer'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -114,6 +115,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {/* Redeem prompt globale — modal + polling unclaimed wins.
                     Apertura via auto-detect o click sul Gift icon header. */}
                 <RedeemAutoPrompt />
+                <BetSlipDrawer />
               </div>
             </ThemeProvider>
           </PrivyProvider>

@@ -1,6 +1,6 @@
 'use client'
 
-import { Gift, Sun, Moon, Wallet, TrendingUp, Star } from 'lucide-react'
+import { Gift, Sun, Moon, Wallet, TrendingUp, Star, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
 import { useFundWallet, useWallets, getEmbeddedConnectedWallet } from '@privy-io/react-auth'
@@ -12,6 +12,7 @@ import { useRedeemPromptStore } from '@/lib/stores/useRedeemPrompt'
 import { ProfileDropdown } from './ProfileDropdown'
 import { RealDemoToggle } from './RealDemoToggle'
 import { NotificationBell } from './NotificationBell'
+import { useBetSlip } from '@/lib/stores/useBetSlip'
 
 interface Props {
   ready: boolean
@@ -245,6 +246,8 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
         </Link>
       )}
 
+      <BetSlipButton iconBtnStyle={iconBtnStyle} />
+
       <NotificationBell iconBtnStyle={iconBtnStyle} />
 
       {authenticated && <RealDemoToggle isDemo={isDemo} onToggle={toggleDemo} />}
@@ -350,5 +353,42 @@ function BalancePill({
         </strong>
       </div>
     </div>
+  )
+}
+
+function BetSlipButton({ iconBtnStyle }: { iconBtnStyle: React.CSSProperties }) {
+  const count = useBetSlip((s) => s.legs.length)
+  const setOpen = useBetSlip((s) => s.setOpen)
+  if (count === 0) return null
+  return (
+    <button
+      type="button"
+      aria-label={`Apri Bet Slip (${count} previsioni)`}
+      onClick={() => setOpen(true)}
+      style={{ ...iconBtnStyle, display: 'flex', position: 'relative' }}
+    >
+      <ShoppingBag size={15} />
+      <span
+        style={{
+          position: 'absolute',
+          top: 2,
+          right: 2,
+          minWidth: 14,
+          height: 14,
+          padding: '0 3px',
+          borderRadius: 'var(--radius-full)',
+          background: 'var(--color-cta)',
+          color: '#fff',
+          fontSize: 9,
+          fontWeight: 800,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1,
+        }}
+      >
+        {count}
+      </span>
+    </button>
   )
 }

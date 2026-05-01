@@ -100,6 +100,46 @@ export async function cancelOrders(orderIDs: string[], creds: ApiKeyCreds): Prom
   await authClient(creds).cancelOrders(orderIDs)
 }
 
+/**
+ * Batch post di N SignedOrder pre-firmati in 1 call SDK (Doc L2 Methods
+ * → postOrders). Massimo 15 ordini.
+ *
+ * Usato da BetSlipDrawer per multi-leg submit. Più efficient di N call
+ * sequenziali — Polymarket processa atomicamente.
+ *
+ * Ritorna array N risultati paralleli all'input order. Risultato per-leg
+ * include orderID/status oppure errorMsg.
+ */
+export interface BatchOrderResult {
+  ok: boolean
+  orderID?: string
+  status?: string
+  errorMsg?: string
+}
+
+export async function postSignedOrdersBatch(
+  signedOrders: Array<{ signedOrder: SignedOrder; orderType?: OrderType }>,
+  creds: ApiKeyCreds
+): Promise<BatchOrderResult[]> {
+  if (signedOrders.length === 0) return []
+  const args = signedOrders.map((s) => ({
+    order: s.signedOrder,
+    orderType: s.orderType ?? OrderType.FOK,
+  }))
+  const res = (await authClient(creds).postOrders(args as never)) as Array<{
+    success?: boolean
+    orderID?: string
+    status?: string
+    errorMsg?: string
+  }>
+  return (res ?? []).map((r) => ({
+    ok: Boolean(r?.success && r?.orderID),
+    orderID: r?.orderID,
+    status: r?.status,
+    errorMsg: r?.errorMsg,
+  }))
+}
+
 /** Cancella TUTTI gli ordini live dell'utente. */
 export async function cancelAllOrders(creds: ApiKeyCreds): Promise<void> {
   await authClient(creds).cancelAll()
