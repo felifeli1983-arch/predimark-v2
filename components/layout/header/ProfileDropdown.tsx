@@ -1,9 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import { ChevronDown, LogOut, Activity, History, Wallet, Star, Settings } from 'lucide-react'
+import {
+  ChevronDown,
+  LogOut,
+  Activity,
+  History,
+  Wallet,
+  Star,
+  Settings,
+  Sun,
+  Moon,
+} from 'lucide-react'
 import { useEffect, useRef, useState, type ComponentType, type SVGProps } from 'react'
 import type { AuthUser } from '@/lib/hooks/useAuth'
+import { useThemeStore } from '@/lib/stores/themeStore'
 
 type IconType = ComponentType<SVGProps<SVGSVGElement> & { size?: number | string }>
 
@@ -29,6 +40,8 @@ interface Props {
 export function ProfileDropdown({ user, onLogout }: Props) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const theme = useThemeStore((s) => s.theme)
+  const toggleTheme = useThemeStore((s) => s.toggleTheme)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -142,6 +155,28 @@ export function ProfileDropdown({ user, onLogout }: Props) {
               {label}
             </Link>
           ))}
+
+          <div style={{ height: '1px', background: 'var(--color-border-subtle)' }} />
+          <button
+            type="button"
+            onClick={toggleTheme}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 16px',
+              color: 'var(--color-text-secondary)',
+              background: 'none',
+              border: 'none',
+              width: '100%',
+              textAlign: 'left',
+              fontSize: '13px',
+              cursor: 'pointer',
+            }}
+          >
+            {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+            {theme === 'dark' ? 'Tema chiaro' : 'Tema scuro'}
+          </button>
 
           <div style={{ height: '1px', background: 'var(--color-border-subtle)' }} />
           <button

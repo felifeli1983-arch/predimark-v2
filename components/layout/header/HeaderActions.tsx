@@ -1,6 +1,6 @@
 'use client'
 
-import { Gift, Sun, Moon, Wallet, TrendingUp, Star, ShoppingBag } from 'lucide-react'
+import { Gift, Wallet, TrendingUp, Star, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
 import { useFundWallet, useWallets, getEmbeddedConnectedWallet } from '@privy-io/react-auth'
@@ -23,8 +23,9 @@ interface Props {
 }
 
 export function HeaderActions({ ready, authenticated, user, login, logout }: Props) {
-  // theme + isDemo dal Zustand store globale (persiste in localStorage)
-  const { theme, toggleTheme, isDemo, toggleDemo } = useThemeStore()
+  // isDemo dal Zustand store globale (persiste in localStorage). Theme
+  // toggle è stato spostato nel ProfileDropdown per liberare spazio header.
+  const { isDemo, toggleDemo } = useThemeStore()
   // Balance dallo store (sync via BalanceHydrator)
   const usdcBalance = useBalance((s) => s.usdcBalance)
   const demoBalance = useBalance((s) => s.demoBalance)
@@ -179,15 +180,6 @@ export function HeaderActions({ ready, authenticated, user, login, logout }: Pro
           )}
         </div>
       )}
-
-      <button
-        className="hidden md:flex"
-        onClick={toggleTheme}
-        aria-label="Toggle tema"
-        style={iconBtnStyle}
-      >
-        {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
-      </button>
 
       {authenticated && (
         <button
