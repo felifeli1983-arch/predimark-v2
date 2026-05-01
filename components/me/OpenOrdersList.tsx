@@ -2,9 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
-import { ListOrdered, Loader2, Trash2, X } from 'lucide-react'
+import { ListOrdered, Loader2, Trash2, X, Sparkles } from 'lucide-react'
 
-import { fetchOpenOrders, deleteOrder, type OpenOrderRow } from '@/lib/api/orders-client'
+import {
+  fetchOpenOrders,
+  deleteOrder,
+  deleteAllOrders,
+  fetchOrderScoring,
+  type OpenOrderRow,
+} from '@/lib/api/orders-client'
 import { useHeartbeat } from '@/lib/hooks/useHeartbeat'
 
 /**
@@ -24,6 +30,7 @@ export function OpenOrdersList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [cancellingId, setCancellingId] = useState<string | null>(null)
+  const [scoring, setScoring] = useState<Record<string, boolean>>({})
 
   // Heartbeat ogni 5s mentre l'utente ha open orders attivi.
   // Senza questo, Polymarket auto-cancella tutti gli orders dopo 10s
@@ -46,6 +53,16 @@ export function OpenOrdersList() {
         setItems(data.items)
         setReservedSize(data.meta.reservedSize)
         setError(null)
+        // Maker rebate eligibility — solo per ordini live attualmente
+        // resting (Doc Cancel Order → Order Scoring). Best-effort: il
+        // fetch fallisce silenzioso, no badge mostrato.
+        const ids = data.items.map((o) => o.id)
+        if (ids.length > 0) {
+          const map = await fetchOrderScoring(token, ids)
+          if (!cancelled) setScoring(map)
+        } else {
+          setScoring({})
+        }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Errore')
       } finally {
@@ -82,16 +99,13 @@ export function OpenOrdersList() {
     try {
       const token = await getAccessToken()
       if (!token) throw new Error('Sessione scaduta')
-      // Sequential — l'API CLOB ha cancelAll() ma per ora useto loop
-      // così cattura granularly errori per singolo ordine.
-      const ids = items.map((o) => o.id)
-      const results = await Promise.allSettled(ids.map((id) => deleteOrder(token, id)))
-      const failed = results.filter((r) => r.status === 'rejected')
-      if (failed.length === 0) setItems([])
-      else
-        setError(
-          `${failed.length}/${ids.length} ordini non cancellati (alcuni già matched?)`
-        )
+      // 1-call cancelAll() del CLOB (Doc Cancel Order). Più veloce e
+      // atomico del loop precedente. Optimistic clear della lista; il
+      // polling 30s sincronizza eventuali ordini residui (es. matched
+      // tra request e response).
+      await deleteAllOrders(token)
+      setItems([])
+      setScoring({})
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore')
     } finally {
@@ -204,6 +218,7 @@ export function OpenOrdersList() {
               onCancel={() => handleCancel(order.id)}
               isCancelling={cancellingId === order.id}
               disabled={cancellingId !== null}
+              earningRebate={scoring[order.id] ?? false}
             />
           </li>
         ))}
@@ -217,11 +232,13 @@ function OrderRow({
   onCancel,
   isCancelling,
   disabled,
+  earningRebate,
 }: {
   order: OpenOrderRow
   onCancel: () => void
   isCancelling: boolean
   disabled: boolean
+  earningRebate: boolean
 }) {
   const sideColor = order.side === 'BUY' ? 'var(--color-success)' : 'var(--color-danger)'
   const remainingPct = order.originalSize > 0 ? (order.remaining / order.originalSize) * 100 : 100
@@ -262,9 +279,31 @@ function OrderRow({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             color: 'var(--color-text-primary)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
           }}
         >
           {order.outcome || 'Outcome'} @ {(order.price * 100).toFixed(2)}¢
+          {earningRebate && (
+            <span
+              title="Maker rebate attivo — questo ordine accumula incentivi liquidity provider"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+                padding: '1px 6px',
+                borderRadius: 'var(--radius-full)',
+                background: 'color-mix(in srgb, var(--color-success) 14%, transparent)',
+                color: 'var(--color-success)',
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+              }}
+            >
+              <Sparkles size={9} /> REBATE
+            </span>
+          )}
         </div>
         <div
           style={{

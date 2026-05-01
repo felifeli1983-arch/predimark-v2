@@ -106,6 +106,32 @@ export async function cancelAllOrders(creds: ApiKeyCreds): Promise<void> {
 }
 
 /**
+ * Cancella tutti gli ordini per uno specifico market (conditionId),
+ * opzionalmente filtrato a un singolo asset_id (token YES o NO).
+ *
+ * Use case: utente apre un evento e vuole cancellare solo gli ordini
+ * su quello (lasciando gli altri intatti). Più chirurgico di cancelAll.
+ *
+ * Doc "Cancel Order": Cancel by Market — entrambi i parametri opzionali.
+ */
+export async function cancelMarketOrders(
+  creds: ApiKeyCreds,
+  filters: { market?: string; assetId?: string } = {}
+): Promise<{ canceled: string[]; notCanceled: Record<string, string> }> {
+  const params: { market?: string; asset_id?: string } = {}
+  if (filters.market) params.market = filters.market
+  if (filters.assetId) params.asset_id = filters.assetId
+  const res = (await authClient(creds).cancelMarketOrders(params)) as {
+    canceled?: string[]
+    not_canceled?: Record<string, string>
+  }
+  return {
+    canceled: res.canceled ?? [],
+    notCanceled: res.not_canceled ?? {},
+  }
+}
+
+/**
  * Lista ordini "live" (resting on book) dell'utente. Filtri opzionali
  * per market/assetId. Usato da /me/orders + maxOrderSize calc per
  * sottrarre la "reserved size" dal balance disponibile.
@@ -173,6 +199,103 @@ export async function postHeartbeat(
     heartbeat_id?: string
   }
   return { heartbeatId: res.heartbeat_id ?? '' }
+}
+
+export interface UserTradeRow {
+  id: string
+  takerOrderId: string
+  market: string
+  assetId: string
+  side: 'BUY' | 'SELL'
+  size: number
+  price: number
+  feeRateBps: number
+  status: string
+  matchTime: string
+  outcome: string
+  makerAddress: string
+  transactionHash: string
+  traderSide: 'TAKER' | 'MAKER'
+}
+
+/**
+ * Trade history utente — paginato cursor-based via SDK V2.
+ * Filtri opzionali per market/assetId/before/after.
+ *
+ * Doc "Cancel Order" → Trade History: trade transitano per status
+ * MATCHED → MINED → CONFIRMED (terminale) | RETRYING → FAILED.
+ *
+ * Per riconciliazione split-trade (trade su più tx per gas limit),
+ * usare bucket_index + match_time del payload raw.
+ */
+export async function getOrderTrades(
+  creds: ApiKeyCreds,
+  filters: {
+    market?: string
+    assetId?: string
+    before?: string
+    after?: string
+    cursor?: string
+  } = {}
+): Promise<{ trades: UserTradeRow[]; nextCursor: string }> {
+  const params: Record<string, string> = {}
+  if (filters.market) params.market = filters.market
+  if (filters.assetId) params.asset_id = filters.assetId
+  if (filters.before) params.before = filters.before
+  if (filters.after) params.after = filters.after
+  if (filters.cursor) params.next_cursor = filters.cursor
+  const res = (await authClient(creds).getTrades(params)) as {
+    data?: Array<Record<string, unknown>>
+    next_cursor?: string
+  }
+  const rows = res?.data ?? []
+  return {
+    trades: rows.map((r) => ({
+      id: String(r.id ?? ''),
+      takerOrderId: String(r.taker_order_id ?? ''),
+      market: String(r.market ?? ''),
+      assetId: String(r.asset_id ?? ''),
+      side: r.side === 'SELL' ? 'SELL' : 'BUY',
+      size: Number(r.size ?? 0),
+      price: Number(r.price ?? 0),
+      feeRateBps: Number(r.fee_rate_bps ?? 0),
+      status: String(r.status ?? ''),
+      matchTime: String(r.match_time ?? ''),
+      outcome: String(r.outcome ?? ''),
+      makerAddress: String(r.maker_address ?? ''),
+      transactionHash: String(r.transaction_hash ?? ''),
+      traderSide: r.trader_side === 'MAKER' ? 'MAKER' : 'TAKER',
+    })),
+    nextCursor: res.next_cursor ?? '',
+  }
+}
+
+/**
+ * Verifica se un ordine resting è eligibile per maker rebates
+ * (incentivi per liquidity provider). Doc "Cancel Order" →
+ * Order Scoring. Usato da OpenOrdersList per badge "Earning rebate".
+ */
+export async function isOrderScoring(creds: ApiKeyCreds, orderId: string): Promise<boolean> {
+  const res = (await authClient(creds).isOrderScoring({ order_id: orderId })) as
+    | { scoring?: boolean }
+    | boolean
+  if (typeof res === 'boolean') return res
+  return Boolean(res?.scoring)
+}
+
+/** Batch variant per checkare scoring su più ordini in una sola call. */
+export async function areOrdersScoring(
+  creds: ApiKeyCreds,
+  orderIds: string[]
+): Promise<Record<string, boolean>> {
+  if (orderIds.length === 0) return {}
+  const res = (await authClient(creds).areOrdersScoring({ orderIds })) as unknown as
+    | Record<string, boolean>
+    | { scoring?: Record<string, boolean> }
+  if (res && typeof res === 'object' && 'scoring' in res && res.scoring) {
+    return res.scoring as Record<string, boolean>
+  }
+  return (res as Record<string, boolean>) ?? {}
 }
 
 /**
